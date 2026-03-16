@@ -174,5 +174,7 @@ echo "Algorithm: {$record->keyAlgorithm}\n";
 echo "Curve: " . ($record->curve ?? '(none)') . "\n";
 
 // Cleanup
+@unlink(__DIR__ . '/demo_typed.sqlite-shm');
+@unlink(__DIR__ . '/demo_typed.sqlite-wal');
 unlink(__DIR__ . '/demo_typed.sqlite');
 echo "\nDone.\n";

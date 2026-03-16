@@ -73,5 +73,7 @@ $store->collection('certificates')->delete('cert-01');
 echo "After delete: {$store->collection('certificates')->count()} records\n";
 
 // Cleanup
+@unlink(__DIR__ . '/demo.sqlite-shm');
+@unlink(__DIR__ . '/demo.sqlite-wal');
 unlink(__DIR__ . '/demo.sqlite');
 echo "\nDone.\n";
