@@ -3,7 +3,9 @@
     "description": "Simple DAL - Contracts and interfaces",
     "type": "library",
     "license": "MIT",
-    "keywords": ["Simple-DAL"],
+    "keywords": [
+        "Simple-DAL"
+    ],
     "homepage": "https://opensource.duma.sh/libraries/php/simple-dal",
     "authors": [
         {

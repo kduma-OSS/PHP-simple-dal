@@ -3,7 +3,9 @@
     "description": "Simple DAL - Core library",
     "type": "library",
     "license": "MIT",
-    "keywords": ["Simple-DAL"],
+    "keywords": [
+        "Simple-DAL"
+    ],
     "homepage": "https://opensource.duma.sh/libraries/php/simple-dal",
     "authors": [
         {
@@ -13,8 +15,8 @@
     ],
     "require": {
         "php": "^8.4",
-        "kduma/simple-dal-contracts": "^0.1",
-        "kduma/simple-dal-adapter-contracts": "^0.1"
+        "kduma/simple-dal-contracts": "^0.0.2",
+        "kduma/simple-dal-adapter-contracts": "^0.0.2"
     },
     "require-dev": {
         "pestphp/pest": "^3.0"

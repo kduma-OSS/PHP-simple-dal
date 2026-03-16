@@ -3,7 +3,9 @@
     "description": "Simple Data Access Layer - monorepo development root",
     "type": "project",
     "license": "MIT",
-    "keywords": ["Simple-DAL"],
+    "keywords": [
+        "Simple-DAL"
+    ],
     "homepage": "https://opensource.duma.sh/libraries/php/simple-dal",
     "authors": [
         {

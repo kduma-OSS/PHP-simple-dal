@@ -3,7 +3,10 @@
     "description": "Simple DAL - Adapter SPI contracts and conformance tests",
     "type": "library",
     "license": "MIT",
-    "keywords": ["Simple-DAL", "Simple-DAL-adapter"],
+    "keywords": [
+        "Simple-DAL",
+        "Simple-DAL-adapter"
+    ],
     "homepage": "https://opensource.duma.sh/libraries/php/simple-dal",
     "authors": [
         {
@@ -13,7 +16,7 @@
     ],
     "require": {
         "php": "^8.4",
-        "kduma/simple-dal-contracts": "^0.1"
+        "kduma/simple-dal-contracts": "^0.0.2"
     },
     "require-dev": {
         "pestphp/pest": "^3.0"

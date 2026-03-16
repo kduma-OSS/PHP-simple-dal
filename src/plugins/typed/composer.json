@@ -3,7 +3,10 @@
     "description": "Simple DAL - Typed Records plugin with auto-mapping and converters",
     "type": "library",
     "license": "MIT",
-    "keywords": ["Simple-DAL", "Simple-DAL-plugin"],
+    "keywords": [
+        "Simple-DAL",
+        "Simple-DAL-plugin"
+    ],
     "homepage": "https://opensource.duma.sh/libraries/php/simple-dal",
     "authors": [
         {
@@ -13,15 +16,15 @@
     ],
     "require": {
         "php": "^8.4",
-        "kduma/simple-dal-typed-contracts": "^0.1",
-        "kduma/simple-dal-contracts": "^0.1",
-        "kduma/simple-dal-adapter-contracts": "^0.1",
-        "kduma/simple-dal": "^0.1",
+        "kduma/simple-dal-typed-contracts": "^0.0.2",
+        "kduma/simple-dal-contracts": "^0.0.2",
+        "kduma/simple-dal-adapter-contracts": "^0.0.2",
+        "kduma/simple-dal": "^0.0.2",
         "spatie/php-attribute-reader": "^1.0"
     },
     "require-dev": {
         "pestphp/pest": "^3.0",
-        "kduma/simple-dal-db-adapter": "^0.1"
+        "kduma/simple-dal-db-adapter": "^0.0.2"
     },
     "autoload": {
         "psr-4": {
