@@ -42,7 +42,7 @@ jobs:
         run: vendor/bin/monorepo-builder merge
 
       - name: Update branch alias for release
-        run: vendor/bin/monorepo-builder package-alias
+        run: vendor/bin/monorepo-builder package-alias || echo "Skipping package-alias (no existing tags)"
 
       - name: Release
         run: vendor/bin/monorepo-builder release ${{ inputs.version }}
