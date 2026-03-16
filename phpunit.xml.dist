@@ -21,6 +21,9 @@
         <testsuite name="ZIP Adapter">
             <directory>zip-adapter/tests</directory>
         </testsuite>
+        <testsuite name="Typed Plugin">
+            <directory>typed-dal-plugin/tests</directory>
+        </testsuite>
     </testsuites>
     <source>
         <include>
@@ -29,6 +32,8 @@
             <directory>db-adapter/src</directory>
             <directory>directory-adapter/src</directory>
             <directory>zip-adapter/src</directory>
+            <directory>typed-dal-plugin-contracts/src</directory>
+            <directory>typed-dal-plugin/src</directory>
         </include>
     </source>
 </phpunit>

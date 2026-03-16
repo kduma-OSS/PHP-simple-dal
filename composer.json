@@ -9,7 +9,9 @@
         "kduma/simple-dal-contracts": "@dev",
         "kduma/simple-dal-db-adapter": "@dev",
         "kduma/simple-dal-directory-adapter": "@dev",
-        "kduma/simple-dal-zip-adapter": "@dev"
+        "kduma/simple-dal-zip-adapter": "@dev",
+        "kduma/simple-dal-typed-contracts": "@dev",
+        "kduma/simple-dal-typed": "@dev"
     },
     "require-dev": {
         "pestphp/pest": "^3.0",
@@ -22,7 +24,8 @@
             "KDuma\\SimpleDAL\\Tests\\": "library/tests/",
             "KDuma\\SimpleDAL\\Adapter\\Database\\Tests\\": "db-adapter/tests/",
             "KDuma\\SimpleDAL\\Adapter\\Directory\\Tests\\": "directory-adapter/tests/",
-            "KDuma\\SimpleDAL\\Adapter\\Zip\\Tests\\": "zip-adapter/tests/"
+            "KDuma\\SimpleDAL\\Adapter\\Zip\\Tests\\": "zip-adapter/tests/",
+            "KDuma\\SimpleDAL\\Typed\\Tests\\": "typed-dal-plugin/tests/"
         }
     },
     "repositories": [
@@ -30,7 +33,9 @@
         { "type": "path", "url": "./library" },
         { "type": "path", "url": "./db-adapter" },
         { "type": "path", "url": "./directory-adapter" },
-        { "type": "path", "url": "./zip-adapter" }
+        { "type": "path", "url": "./zip-adapter" },
+        { "type": "path", "url": "./typed-dal-plugin-contracts" },
+        { "type": "path", "url": "./typed-dal-plugin" }
     ],
     "minimum-stability": "dev",
     "prefer-stable": true,
