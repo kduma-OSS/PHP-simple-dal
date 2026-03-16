@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to release (e.g. "0.1.0", "patch", "minor", "major")'
+        description: 'Version to release (e.g. "0.1.0")'
         required: true
         type: string
 
@@ -42,23 +42,48 @@ jobs:
       - name: Merge package configs
         run: vendor/bin/monorepo-builder merge
 
+      - name: Bump inter-package deps to release version
+        run: vendor/bin/monorepo-builder bump-interdependency "^${{ inputs.version }}"
+
       - name: Update branch alias for release
-        run: vendor/bin/monorepo-builder package-alias || echo "Skipping package-alias (no existing tags)"
+        run: vendor/bin/monorepo-builder package-alias || true
 
-      - name: Release
-        run: vendor/bin/monorepo-builder release ${{ inputs.version }}
+      - name: Commit and tag release
+        run: |
+          git add -A
+          git commit -m "release v${{ inputs.version }}" --allow-empty
+          git tag "v${{ inputs.version }}"
 
-      - name: Resolve release tag
-        id: tag
-        run: echo "tag=$(git describe --tags --abbrev=0)" >> "$GITHUB_OUTPUT"
+      - name: Compute next dev version
+        id: next
+        run: |
+          IFS='.' read -r major minor patch <<< "${{ inputs.version }}"
+          next_minor=$((minor + 1))
+          echo "version=${major}.${next_minor}" >> "$GITHUB_OUTPUT"
+
+      - name: Bump inter-package deps to next dev version
+        run: vendor/bin/monorepo-builder bump-interdependency "^${{ steps.next.outputs.version }}"
+
+      - name: Update branch alias for next dev
+        run: vendor/bin/monorepo-builder package-alias || true
+
+      - name: Commit next dev version
+        run: |
+          git add -A
+          git diff --cached --quiet && echo "No changes to commit" || git commit -m "open v${{ steps.next.outputs.version }}-dev"
+
+      - name: Push
+        run: |
+          git push origin master
+          git push origin "v${{ inputs.version }}"
 
       - name: Trigger split workflow for tag
-        run: gh workflow run split.yml -f tag=${{ steps.tag.outputs.tag }}
+        run: gh workflow run split.yml -f "tag=v${{ inputs.version }}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.tag.outputs.tag }}
+          tag_name: v${{ inputs.version }}
           generate_release_notes: true
