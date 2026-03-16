@@ -11,7 +11,9 @@ interface TypedCollectionEntityInterface
 {
     public string $name { get; }
 
-    public function create(array $data, ?string $id = null): TypedRecord;
+    public function make(): TypedRecord;
+
+    public function create(TypedRecord $record, ?string $id = null): TypedRecord;
 
     public function find(string $id): TypedRecord;
 
@@ -26,10 +28,6 @@ interface TypedCollectionEntityInterface
     public function filter(FilterInterface $filter): array;
 
     public function save(TypedRecord $record): TypedRecord;
-
-    public function update(string $id, array $data): TypedRecord;
-
-    public function replace(string $id, array $data): TypedRecord;
 
     public function delete(string $id): void;
 

@@ -771,31 +771,36 @@ $config = $store->singleton('ca_config');       // → TypedSingletonEntity
 
 ### Working with Typed Records
 
-The API mirrors the untyped `DataStore`, but all returned records are instances of your typed class:
+Use `make()` to create a blank typed record, set its properties using native PHP types, then persist with `create()` or `set()`:
 
 ```php
-// Create -- pass raw data, get typed record back
-$cert = $store->collection('certificates')->create([
-    'serial_number' => '01',
-    'subject' => ['common_name' => 'example.com'],
-    'status' => 'active',
-    'not_after' => '2027-01-01T00:00:00+00:00',
-    'revocation_reason' => null,
-], id: 'cert-01');
+$certs = $store->collection('certificates');
 
-// Access typed properties directly
+// Create a blank record and populate it
+$cert = $certs->make();
+$cert->serialNumber = '01';
+$cert->commonName = 'example.com';
+$cert->status = CertificateStatus::Active;           // enum, not string
+$cert->notAfter = new DateTimeImmutable('2027-01-01'); // DateTimeImmutable, not string
+$cert->revocationReason = null;
+
+// Persist
+$cert = $certs->create($cert, id: 'cert-01');
+
+// Access typed properties
 echo $cert->commonName;              // "example.com"
-echo $cert->status->value;           // "active" (enum)
-echo $cert->notAfter->format('Y');   // "2027" (DateTimeImmutable)
+echo $cert->status->value;           // "active"
+echo $cert->notAfter->format('Y');   // "2027"
 
-// Mutate and save
+// Find and modify
+$cert = $certs->find('cert-01');
 $cert->status = CertificateStatus::Revoked;
 $cert->revocationReason = 'key_compromise';
-$cert = $store->collection('certificates')->save($cert);
+$cert = $certs->save($cert);
 
-// Find, all, filter -- same API, typed results
-$cert = $store->collection('certificates')->find('cert-01');     // CertificateRecord
-$all  = $store->collection('certificates')->all();               // CertificateRecord[]
+// Other operations
+$cert = $certs->find('cert-01');     // CertificateRecord
+$all  = $certs->all();               // CertificateRecord[]
 ```
 
 **Singletons** work the same way:
@@ -803,16 +808,19 @@ $all  = $store->collection('certificates')->all();               // CertificateR
 ```php
 $config = $store->singleton('ca_config');
 
-$config->set([
-    'issuer' => ['common_name' => 'My Root CA'],
-    'key_algorithm' => 'EC',
-    'curve' => 'P-384',
-]);
+// Create via make() + set()
+$record = $config->make();
+$record->issuerName = 'My Root CA';
+$record->keyAlgorithm = 'EC';
+$record->curve = 'P-384';
+$config->set($record);
 
+// Read
 $record = $config->get();       // CaConfigRecord
 echo $record->issuerName;       // "My Root CA"
 echo $record->keyAlgorithm;     // "EC"
 
+// Modify and save
 $record->keyAlgorithm = 'RSA';
 $record->curve = null;
 $config->save($record);

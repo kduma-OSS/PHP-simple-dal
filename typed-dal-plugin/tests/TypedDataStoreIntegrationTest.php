@@ -90,19 +90,56 @@ beforeEach(function () {
 });
 
 // -----------------------------------------------------------------
+//  Helpers
+// -----------------------------------------------------------------
+
+function makeArticle(TypedDataStore $store, string $title = 'Test', IntegrationStatus $status = IntegrationStatus::Draft, ?string $body = null, ?DateTimeImmutable $publishedAt = null, array $tags = []): ArticleRecord
+{
+    $record = $store->collection('articles')->make();
+    $record->title = $title;
+    $record->status = $status;
+    $record->body = $body;
+    $record->publishedAt = $publishedAt ?? new DateTimeImmutable('2024-01-01T00:00:00+00:00');
+    $record->tags = $tags;
+
+    return $record;
+}
+
+function makeSettings(TypedDataStore $store, string $siteName = 'My Site', string $locale = 'en', bool $maintenance = false): SettingsRecord
+{
+    $record = $store->singleton('settings')->make();
+    $record->siteName = $siteName;
+    $record->locale = $locale;
+    $record->maintenance = $maintenance;
+
+    return $record;
+}
+
+// -----------------------------------------------------------------
+//  make()
+// -----------------------------------------------------------------
+
+test('make returns correct typed record class for collection', function () {
+    $record = $this->store->collection('articles')->make();
+
+    expect($record)->toBeInstanceOf(ArticleRecord::class);
+});
+
+test('make returns correct typed record class for singleton', function () {
+    $record = $this->store->singleton('settings')->make();
+
+    expect($record)->toBeInstanceOf(SettingsRecord::class);
+});
+
+// -----------------------------------------------------------------
 //  Collection CRUD
 // -----------------------------------------------------------------
 
 test('create and find a typed collection record', function () {
     $collection = $this->store->collection('articles');
 
-    $created = $collection->create([
-        'title' => 'First Article',
-        'status' => 'draft',
-        'body' => 'Hello world.',
-        'published_at' => '2024-06-15T10:00:00+00:00',
-        'meta' => ['tags' => ['php', 'dal']],
-    ], 'art-1');
+    $record = makeArticle($this->store, 'First Article', IntegrationStatus::Draft, 'Hello world.', new DateTimeImmutable('2024-06-15T10:00:00+00:00'), ['php', 'dal']);
+    $created = $collection->create($record, 'art-1');
 
     expect($created)->toBeInstanceOf(ArticleRecord::class);
     expect($created->id)->toBe('art-1');
@@ -128,13 +165,7 @@ test('findOrNull returns null for missing record', function () {
 test('has checks record existence', function () {
     $collection = $this->store->collection('articles');
 
-    $collection->create([
-        'title' => 'Exists',
-        'status' => 'draft',
-        'body' => null,
-        'published_at' => '2024-01-01T00:00:00+00:00',
-        'meta' => ['tags' => []],
-    ], 'art-2');
+    $collection->create(makeArticle($this->store, 'Exists'), 'art-2');
 
     expect($collection->has('art-2'))->toBeTrue();
     expect($collection->has('art-999'))->toBeFalse();
@@ -143,21 +174,8 @@ test('has checks record existence', function () {
 test('all returns all typed records', function () {
     $collection = $this->store->collection('articles');
 
-    $collection->create([
-        'title' => 'Article A',
-        'status' => 'draft',
-        'body' => null,
-        'published_at' => '2024-01-01T00:00:00+00:00',
-        'meta' => ['tags' => []],
-    ], 'art-a');
-
-    $collection->create([
-        'title' => 'Article B',
-        'status' => 'published',
-        'body' => 'Content B',
-        'published_at' => '2024-02-01T00:00:00+00:00',
-        'meta' => ['tags' => ['news']],
-    ], 'art-b');
+    $collection->create(makeArticle($this->store, 'Article A'), 'art-a');
+    $collection->create(makeArticle($this->store, 'Article B', IntegrationStatus::Published, 'Content B', new DateTimeImmutable('2024-02-01T00:00:00+00:00'), ['news']), 'art-b');
 
     $all = $collection->all();
 
@@ -169,13 +187,7 @@ test('all returns all typed records', function () {
 test('save persists modified typed record', function () {
     $collection = $this->store->collection('articles');
 
-    $created = $collection->create([
-        'title' => 'Original Title',
-        'status' => 'draft',
-        'body' => null,
-        'published_at' => '2024-01-01T00:00:00+00:00',
-        'meta' => ['tags' => []],
-    ], 'art-save');
+    $created = $collection->create(makeArticle($this->store, 'Original Title'), 'art-save');
 
     $created->title = 'Updated Title';
     $created->status = IntegrationStatus::Published;
@@ -192,58 +204,25 @@ test('save persists modified typed record', function () {
     expect($refetched->status)->toBe(IntegrationStatus::Published);
 });
 
-test('update merges partial data into existing record', function () {
+test('save replaces data for existing record', function () {
     $collection = $this->store->collection('articles');
 
-    $collection->create([
-        'title' => 'Update Me',
-        'status' => 'draft',
-        'body' => 'Old body',
-        'published_at' => '2024-01-01T00:00:00+00:00',
-        'meta' => ['tags' => ['old']],
-    ], 'art-update');
+    $collection->create(makeArticle($this->store, 'Update Me', IntegrationStatus::Draft, 'Old body', new DateTimeImmutable('2024-01-01T00:00:00+00:00'), ['old']), 'art-update');
 
-    $updated = $collection->update('art-update', ['body' => 'New body']);
+    $record = $collection->find('art-update');
+    $record->body = 'New body';
 
-    expect($updated)->toBeInstanceOf(ArticleRecord::class);
-    expect($updated->title)->toBe('Update Me');
-    expect($updated->body)->toBe('New body');
-});
+    $saved = $collection->save($record);
 
-test('replace overwrites all data', function () {
-    $collection = $this->store->collection('articles');
-
-    $collection->create([
-        'title' => 'Replace Me',
-        'status' => 'draft',
-        'body' => 'Old body',
-        'published_at' => '2024-01-01T00:00:00+00:00',
-        'meta' => ['tags' => ['old']],
-    ], 'art-replace');
-
-    $replaced = $collection->replace('art-replace', [
-        'title' => 'Replaced',
-        'status' => 'published',
-        'body' => 'New body',
-        'published_at' => '2024-06-01T00:00:00+00:00',
-        'meta' => ['tags' => ['new']],
-    ]);
-
-    expect($replaced)->toBeInstanceOf(ArticleRecord::class);
-    expect($replaced->title)->toBe('Replaced');
-    expect($replaced->status)->toBe(IntegrationStatus::Published);
+    expect($saved)->toBeInstanceOf(ArticleRecord::class);
+    expect($saved->title)->toBe('Update Me');
+    expect($saved->body)->toBe('New body');
 });
 
 test('delete removes a record', function () {
     $collection = $this->store->collection('articles');
 
-    $collection->create([
-        'title' => 'Delete Me',
-        'status' => 'draft',
-        'body' => null,
-        'published_at' => '2024-01-01T00:00:00+00:00',
-        'meta' => ['tags' => []],
-    ], 'art-del');
+    $collection->create(makeArticle($this->store, 'Delete Me'), 'art-del');
 
     expect($collection->has('art-del'))->toBeTrue();
 
@@ -257,21 +236,8 @@ test('count returns the number of records', function () {
 
     expect($collection->count())->toBe(0);
 
-    $collection->create([
-        'title' => 'A',
-        'status' => 'draft',
-        'body' => null,
-        'published_at' => '2024-01-01T00:00:00+00:00',
-        'meta' => ['tags' => []],
-    ], 'art-c1');
-
-    $collection->create([
-        'title' => 'B',
-        'status' => 'draft',
-        'body' => null,
-        'published_at' => '2024-01-01T00:00:00+00:00',
-        'meta' => ['tags' => []],
-    ], 'art-c2');
+    $collection->create(makeArticle($this->store, 'A'), 'art-c1');
+    $collection->create(makeArticle($this->store, 'B'), 'art-c2');
 
     expect($collection->count())->toBe(2);
 });
@@ -293,13 +259,7 @@ test('collection entity exposes name', function () {
 test('typed attachments store via enum', function () {
     $collection = $this->store->collection('articles');
 
-    $collection->create([
-        'title' => 'With Attachment',
-        'status' => 'draft',
-        'body' => null,
-        'published_at' => '2024-01-01T00:00:00+00:00',
-        'meta' => ['tags' => []],
-    ], 'art-att');
+    $collection->create(makeArticle($this->store, 'With Attachment'), 'art-att');
 
     $attachments = $collection->attachments('art-att');
 
@@ -317,13 +277,7 @@ test('typed attachments store via enum', function () {
 test('typed attachments list and deleteAll', function () {
     $collection = $this->store->collection('articles');
 
-    $collection->create([
-        'title' => 'Multi Attachment',
-        'status' => 'draft',
-        'body' => null,
-        'published_at' => '2024-01-01T00:00:00+00:00',
-        'meta' => ['tags' => []],
-    ], 'art-multi');
+    $collection->create(makeArticle($this->store, 'Multi Attachment'), 'art-multi');
 
     $attachments = $collection->attachments('art-multi');
     $attachments->put(IntegrationAttachment::Thumbnail, 'thumb data');
@@ -339,13 +293,7 @@ test('typed attachments list and deleteAll', function () {
 test('typed attachments delete single', function () {
     $collection = $this->store->collection('articles');
 
-    $collection->create([
-        'title' => 'Delete Attachment',
-        'status' => 'draft',
-        'body' => null,
-        'published_at' => '2024-01-01T00:00:00+00:00',
-        'meta' => ['tags' => []],
-    ], 'art-delatt');
+    $collection->create(makeArticle($this->store, 'Delete Attachment'), 'art-delatt');
 
     $attachments = $collection->attachments('art-delatt');
     $attachments->put(IntegrationAttachment::Thumbnail, 'thumb');
@@ -360,13 +308,7 @@ test('typed attachments delete single', function () {
 test('typed attachments getOrNull returns null for missing', function () {
     $collection = $this->store->collection('articles');
 
-    $collection->create([
-        'title' => 'No Attachment',
-        'status' => 'draft',
-        'body' => null,
-        'published_at' => '2024-01-01T00:00:00+00:00',
-        'meta' => ['tags' => []],
-    ], 'art-noatt');
+    $collection->create(makeArticle($this->store, 'No Attachment'), 'art-noatt');
 
     $attachments = $collection->attachments('art-noatt');
 
@@ -382,11 +324,7 @@ test('singleton set and get', function () {
 
     expect($singleton->exists())->toBeFalse();
 
-    $created = $singleton->set([
-        'site_name' => 'My Site',
-        'locale' => 'en',
-        'maintenance' => false,
-    ]);
+    $created = $singleton->set(makeSettings($this->store));
 
     expect($created)->toBeInstanceOf(SettingsRecord::class);
     expect($created->siteName)->toBe('My Site');
@@ -409,11 +347,7 @@ test('singleton getOrNull returns null when not set', function () {
 test('singleton save persists modifications', function () {
     $singleton = $this->store->singleton('settings');
 
-    $singleton->set([
-        'site_name' => 'Original',
-        'locale' => 'en',
-        'maintenance' => false,
-    ]);
+    $singleton->set(makeSettings($this->store, 'Original'));
 
     $record = $singleton->get();
     $record->siteName = 'Updated Site';
@@ -431,30 +365,25 @@ test('singleton save persists modifications', function () {
     expect($refetched->maintenance)->toBeTrue();
 });
 
-test('singleton update merges partial data', function () {
+test('singleton save updates partial data', function () {
     $singleton = $this->store->singleton('settings');
 
-    $singleton->set([
-        'site_name' => 'My Site',
-        'locale' => 'en',
-        'maintenance' => false,
-    ]);
+    $singleton->set(makeSettings($this->store));
 
-    $updated = $singleton->update(['locale' => 'fr']);
+    $record = $singleton->get();
+    $record->locale = 'fr';
 
-    expect($updated)->toBeInstanceOf(SettingsRecord::class);
-    expect($updated->siteName)->toBe('My Site');
-    expect($updated->locale)->toBe('fr');
+    $saved = $singleton->save($record);
+
+    expect($saved)->toBeInstanceOf(SettingsRecord::class);
+    expect($saved->siteName)->toBe('My Site');
+    expect($saved->locale)->toBe('fr');
 });
 
 test('singleton delete removes the record', function () {
     $singleton = $this->store->singleton('settings');
 
-    $singleton->set([
-        'site_name' => 'Delete Me',
-        'locale' => 'en',
-        'maintenance' => false,
-    ]);
+    $singleton->set(makeSettings($this->store, 'Delete Me'));
 
     expect($singleton->exists())->toBeTrue();
 

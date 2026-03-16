@@ -10,17 +10,17 @@ interface TypedSingletonEntityInterface
 {
     public string $name { get; }
 
+    public function make(): TypedRecord;
+
     public function get(): TypedRecord;
 
     public function getOrNull(): ?TypedRecord;
 
     public function exists(): bool;
 
-    public function set(array $data): TypedRecord;
+    public function set(TypedRecord $record): TypedRecord;
 
     public function save(TypedRecord $record): TypedRecord;
-
-    public function update(array $data): TypedRecord;
 
     public function delete(): void;
 

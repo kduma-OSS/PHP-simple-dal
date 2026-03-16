@@ -141,6 +141,29 @@ class TypedRecordHydrator
     }
 
     /**
+     * Create a blank TypedRecord instance for populating before persistence.
+     *
+     * @param class-string<TypedRecord> $class
+     */
+    public static function createBlank(string $class): TypedRecord
+    {
+        $mappings = self::discoverFields($class);
+
+        $ref = new \ReflectionClass($class);
+        $instance = $ref->newInstanceWithoutConstructor();
+
+        $baseRef = new \ReflectionClass(TypedRecord::class);
+        $baseRef->getProperty('id')->setValue($instance, '');
+        $baseRef->getProperty('createdAt')->setValue($instance, null);
+        $baseRef->getProperty('updatedAt')->setValue($instance, null);
+
+        $instance->_setFieldMappings($mappings);
+        $instance->_setExtraData([]);
+
+        return $instance;
+    }
+
+    /**
      * Dehydrate a TypedRecord back to a storage array.
      */
     public static function dehydrateToArray(TypedRecord $record): array

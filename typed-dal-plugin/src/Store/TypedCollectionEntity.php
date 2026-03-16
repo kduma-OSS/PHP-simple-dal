@@ -28,9 +28,19 @@ class TypedCollectionEntity implements TypedCollectionEntityInterface
         private readonly ?string $attachmentEnum,
     ) {}
 
-    public function create(array $data, ?string $id = null): TypedRecord
+    public function make(): TypedRecord
     {
-        $record = $this->inner->create($data, $id);
+        if ($this->recordClass === null) {
+            throw new \LogicException('No recordClass configured for this typed collection entity.');
+        }
+
+        return TypedRecordHydrator::createBlank($this->recordClass);
+    }
+
+    public function create(TypedRecord $data, ?string $id = null): TypedRecord
+    {
+        $rawData = TypedRecordHydrator::dehydrateToArray($data);
+        $record = $this->inner->create($rawData, $id);
 
         return $this->wrapRecord($record);
     }
@@ -78,20 +88,6 @@ class TypedCollectionEntity implements TypedCollectionEntityInterface
         $innerRecord = $this->inner->replace($record->id, $data);
 
         return $this->wrapRecord($innerRecord);
-    }
-
-    public function update(string $id, array $data): TypedRecord
-    {
-        $record = $this->inner->update($id, $data);
-
-        return $this->wrapRecord($record);
-    }
-
-    public function replace(string $id, array $data): TypedRecord
-    {
-        $record = $this->inner->replace($id, $data);
-
-        return $this->wrapRecord($record);
     }
 
     public function delete(string $id): void

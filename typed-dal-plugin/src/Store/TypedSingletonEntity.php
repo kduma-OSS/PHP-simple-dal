@@ -50,11 +50,21 @@ class TypedSingletonEntity implements TypedSingletonEntityInterface
         return $this->inner->exists();
     }
 
-    public function set(array $data): TypedRecord
+    public function make(): TypedRecord
     {
-        $record = $this->inner->set($data);
+        if ($this->recordClass === null) {
+            throw new \LogicException('No recordClass configured for this typed singleton entity.');
+        }
 
-        return $this->wrapRecord($record);
+        return TypedRecordHydrator::createBlank($this->recordClass);
+    }
+
+    public function set(TypedRecord $record): TypedRecord
+    {
+        $data = TypedRecordHydrator::dehydrateToArray($record);
+        $innerRecord = $this->inner->set($data);
+
+        return $this->wrapRecord($innerRecord);
     }
 
     public function save(TypedRecord $record): TypedRecord
@@ -63,13 +73,6 @@ class TypedSingletonEntity implements TypedSingletonEntityInterface
         $innerRecord = $this->inner->set($data);
 
         return $this->wrapRecord($innerRecord);
-    }
-
-    public function update(array $data): TypedRecord
-    {
-        $record = $this->inner->update($data);
-
-        return $this->wrapRecord($record);
     }
 
     public function delete(): void

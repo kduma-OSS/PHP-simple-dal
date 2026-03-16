@@ -94,21 +94,20 @@ $store = new TypedDataStore(
 );
 
 // ── 5. Create a typed collection record ──
+//
+// Use make() to get a blank typed record, set properties using
+// native PHP types (enums, DateTimeImmutable), then persist with create().
 
-$cert = $store->collection('certificates')->create(
-    data: [
-        'serial_number' => '01',
-        'subject' => [
-            'common_name' => 'example.com',
-            'organization' => 'Example Inc.',
-        ],
-        'status' => 'active',
-        'not_before' => '2026-01-01T00:00:00+00:00',
-        'not_after' => '2027-01-01T00:00:00+00:00',
-        'revocation_reason' => null,
-    ],
-    id: 'cert-01',
-);
+$cert = $store->collection('certificates')->make();
+$cert->serialNumber = '01';
+$cert->commonName = 'example.com';
+$cert->organization = 'Example Inc.';
+$cert->status = CertificateStatus::Active;
+$cert->notBefore = new DateTimeImmutable('2026-01-01');
+$cert->notAfter = new DateTimeImmutable('2027-01-01');
+$cert->revocationReason = null;
+
+$cert = $store->collection('certificates')->create($cert, id: 'cert-01');
 
 echo "Created: {$cert->id}\n";
 echo "CN: {$cert->commonName}\n";
@@ -151,11 +150,11 @@ echo "Certificate content: " . strlen($pem->contents()) . " bytes\n";
 
 $config = $store->singleton('ca_config');
 
-$config->set([
-    'issuer' => ['common_name' => 'My Root CA'],
-    'key_algorithm' => 'EC',
-    'curve' => 'P-384',
-]);
+$record = $config->make();
+$record->issuerName = 'My Root CA';
+$record->keyAlgorithm = 'EC';
+$record->curve = 'P-384';
+$config->set($record);
 
 $record = $config->get();
 echo "\nCA Config:\n";
