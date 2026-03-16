@@ -1,0 +1,42 @@
+{
+    "name": "kduma/simple-dal-monorepo",
+    "description": "Simple Data Access Layer - monorepo development root",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "php": "^8.4",
+        "kduma/simple-dal": "@dev",
+        "kduma/simple-dal-contracts": "@dev",
+        "kduma/simple-dal-db-adapter": "@dev",
+        "kduma/simple-dal-directory-adapter": "@dev",
+        "kduma/simple-dal-zip-adapter": "@dev"
+    },
+    "require-dev": {
+        "pestphp/pest": "^3.0",
+        "phpstan/phpstan": "^2.0",
+        "laravel/pint": "^1.0"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "KDuma\\SimpleDAL\\Contracts\\Tests\\": "contracts/tests/",
+            "KDuma\\SimpleDAL\\Tests\\": "library/tests/",
+            "KDuma\\SimpleDAL\\Adapter\\Database\\Tests\\": "db-adapter/tests/",
+            "KDuma\\SimpleDAL\\Adapter\\Directory\\Tests\\": "directory-adapter/tests/",
+            "KDuma\\SimpleDAL\\Adapter\\Zip\\Tests\\": "zip-adapter/tests/"
+        }
+    },
+    "repositories": [
+        { "type": "path", "url": "./contracts" },
+        { "type": "path", "url": "./library" },
+        { "type": "path", "url": "./db-adapter" },
+        { "type": "path", "url": "./directory-adapter" },
+        { "type": "path", "url": "./zip-adapter" }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}

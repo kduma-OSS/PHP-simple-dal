@@ -1,0 +1,35 @@
+{
+    "name": "kduma/simple-dal-directory-adapter",
+    "description": "Simple DAL - Directory/filesystem adapter",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": "^8.4",
+        "kduma/simple-dal-contracts": "^1.0",
+        "league/flysystem": "^3.0"
+    },
+    "require-dev": {
+        "pestphp/pest": "^3.0",
+        "kduma/simple-dal": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "KDuma\\SimpleDAL\\Adapter\\Directory\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "KDuma\\SimpleDAL\\Adapter\\Directory\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "1.0.x-dev"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}

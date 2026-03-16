@@ -1,0 +1,35 @@
+{
+    "name": "kduma/simple-dal-db-adapter",
+    "description": "Simple DAL - SQLite database adapter",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": "^8.4",
+        "kduma/simple-dal-contracts": "^1.0",
+        "ext-pdo": "*"
+    },
+    "require-dev": {
+        "pestphp/pest": "^3.0",
+        "kduma/simple-dal": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "KDuma\\SimpleDAL\\Adapter\\Database\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "KDuma\\SimpleDAL\\Adapter\\Database\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "1.0.x-dev"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}

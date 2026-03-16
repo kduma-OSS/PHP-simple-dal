@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+         cacheDirectory=".phpunit.cache"
+>
+    <testsuites>
+        <testsuite name="Contracts">
+            <directory>contracts/tests</directory>
+        </testsuite>
+        <testsuite name="Library">
+            <directory>library/tests</directory>
+        </testsuite>
+        <testsuite name="Database Adapter">
+            <directory>db-adapter/tests</directory>
+        </testsuite>
+        <testsuite name="Directory Adapter">
+            <directory>directory-adapter/tests</directory>
+        </testsuite>
+        <testsuite name="ZIP Adapter">
+            <directory>zip-adapter/tests</directory>
+        </testsuite>
+    </testsuites>
+    <source>
+        <include>
+            <directory>contracts/src</directory>
+            <directory>library/src</directory>
+            <directory>db-adapter/src</directory>
+            <directory>directory-adapter/src</directory>
+            <directory>zip-adapter/src</directory>
+        </include>
+    </source>
+</phpunit>
