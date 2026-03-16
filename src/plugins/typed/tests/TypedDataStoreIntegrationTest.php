@@ -40,7 +40,7 @@ class ArticleRecord extends TypedRecord
     public ?string $body;
 
     #[Field(converter: DateTimeConverter::class)]
-    public \DateTimeImmutable $publishedAt;
+    public DateTimeImmutable $publishedAt;
 
     #[Field(path: 'meta.tags')]
     public array $tags;

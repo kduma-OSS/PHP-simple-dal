@@ -63,18 +63,18 @@ test('enum converter converts int-backed enum to storage', function () {
 // -----------------------------------------------------------------
 
 test('datetime converter converts from ISO string', function () {
-    $converter = new DateTimeConverter();
+    $converter = new DateTimeConverter;
 
     $result = $converter->fromStorage('2024-06-15T10:30:00+00:00');
 
-    expect($result)->toBeInstanceOf(\DateTimeImmutable::class);
+    expect($result)->toBeInstanceOf(DateTimeImmutable::class);
     expect($result->format('Y-m-d'))->toBe('2024-06-15');
     expect($result->format('H:i:s'))->toBe('10:30:00');
 });
 
 test('datetime converter converts to ISO ATOM string', function () {
-    $converter = new DateTimeConverter();
-    $dt = new \DateTimeImmutable('2024-06-15T10:30:00+00:00');
+    $converter = new DateTimeConverter;
+    $dt = new DateTimeImmutable('2024-06-15T10:30:00+00:00');
 
     $result = $converter->toStorage($dt);
 
@@ -82,7 +82,7 @@ test('datetime converter converts to ISO ATOM string', function () {
 });
 
 test('datetime converter roundtrips correctly', function () {
-    $converter = new DateTimeConverter();
+    $converter = new DateTimeConverter;
     $original = '2024-12-25T08:00:00+00:00';
 
     $dt = $converter->fromStorage($original);

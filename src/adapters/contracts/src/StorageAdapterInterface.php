@@ -5,13 +5,15 @@ declare(strict_types=1);
 namespace KDuma\SimpleDAL\Adapter\Contracts;
 
 use KDuma\SimpleDAL\Contracts\EntityDefinitionInterface;
+use KDuma\SimpleDAL\Contracts\Exception\AttachmentNotFoundException;
+use KDuma\SimpleDAL\Contracts\Exception\RecordNotFoundException;
 
 interface StorageAdapterInterface
 {
     /**
      * Write (insert or replace) a record.
      *
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     public function writeRecord(string $entityName, string $recordId, array $data): void;
 
@@ -20,7 +22,7 @@ interface StorageAdapterInterface
      *
      * @return array<string, mixed>
      *
-     * @throws \KDuma\SimpleDAL\Contracts\Exception\RecordNotFoundException
+     * @throws RecordNotFoundException
      */
     public function readRecord(string $entityName, string $recordId): array;
 
@@ -44,9 +46,8 @@ interface StorageAdapterInterface
     /**
      * Find records matching filters.
      *
-     * @param array<int, array<string, mixed>> $filters Serialized filter descriptors.
-     * @param array<int, array<string, mixed>> $sort Serialized sort descriptors.
-     *
+     * @param  array<int, array<string, mixed>>  $filters  Serialized filter descriptors.
+     * @param  array<int, array<string, mixed>>  $sort  Serialized sort descriptors.
      * @return array<string, array<string, mixed>> Map of record ID => data.
      */
     public function findRecords(
@@ -60,7 +61,7 @@ interface StorageAdapterInterface
     /**
      * Write attachment content.
      *
-     * @param string|resource $contents
+     * @param  string|resource  $contents
      */
     public function writeAttachment(
         string $entityName,
@@ -74,7 +75,7 @@ interface StorageAdapterInterface
      *
      * @return resource
      *
-     * @throws \KDuma\SimpleDAL\Contracts\Exception\AttachmentNotFoundException
+     * @throws AttachmentNotFoundException
      */
     public function readAttachment(string $entityName, string $recordId, string $name): mixed;
 

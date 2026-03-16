@@ -8,7 +8,7 @@ use League\Flysystem\Filesystem;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 
 beforeEach(function () {
-    $this->tempDir = sys_get_temp_dir() . '/simple-dal-test-' . uniqid();
+    $this->tempDir = sys_get_temp_dir().'/simple-dal-test-'.uniqid();
     mkdir($this->tempDir, 0777, true);
 
     $flysystem = new Filesystem(new LocalFilesystemAdapter($this->tempDir));
@@ -16,7 +16,8 @@ beforeEach(function () {
     $this->adapter = new DirectoryAdapter($flysystem);
     $this->entityName = 'test_entity';
 
-    $definition = new class ('test_entity', false, true, false, ['status', 'meta.role']) implements EntityDefinitionInterface {
+    $definition = new class('test_entity', false, true, false, ['status', 'meta.role']) implements EntityDefinitionInterface
+    {
         public function __construct(
             public readonly string $name,
             public readonly bool $isSingleton,
@@ -55,7 +56,7 @@ afterEach(function () {
 test('record data.json exists in the record directory', function () {
     $this->adapter->writeRecord('test_entity', 'rec-1', ['name' => 'Alice']);
 
-    expect(file_exists($this->tempDir . '/test_entity/rec-1/data.json'))->toBeTrue();
+    expect(file_exists($this->tempDir.'/test_entity/rec-1/data.json'))->toBeTrue();
 });
 
 test('data.json is pretty-printed with sorted keys', function () {
@@ -65,7 +66,7 @@ test('data.json is pretty-printed with sorted keys', function () {
         'meta' => ['z_key' => 'z', 'a_key' => 'a'],
     ]);
 
-    $raw = file_get_contents($this->tempDir . '/test_entity/rec-1/data.json');
+    $raw = file_get_contents($this->tempDir.'/test_entity/rec-1/data.json');
     $decoded = json_decode($raw, true);
 
     // Keys should be sorted alphabetically at both levels
@@ -80,9 +81,9 @@ test('attachments are stored alongside data.json', function () {
     $this->adapter->writeRecord('test_entity', 'rec-1', ['x' => 1]);
     $this->adapter->writeAttachment('test_entity', 'rec-1', 'certificate.pem', 'CERT_DATA');
 
-    expect(file_exists($this->tempDir . '/test_entity/rec-1/data.json'))->toBeTrue();
-    expect(file_exists($this->tempDir . '/test_entity/rec-1/certificate.pem'))->toBeTrue();
-    expect(file_get_contents($this->tempDir . '/test_entity/rec-1/certificate.pem'))->toBe('CERT_DATA');
+    expect(file_exists($this->tempDir.'/test_entity/rec-1/data.json'))->toBeTrue();
+    expect(file_exists($this->tempDir.'/test_entity/rec-1/certificate.pem'))->toBeTrue();
+    expect(file_get_contents($this->tempDir.'/test_entity/rec-1/certificate.pem'))->toBe('CERT_DATA');
 });
 
 test('index file is created and maintained', function () {
@@ -92,7 +93,7 @@ test('index file is created and maintained', function () {
         'meta' => ['role' => 'admin'],
     ]);
 
-    $indexPath = $this->tempDir . '/test_entity/_index.json';
+    $indexPath = $this->tempDir.'/test_entity/_index.json';
     expect(file_exists($indexPath))->toBeTrue();
 
     $index = json_decode(file_get_contents($indexPath), true);
@@ -117,7 +118,7 @@ test('index is updated when a record is overwritten', function () {
         'meta' => ['role' => 'user'],
     ]);
 
-    $index = json_decode(file_get_contents($this->tempDir . '/test_entity/_index.json'), true);
+    $index = json_decode(file_get_contents($this->tempDir.'/test_entity/_index.json'), true);
 
     // Old value should be gone
     expect($index['status'])->not->toHaveKey('active');
@@ -139,7 +140,7 @@ test('index is updated when a record is deleted', function () {
 
     $this->adapter->deleteRecord('test_entity', 'rec-1');
 
-    $index = json_decode(file_get_contents($this->tempDir . '/test_entity/_index.json'), true);
+    $index = json_decode(file_get_contents($this->tempDir.'/test_entity/_index.json'), true);
 
     // rec-1 should be removed from the active index
     expect($index['status']['active'])->not->toContain('rec-1');
@@ -152,7 +153,7 @@ test('index file is removed on purge', function () {
         'meta' => ['role' => 'admin'],
     ]);
 
-    $indexPath = $this->tempDir . '/test_entity/_index.json';
+    $indexPath = $this->tempDir.'/test_entity/_index.json';
     expect(file_exists($indexPath))->toBeTrue();
 
     $this->adapter->purgeEntity('test_entity');
@@ -163,9 +164,9 @@ test('index file is removed on purge', function () {
 test('directory layout follows entity/id/data.json convention', function () {
     $this->adapter->writeRecord('test_entity', 'my-record', ['key' => 'value']);
 
-    $expectedDir = $this->tempDir . '/test_entity/my-record';
+    $expectedDir = $this->tempDir.'/test_entity/my-record';
     expect(is_dir($expectedDir))->toBeTrue();
-    expect(file_exists($expectedDir . '/data.json'))->toBeTrue();
+    expect(file_exists($expectedDir.'/data.json'))->toBeTrue();
 });
 
 test('listRecordIds excludes underscore-prefixed entries', function () {

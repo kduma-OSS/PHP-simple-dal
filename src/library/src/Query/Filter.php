@@ -27,7 +27,7 @@ final class Filter implements FilterInterface
      */
     public static function where(string $field, string|FilterOperator $operator, mixed $value): static
     {
-        $instance = new static();
+        $instance = new self;
 
         return $instance->andWhere($field, $operator, $value);
     }

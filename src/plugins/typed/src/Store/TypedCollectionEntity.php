@@ -19,8 +19,8 @@ class TypedCollectionEntity implements TypedCollectionEntityInterface
     }
 
     /**
-     * @param class-string<TypedRecord>|null $recordClass
-     * @param class-string<\BackedEnum>|null $attachmentEnum
+     * @param  class-string<TypedRecord>|null  $recordClass
+     * @param  class-string<\BackedEnum>|null  $attachmentEnum
      */
     public function __construct(
         private readonly CollectionEntityInterface $inner,

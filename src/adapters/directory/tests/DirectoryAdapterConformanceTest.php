@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace KDuma\SimpleDAL\Adapter\Directory\Tests;
 
+use KDuma\SimpleDAL\Adapter\Contracts\Tests\Concerns\AdapterConformanceTests;
 use KDuma\SimpleDAL\Adapter\Directory\DirectoryAdapter;
 use KDuma\SimpleDAL\Contracts\EntityDefinitionInterface;
-use KDuma\SimpleDAL\Adapter\Contracts\Tests\Concerns\AdapterConformanceTests;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use PHPUnit\Framework\TestCase;
@@ -25,7 +25,7 @@ final class DirectoryAdapterConformanceTest extends TestCase
     {
         parent::setUp();
 
-        $this->tempDir = sys_get_temp_dir() . '/simple-dal-test-' . uniqid();
+        $this->tempDir = sys_get_temp_dir().'/simple-dal-test-'.uniqid();
         mkdir($this->tempDir, 0777, true);
 
         $flysystem = new Filesystem(new LocalFilesystemAdapter($this->tempDir));
@@ -33,7 +33,8 @@ final class DirectoryAdapterConformanceTest extends TestCase
         $this->adapter = new DirectoryAdapter($flysystem);
         $this->entityName = 'test_entity';
 
-        $definition = new class ('test_entity', false, true, false, ['status', 'meta.role']) implements EntityDefinitionInterface {
+        $definition = new class('test_entity', false, true, false, ['status', 'meta.role']) implements EntityDefinitionInterface
+        {
             public function __construct(
                 public readonly string $name,
                 public readonly bool $isSingleton,

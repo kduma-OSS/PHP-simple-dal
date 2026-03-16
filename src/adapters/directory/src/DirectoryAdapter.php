@@ -24,7 +24,7 @@ final class DirectoryAdapter implements StorageAdapterInterface
     {
         $this->definitions[$entityName] = $definition;
 
-        if (!$this->filesystem->fileExists("{$entityName}/.gitkeep")) {
+        if (! $this->filesystem->fileExists("{$entityName}/.gitkeep")) {
             $this->filesystem->createDirectory($entityName);
         }
     }
@@ -58,7 +58,7 @@ final class DirectoryAdapter implements StorageAdapterInterface
     {
         $dir = "{$entityName}/{$recordId}";
 
-        if (!$this->filesystem->fileExists("{$dir}/data.json")) {
+        if (! $this->filesystem->fileExists("{$dir}/data.json")) {
             return;
         }
 
@@ -83,7 +83,7 @@ final class DirectoryAdapter implements StorageAdapterInterface
         $ids = [];
 
         foreach ($listing as $item) {
-            if (!$item->isDir()) {
+            if (! $item->isDir()) {
                 continue;
             }
 
@@ -154,7 +154,7 @@ final class DirectoryAdapter implements StorageAdapterInterface
     {
         $path = "{$entityName}/{$recordId}/{$name}";
 
-        if (!$this->filesystem->fileExists($path)) {
+        if (! $this->filesystem->fileExists($path)) {
             throw new AttachmentNotFoundException("Attachment '{$name}' not found for record '{$recordId}' in entity '{$entityName}'.");
         }
 
@@ -178,7 +178,7 @@ final class DirectoryAdapter implements StorageAdapterInterface
         }
 
         foreach ($listing as $item) {
-            if (!$item->isFile()) {
+            if (! $item->isFile()) {
                 continue;
             }
 
@@ -203,7 +203,7 @@ final class DirectoryAdapter implements StorageAdapterInterface
         $names = [];
 
         foreach ($listing as $item) {
-            if (!$item->isFile()) {
+            if (! $item->isFile()) {
                 continue;
             }
 
@@ -248,7 +248,7 @@ final class DirectoryAdapter implements StorageAdapterInterface
     {
         $path = $this->indexPath($entityName);
 
-        if (!$this->filesystem->fileExists($path)) {
+        if (! $this->filesystem->fileExists($path)) {
             return [];
         }
 
@@ -258,7 +258,7 @@ final class DirectoryAdapter implements StorageAdapterInterface
     }
 
     /**
-     * @param array<string, array<string, string[]>> $index
+     * @param  array<string, array<string, string[]>>  $index
      */
     private function writeIndex(string $entityName, array $index): void
     {
@@ -281,7 +281,7 @@ final class DirectoryAdapter implements StorageAdapterInterface
      */
     private function getIndexedFields(string $entityName): array
     {
-        if (!isset($this->definitions[$entityName])) {
+        if (! isset($this->definitions[$entityName])) {
             return [];
         }
 
@@ -289,7 +289,7 @@ final class DirectoryAdapter implements StorageAdapterInterface
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     private function updateIndexForRecord(string $entityName, string $recordId, array $data): void
     {
@@ -328,15 +328,15 @@ final class DirectoryAdapter implements StorageAdapterInterface
 
             $stringValue = (string) $fieldValue;
 
-            if (!isset($index[$field])) {
+            if (! isset($index[$field])) {
                 $index[$field] = [];
             }
 
-            if (!isset($index[$field][$stringValue])) {
+            if (! isset($index[$field][$stringValue])) {
                 $index[$field][$stringValue] = [];
             }
 
-            if (!in_array($recordId, $index[$field][$stringValue], true)) {
+            if (! in_array($recordId, $index[$field][$stringValue], true)) {
                 $index[$field][$stringValue][] = $recordId;
             }
         }
@@ -384,7 +384,7 @@ final class DirectoryAdapter implements StorageAdapterInterface
     /**
      * Determine the set of candidate record IDs, using the index when possible.
      *
-     * @param array<int, array<string, mixed>> $filters
+     * @param  array<int, array<string, mixed>>  $filters
      * @return string[]
      */
     private function resolveCandidateIds(string $entityName, array $filters): array
@@ -404,7 +404,7 @@ final class DirectoryAdapter implements StorageAdapterInterface
 
             $field = $filter['field'] ?? '';
 
-            if (!in_array($field, $indexedFields, true)) {
+            if (! in_array($field, $indexedFields, true)) {
                 continue;
             }
 
@@ -434,8 +434,8 @@ final class DirectoryAdapter implements StorageAdapterInterface
     /**
      * Check if a record's data matches all filter conditions.
      *
-     * @param array<string, mixed> $data
-     * @param array<int, array<string, mixed>> $filters
+     * @param  array<string, mixed>  $data
+     * @param  array<int, array<string, mixed>>  $filters
      */
     private function matchesAllFilters(array $data, array $filters): bool
     {
@@ -457,11 +457,11 @@ final class DirectoryAdapter implements StorageAdapterInterface
                 'starts_with' => is_string($fieldValue) && is_string($value) && mb_stripos($fieldValue, $value) === 0,
                 'ends_with' => is_string($fieldValue) && is_string($value) && str_ends_with(mb_strtolower($fieldValue), mb_strtolower($value)),
                 'in' => is_array($value) && in_array($fieldValue, $value, true),
-                'not_in' => is_array($value) && !in_array($fieldValue, $value, true),
+                'not_in' => is_array($value) && ! in_array($fieldValue, $value, true),
                 default => true,
             };
 
-            if (!$matches) {
+            if (! $matches) {
                 return false;
             }
         }
@@ -478,7 +478,7 @@ final class DirectoryAdapter implements StorageAdapterInterface
         $current = $data;
 
         foreach ($segments as $segment) {
-            if (!is_array($current) || !array_key_exists($segment, $current)) {
+            if (! is_array($current) || ! array_key_exists($segment, $current)) {
                 return null;
             }
 
@@ -493,8 +493,8 @@ final class DirectoryAdapter implements StorageAdapterInterface
     // ---------------------------------------------------------------
 
     /**
-     * @param array<string, array<string, mixed>> $results
-     * @param array<int, array<string, mixed>> $sort
+     * @param  array<string, array<string, mixed>>  $results
+     * @param  array<int, array<string, mixed>>  $sort
      * @return array<string, array<string, mixed>>
      */
     private function applySort(array $results, array $sort): array
@@ -540,7 +540,7 @@ final class DirectoryAdapter implements StorageAdapterInterface
         ksort($array);
 
         foreach ($array as &$value) {
-            if (is_array($value) && !array_is_list($value)) {
+            if (is_array($value) && ! array_is_list($value)) {
                 $this->sortKeysRecursively($value);
             }
         }

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace KDuma\SimpleDAL\Adapter\Database;
 
-use KDuma\SimpleDAL\Adapter\Database\Schema\SchemaManager;
 use KDuma\SimpleDAL\Adapter\Contracts\StorageAdapterInterface;
+use KDuma\SimpleDAL\Adapter\Database\Schema\SchemaManager;
 use KDuma\SimpleDAL\Contracts\EntityDefinitionInterface;
 use KDuma\SimpleDAL\Contracts\Exception\AttachmentNotFoundException;
 use KDuma\SimpleDAL\Contracts\Exception\RecordNotFoundException;
@@ -57,7 +57,7 @@ final class DatabaseAdapter implements StorageAdapterInterface
     public function writeRecord(string $entityName, string $recordId, array $data): void
     {
         $table = $this->sanitizeTableName($entityName);
-        $now = (new \DateTimeImmutable())->format('Y-m-d\TH:i:s.uP');
+        $now = (new \DateTimeImmutable)->format('Y-m-d\TH:i:s.uP');
 
         $stmt = $this->pdo->prepare(<<<SQL
             INSERT INTO {$table} (id, data, created_at, updated_at)
@@ -152,7 +152,7 @@ final class DatabaseAdapter implements StorageAdapterInterface
                     $whereSql = $entry['clause'];
                 } else {
                     $connector = strtoupper($entry['type']);
-                    $whereSql .= " {$connector} " . $entry['clause'];
+                    $whereSql .= " {$connector} ".$entry['clause'];
                 }
             }
 
@@ -163,11 +163,11 @@ final class DatabaseAdapter implements StorageAdapterInterface
         if ($sort !== []) {
             $orderParts = [];
             foreach ($sort as $sortDescriptor) {
-                $jsonPath = '$.' . $sortDescriptor['field'];
+                $jsonPath = '$.'.$sortDescriptor['field'];
                 $direction = strtoupper($sortDescriptor['direction'] ?? 'asc');
                 $orderParts[] = "json_extract(data, '{$jsonPath}') {$direction}";
             }
-            $sql .= ' ORDER BY ' . implode(', ', $orderParts);
+            $sql .= ' ORDER BY '.implode(', ', $orderParts);
         }
 
         // ---- LIMIT / OFFSET ----
@@ -324,7 +324,7 @@ final class DatabaseAdapter implements StorageAdapterInterface
     /**
      * Build a single WHERE clause fragment and its bound parameters from a filter descriptor.
      *
-     * @param array<string, mixed> $filter
+     * @param  array<string, mixed>  $filter
      * @return array{0: string, 1: array<string, mixed>}
      */
     private function buildFilterClause(array $filter, int $index): array
@@ -332,7 +332,7 @@ final class DatabaseAdapter implements StorageAdapterInterface
         $field = $filter['field'];
         $operator = $filter['operator'];
         $value = $filter['value'];
-        $jsonPath = '$.' . $field;
+        $jsonPath = '$.'.$field;
         $jsonExpr = "json_extract(data, '{$jsonPath}')";
         $paramName = ":filter_{$index}";
         $params = [];
@@ -357,17 +357,17 @@ final class DatabaseAdapter implements StorageAdapterInterface
 
             case 'contains':
                 $clause = "{$jsonExpr} LIKE {$paramName}";
-                $params[$paramName] = '%' . $value . '%';
+                $params[$paramName] = '%'.$value.'%';
                 break;
 
             case 'starts_with':
                 $clause = "{$jsonExpr} LIKE {$paramName}";
-                $params[$paramName] = $value . '%';
+                $params[$paramName] = $value.'%';
                 break;
 
             case 'ends_with':
                 $clause = "{$jsonExpr} LIKE {$paramName}";
-                $params[$paramName] = '%' . $value;
+                $params[$paramName] = '%'.$value;
                 break;
 
             case 'in':

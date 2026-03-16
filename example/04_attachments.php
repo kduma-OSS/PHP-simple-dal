@@ -9,7 +9,7 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__.'/../vendor/autoload.php';
 
 use KDuma\SimpleDAL\Adapter\Database\DatabaseAdapter;
 use KDuma\SimpleDAL\DataStore;
@@ -67,18 +67,18 @@ echo "\nCertificate content:\n{$att->contents()}\n";
 
 $att = $certs->attachments('cert-01')->get('certificate.der');
 $resource = $att->stream();
-echo "Stream type: " . get_resource_type($resource) . "\n";
-echo "Stream content: " . stream_get_contents($resource) . "\n";
+echo 'Stream type: '.get_resource_type($resource)."\n";
+echo 'Stream content: '.stream_get_contents($resource)."\n";
 
 // ── Check existence ──
 
-echo "\nHas certificate.pem: " . ($certs->attachments('cert-01')->has('certificate.pem') ? 'yes' : 'no') . "\n";
-echo "Has missing.txt: " . ($certs->attachments('cert-01')->has('missing.txt') ? 'yes' : 'no') . "\n";
+echo "\nHas certificate.pem: ".($certs->attachments('cert-01')->has('certificate.pem') ? 'yes' : 'no')."\n";
+echo 'Has missing.txt: '.($certs->attachments('cert-01')->has('missing.txt') ? 'yes' : 'no')."\n";
 
 // ── Nullable get ──
 
 $maybe = $certs->attachments('cert-01')->getOrNull('missing.txt');
-echo "getOrNull for missing: " . ($maybe === null ? 'null' : $maybe->name) . "\n";
+echo 'getOrNull for missing: '.($maybe === null ? 'null' : $maybe->name)."\n";
 
 // ── Delete one attachment ──
 
@@ -91,7 +91,7 @@ foreach ($certs->attachments('cert-01')->list() as $att) {
 // ── Delete all attachments ──
 
 $certs->attachments('cert-01')->deleteAll();
-echo "\nAfter deleteAll: " . count($certs->attachments('cert-01')->list()) . " attachments\n";
+echo "\nAfter deleteAll: ".count($certs->attachments('cert-01')->list())." attachments\n";
 
 // ── Deleting a record also deletes its attachments ──
 

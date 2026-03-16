@@ -8,6 +8,4 @@ namespace KDuma\SimpleDAL\Contracts\Exception;
  * Marker interface for all Simple DAL exceptions.
  * Allows broad catch: catch (DataStoreExceptionInterface $e)
  */
-interface DataStoreExceptionInterface extends \Throwable
-{
-}
+interface DataStoreExceptionInterface extends \Throwable {}

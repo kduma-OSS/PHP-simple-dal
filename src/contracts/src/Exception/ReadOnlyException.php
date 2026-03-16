@@ -4,6 +4,4 @@ declare(strict_types=1);
 
 namespace KDuma\SimpleDAL\Contracts\Exception;
 
-class ReadOnlyException extends \RuntimeException implements DataStoreExceptionInterface
-{
-}
+class ReadOnlyException extends \RuntimeException implements DataStoreExceptionInterface {}

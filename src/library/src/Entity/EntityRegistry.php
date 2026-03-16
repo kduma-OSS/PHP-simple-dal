@@ -19,7 +19,7 @@ final class EntityRegistry
 
     public function get(string $name): EntityDefinitionInterface
     {
-        if (!$this->has($name)) {
+        if (! $this->has($name)) {
             throw new EntityNotFoundException(
                 sprintf('Entity "%s" is not registered.', $name),
             );
@@ -48,6 +48,6 @@ final class EntityRegistry
 
     public function isCollection(string $name): bool
     {
-        return !$this->get($name)->isSingleton;
+        return ! $this->get($name)->isSingleton;
     }
 }

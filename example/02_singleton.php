@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__.'/../vendor/autoload.php';
 
 use KDuma\SimpleDAL\Adapter\Database\DatabaseAdapter;
 use KDuma\SimpleDAL\DataStore;
@@ -59,21 +59,21 @@ echo "Issuer still here: {$record->get('issuer.organization')}\n";
 
 $record = $config->get();
 $record->set('key_algorithm', 'RSA')
-       ->unset('curve')
-       ->merge(['key_size' => 4096]);
+    ->unset('curve')
+    ->merge(['key_size' => 4096]);
 $config->save($record);
 
 echo "\nUpdated config:\n";
-echo json_encode($config->get()->data, JSON_PRETTY_PRINT) . "\n";
+echo json_encode($config->get()->data, JSON_PRETTY_PRINT)."\n";
 
 // ── Check existence ──
 
-echo "\nExists: " . ($config->exists() ? 'yes' : 'no') . "\n";
+echo "\nExists: ".($config->exists() ? 'yes' : 'no')."\n";
 
 // ── Delete ──
 
 $config->delete();
-echo "After delete: " . ($config->exists() ? 'yes' : 'no') . "\n";
+echo 'After delete: '.($config->exists() ? 'yes' : 'no')."\n";
 
 // ── Attachments on a singleton ──
 

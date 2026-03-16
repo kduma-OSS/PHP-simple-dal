@@ -6,7 +6,6 @@ namespace KDuma\SimpleDAL\Typed;
 
 use KDuma\SimpleDAL\Contracts\RecordInterface;
 use KDuma\SimpleDAL\Typed\Contracts\Attribute\Field;
-use KDuma\SimpleDAL\Typed\Contracts\Converter\FieldConverterInterface;
 use KDuma\SimpleDAL\Typed\Contracts\TypedRecord;
 use KDuma\SimpleDAL\Typed\Converter\EnumConverter;
 use Spatie\Attributes\Attributes;
@@ -20,7 +19,7 @@ class TypedRecordHydrator
      * Discover #[Field] properties on a TypedRecord subclass.
      * Results are cached per class.
      *
-     * @param class-string<TypedRecord> $class
+     * @param  class-string<TypedRecord>  $class
      * @return FieldMapping[]
      */
     public static function discoverFields(string $class): array
@@ -34,7 +33,7 @@ class TypedRecordHydrator
 
         foreach ($targets as $target) {
             // Only handle property targets
-            if (!$target->target instanceof \ReflectionProperty) {
+            if (! $target->target instanceof \ReflectionProperty) {
                 continue;
             }
 
@@ -53,7 +52,7 @@ class TypedRecordHydrator
                 // Auto-detect backed enum
                 $type = $prop->getType();
 
-                if ($type instanceof \ReflectionNamedType && !$type->isBuiltin()) {
+                if ($type instanceof \ReflectionNamedType && ! $type->isBuiltin()) {
                     $typeName = $type->getName();
 
                     if (enum_exists($typeName)) {
@@ -91,7 +90,7 @@ class TypedRecordHydrator
     /**
      * Hydrate a TypedRecord from a RecordInterface (generic record from the base library).
      *
-     * @param class-string<TypedRecord> $class
+     * @param  class-string<TypedRecord>  $class
      */
     public static function hydrateFromRecord(string $class, RecordInterface $record): TypedRecord
     {
@@ -143,7 +142,7 @@ class TypedRecordHydrator
     /**
      * Create a blank TypedRecord instance for populating before persistence.
      *
-     * @param class-string<TypedRecord> $class
+     * @param  class-string<TypedRecord>  $class
      */
     public static function createBlank(string $class): TypedRecord
     {
@@ -172,7 +171,7 @@ class TypedRecordHydrator
         $data = $record->_getExtraData();
 
         foreach ($mappings as $mapping) {
-            if (!$mapping->reflection->isInitialized($record)) {
+            if (! $mapping->reflection->isInitialized($record)) {
                 continue;
             }
 
@@ -205,7 +204,7 @@ class TypedRecordHydrator
         $current = $data;
 
         foreach ($segments as $segment) {
-            if (!is_array($current) || !array_key_exists($segment, $current)) {
+            if (! is_array($current) || ! array_key_exists($segment, $current)) {
                 return null;
             }
 
@@ -224,7 +223,7 @@ class TypedRecordHydrator
         $current = &$data;
 
         foreach (array_slice($segments, 0, -1) as $segment) {
-            if (!isset($current[$segment]) || !is_array($current[$segment])) {
+            if (! isset($current[$segment]) || ! is_array($current[$segment])) {
                 return;
             }
 
@@ -243,7 +242,7 @@ class TypedRecordHydrator
         $current = &$data;
 
         foreach (array_slice($segments, 0, -1) as $segment) {
-            if (!isset($current[$segment]) || !is_array($current[$segment])) {
+            if (! isset($current[$segment]) || ! is_array($current[$segment])) {
                 $current[$segment] = [];
             }
 

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace KDuma\SimpleDAL\Adapter\Zip;
 
-use KDuma\SimpleDAL\Adapter\Directory\DirectoryAdapter;
 use KDuma\SimpleDAL\Adapter\Contracts\StorageAdapterInterface;
+use KDuma\SimpleDAL\Adapter\Directory\DirectoryAdapter;
 use KDuma\SimpleDAL\Contracts\EntityDefinitionInterface;
 use League\Flysystem\FilesystemOperator;
 

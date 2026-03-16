@@ -18,11 +18,11 @@ class TypedSingletonDefinition implements EntityDefinitionInterface
     }
 
     /**
-     * @param string $name Entity name.
-     * @param class-string|null $recordClass TypedRecord subclass for hydration.
-     * @param class-string<\BackedEnum>|null $attachmentEnum Enum class for typed attachments.
-     * @param bool $hasAttachments Whether the entity supports attachments.
-     * @param bool $hasTimestamps Whether the entity tracks timestamps.
+     * @param  string  $name  Entity name.
+     * @param  class-string|null  $recordClass  TypedRecord subclass for hydration.
+     * @param  class-string<\BackedEnum>|null  $attachmentEnum  Enum class for typed attachments.
+     * @param  bool  $hasAttachments  Whether the entity supports attachments.
+     * @param  bool  $hasTimestamps  Whether the entity tracks timestamps.
      */
     public function __construct(
         public readonly string $name,

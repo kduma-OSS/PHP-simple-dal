@@ -11,7 +11,7 @@ interface TypedAttachmentStoreInterface
     public function put(\BackedEnum $name, string $contents, string $mimeType = 'application/octet-stream'): AttachmentInterface;
 
     /**
-     * @param resource $stream
+     * @param  resource  $stream
      */
     public function putStream(\BackedEnum $name, mixed $stream, string $mimeType = 'application/octet-stream'): AttachmentInterface;
 

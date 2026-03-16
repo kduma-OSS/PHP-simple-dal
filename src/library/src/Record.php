@@ -26,7 +26,7 @@ final class Record implements RecordInterface
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     public function __construct(
         private string $_id,
@@ -41,7 +41,7 @@ final class Record implements RecordInterface
         $current = $this->_data;
 
         foreach ($segments as $segment) {
-            if (!is_array($current) || !array_key_exists($segment, $current)) {
+            if (! is_array($current) || ! array_key_exists($segment, $current)) {
                 return $default;
             }
 
@@ -57,7 +57,7 @@ final class Record implements RecordInterface
         $current = $this->_data;
 
         foreach ($segments as $segment) {
-            if (!is_array($current) || !array_key_exists($segment, $current)) {
+            if (! is_array($current) || ! array_key_exists($segment, $current)) {
                 return false;
             }
 
@@ -73,7 +73,7 @@ final class Record implements RecordInterface
         $current = &$this->_data;
 
         foreach (array_slice($segments, 0, -1) as $segment) {
-            if (!isset($current[$segment]) || !is_array($current[$segment])) {
+            if (! isset($current[$segment]) || ! is_array($current[$segment])) {
                 $current[$segment] = [];
             }
 
@@ -91,7 +91,7 @@ final class Record implements RecordInterface
         $current = &$this->_data;
 
         foreach (array_slice($segments, 0, -1) as $segment) {
-            if (!isset($current[$segment]) || !is_array($current[$segment])) {
+            if (! isset($current[$segment]) || ! is_array($current[$segment])) {
                 return $this;
             }
 
@@ -134,7 +134,7 @@ final class Record implements RecordInterface
     /**
      * @internal Used by stores to replace data after persistence.
      *
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     public function setData(array $data): void
     {
@@ -142,8 +142,8 @@ final class Record implements RecordInterface
     }
 
     /**
-     * @param array<string, mixed> $base
-     * @param array<string, mixed> $overlay
+     * @param  array<string, mixed>  $base
+     * @param  array<string, mixed>  $overlay
      * @return array<string, mixed>
      */
     public static function deepMerge(array $base, array $overlay): array

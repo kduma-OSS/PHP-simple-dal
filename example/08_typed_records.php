@@ -10,7 +10,7 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__.'/../vendor/autoload.php';
 
 use KDuma\SimpleDAL\Adapter\Database\DatabaseAdapter;
 use KDuma\SimpleDAL\Typed\Contracts\Attribute\Field;
@@ -52,10 +52,10 @@ class CertificateRecord extends TypedRecord
     public CertificateStatus $status;
 
     #[Field(converter: DateTimeConverter::class)]
-    public \DateTimeImmutable $notBefore;
+    public DateTimeImmutable $notBefore;
 
     #[Field(converter: DateTimeConverter::class)]
-    public \DateTimeImmutable $notAfter;
+    public DateTimeImmutable $notAfter;
 
     #[Field]
     public ?string $revocationReason;
@@ -78,7 +78,7 @@ class CaConfigRecord extends TypedRecord
 // ── 4. Create TypedDataStore ──
 
 $store = new TypedDataStore(
-    adapter: new DatabaseAdapter(new PDO('sqlite:' . __DIR__ . '/demo_typed.sqlite')),
+    adapter: new DatabaseAdapter(new PDO('sqlite:'.__DIR__.'/demo_typed.sqlite')),
     entities: [
         new TypedCollectionDefinition(
             name: 'certificates',
@@ -114,7 +114,7 @@ echo "CN: {$cert->commonName}\n";
 echo "Org: {$cert->organization}\n";
 echo "Status: {$cert->status->value}\n";
 echo "Not After: {$cert->notAfter->format('Y-m-d')}\n";
-echo "Revocation Reason: " . ($cert->revocationReason ?? '(none)') . "\n";
+echo 'Revocation Reason: '.($cert->revocationReason ?? '(none)')."\n";
 
 // ── 6. Find and modify ──
 
@@ -140,11 +140,11 @@ $attachments->put(
 );
 
 echo "\nAttachments:\n";
-echo "Has certificate: " . ($attachments->has(CertificateAttachment::Certificate) ? 'yes' : 'no') . "\n";
-echo "Has private key: " . ($attachments->has(CertificateAttachment::PrivateKey) ? 'yes' : 'no') . "\n";
+echo 'Has certificate: '.($attachments->has(CertificateAttachment::Certificate) ? 'yes' : 'no')."\n";
+echo 'Has private key: '.($attachments->has(CertificateAttachment::PrivateKey) ? 'yes' : 'no')."\n";
 
 $pem = $attachments->get(CertificateAttachment::Certificate);
-echo "Certificate content: " . strlen($pem->contents()) . " bytes\n";
+echo 'Certificate content: '.strlen($pem->contents())." bytes\n";
 
 // ── 8. Typed singleton ──
 
@@ -170,10 +170,10 @@ $config->save($record);
 $record = $config->get();
 echo "\nUpdated CA Config:\n";
 echo "Algorithm: {$record->keyAlgorithm}\n";
-echo "Curve: " . ($record->curve ?? '(none)') . "\n";
+echo 'Curve: '.($record->curve ?? '(none)')."\n";
 
 // Cleanup
-@unlink(__DIR__ . '/demo_typed.sqlite-shm');
-@unlink(__DIR__ . '/demo_typed.sqlite-wal');
-unlink(__DIR__ . '/demo_typed.sqlite');
+@unlink(__DIR__.'/demo_typed.sqlite-shm');
+@unlink(__DIR__.'/demo_typed.sqlite-wal');
+unlink(__DIR__.'/demo_typed.sqlite');
 echo "\nDone.\n";

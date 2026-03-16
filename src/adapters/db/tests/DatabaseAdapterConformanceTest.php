@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace KDuma\SimpleDAL\Adapter\Database\Tests;
 
+use KDuma\SimpleDAL\Adapter\Contracts\Tests\Concerns\AdapterConformanceTests;
 use KDuma\SimpleDAL\Adapter\Database\DatabaseAdapter;
 use KDuma\SimpleDAL\Contracts\EntityDefinitionInterface;
-use KDuma\SimpleDAL\Adapter\Contracts\Tests\Concerns\AdapterConformanceTests;
 use PHPUnit\Framework\TestCase;
 
 final class DatabaseAdapterConformanceTest extends TestCase
@@ -25,7 +25,8 @@ final class DatabaseAdapterConformanceTest extends TestCase
         $this->adapter = new DatabaseAdapter($pdo);
         $this->entityName = 'test_entity';
 
-        $definition = new class ('test_entity', false, true, true, ['status', 'meta.role']) implements EntityDefinitionInterface {
+        $definition = new class('test_entity', false, true, true, ['status', 'meta.role']) implements EntityDefinitionInterface
+        {
             public function __construct(
                 public readonly string $name,
                 public readonly bool $isSingleton,

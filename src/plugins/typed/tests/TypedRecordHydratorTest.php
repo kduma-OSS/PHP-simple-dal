@@ -6,6 +6,7 @@ use KDuma\SimpleDAL\Record;
 use KDuma\SimpleDAL\Typed\Contracts\Attribute\Field;
 use KDuma\SimpleDAL\Typed\Contracts\TypedRecord;
 use KDuma\SimpleDAL\Typed\Converter\DateTimeConverter;
+use KDuma\SimpleDAL\Typed\Converter\EnumConverter;
 use KDuma\SimpleDAL\Typed\TypedRecordHydrator;
 
 // -----------------------------------------------------------------
@@ -30,7 +31,7 @@ class HydratorTestRecord extends TypedRecord
     public string $authorName;
 
     #[Field(converter: DateTimeConverter::class)]
-    public \DateTimeImmutable $publishedAt;
+    public DateTimeImmutable $publishedAt;
 
     #[Field]
     public ?string $description;
@@ -96,7 +97,7 @@ test('discoverFields auto-detects backed enum converter', function () {
     $mappings = TypedRecordHydrator::discoverFields(HydratorTestRecord::class);
     $statusMapping = array_values(array_filter($mappings, fn ($m) => $m->propertyName === 'status'))[0];
 
-    expect($statusMapping->converter)->toBeInstanceOf(\KDuma\SimpleDAL\Typed\Converter\EnumConverter::class);
+    expect($statusMapping->converter)->toBeInstanceOf(EnumConverter::class);
 });
 
 test('discoverFields uses explicit converter when provided', function () {
@@ -135,8 +136,8 @@ test('hydrateFromRecord populates typed properties', function () {
             'published_at' => '2024-06-15T10:00:00+00:00',
             'description' => 'A test post',
         ],
-        _createdAt: new \DateTimeImmutable('2024-01-01'),
-        _updatedAt: new \DateTimeImmutable('2024-06-15'),
+        _createdAt: new DateTimeImmutable('2024-01-01'),
+        _updatedAt: new DateTimeImmutable('2024-06-15'),
     );
 
     $typed = TypedRecordHydrator::hydrateFromRecord(HydratorTestRecord::class, $record);
@@ -146,11 +147,11 @@ test('hydrateFromRecord populates typed properties', function () {
     expect($typed->title)->toBe('Hello World');
     expect($typed->status)->toBe(HydratorTestStatus::Published);
     expect($typed->authorName)->toBe('John Doe');
-    expect($typed->publishedAt)->toBeInstanceOf(\DateTimeImmutable::class);
+    expect($typed->publishedAt)->toBeInstanceOf(DateTimeImmutable::class);
     expect($typed->publishedAt->format('Y-m-d'))->toBe('2024-06-15');
     expect($typed->description)->toBe('A test post');
-    expect($typed->createdAt)->toBeInstanceOf(\DateTimeImmutable::class);
-    expect($typed->updatedAt)->toBeInstanceOf(\DateTimeImmutable::class);
+    expect($typed->createdAt)->toBeInstanceOf(DateTimeImmutable::class);
+    expect($typed->updatedAt)->toBeInstanceOf(DateTimeImmutable::class);
 });
 
 test('hydrateFromRecord handles null for nullable fields', function () {

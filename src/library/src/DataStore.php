@@ -22,13 +22,13 @@ final class DataStore implements DataStoreInterface
     private array $stores = [];
 
     /**
-     * @param EntityDefinitionInterface[] $entities
+     * @param  EntityDefinitionInterface[]  $entities
      */
     public function __construct(
         private readonly StorageAdapterInterface $adapter,
         array $entities,
     ) {
-        $this->registry = new EntityRegistry();
+        $this->registry = new EntityRegistry;
 
         foreach ($entities as $entity) {
             $this->registry->register($entity);
@@ -46,7 +46,7 @@ final class DataStore implements DataStoreInterface
             );
         }
 
-        if (!isset($this->stores[$entity])) {
+        if (! isset($this->stores[$entity])) {
             $this->stores[$entity] = new CollectionEntityStore($this->adapter, $definition);
         }
 
@@ -57,13 +57,13 @@ final class DataStore implements DataStoreInterface
     {
         $definition = $this->registry->get($entity);
 
-        if (!$definition->isSingleton) {
+        if (! $definition->isSingleton) {
             throw new EntityNotFoundException(
                 sprintf('Entity "%s" is a collection. Use collection() instead of singleton().', $entity),
             );
         }
 
-        if (!isset($this->stores[$entity])) {
+        if (! isset($this->stores[$entity])) {
             $this->stores[$entity] = new SingletonEntityStore($this->adapter, $definition);
         }
 

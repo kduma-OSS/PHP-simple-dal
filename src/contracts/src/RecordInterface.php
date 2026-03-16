@@ -44,7 +44,7 @@ interface RecordInterface
     /**
      * Deep merge an array of data into the record. Fluent.
      *
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     public function merge(array $data): static;
 }

@@ -10,7 +10,7 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__.'/../vendor/autoload.php';
 
 use KDuma\SimpleDAL\Adapter\Database\DatabaseAdapter;
 use KDuma\SimpleDAL\Adapter\Directory\DirectoryAdapter;
@@ -36,7 +36,7 @@ function seedAndQuery(DataStoreInterface $store): void
 
     $active = $certs->filter(Filter::where('status', '=', 'active'));
 
-    echo "  Active: " . count($active) . " certificates\n";
+    echo '  Active: '.count($active)." certificates\n";
     foreach ($active as $r) {
         echo "    - {$r->id}: {$r->get('domain')}\n";
     }
@@ -55,7 +55,7 @@ seedAndQuery(new DataStore(
 // ── Directory adapter ──
 
 echo "\n=== Directory ===\n";
-$dir = __DIR__ . '/adapter-demo';
+$dir = __DIR__.'/adapter-demo';
 @mkdir($dir, 0777, true);
 
 seedAndQuery(new DataStore(
@@ -68,13 +68,15 @@ $it = new RecursiveIteratorIterator(
     new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS),
     RecursiveIteratorIterator::CHILD_FIRST,
 );
-foreach ($it as $f) { $f->isDir() ? rmdir($f->getPathname()) : unlink($f->getPathname()); }
+foreach ($it as $f) {
+    $f->isDir() ? rmdir($f->getPathname()) : unlink($f->getPathname());
+}
 rmdir($dir);
 
 // ── ZIP adapter ──
 
 echo "\n=== ZIP ===\n";
-$zipPath = __DIR__ . '/adapter-demo.zip';
+$zipPath = __DIR__.'/adapter-demo.zip';
 
 seedAndQuery(new DataStore(
     adapter: new ZipAdapter(

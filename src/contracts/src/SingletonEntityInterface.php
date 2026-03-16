@@ -28,7 +28,7 @@ interface SingletonEntityInterface
     /**
      * Write (create or full replace) the singleton data.
      *
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     public function set(array $data): RecordInterface;
 
@@ -40,7 +40,7 @@ interface SingletonEntityInterface
     /**
      * Shorthand: partial deep merge update.
      *
-     * @param array<string, mixed> $data Fields to merge.
+     * @param  array<string, mixed>  $data  Fields to merge.
      *
      * @throws Exception\RecordNotFoundException If not yet set.
      */

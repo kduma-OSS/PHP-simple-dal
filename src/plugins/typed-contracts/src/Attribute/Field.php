@@ -10,8 +10,8 @@ use Attribute;
 class Field
 {
     /**
-     * @param string|null $path      null = auto camelCase to snake_case
-     * @param string|null $converter class-string<\KDuma\SimpleDAL\Typed\Contracts\Converter\FieldConverterInterface>
+     * @param  string|null  $path  null = auto camelCase to snake_case
+     * @param  string|null  $converter  class-string<\KDuma\SimpleDAL\Typed\Contracts\Converter\FieldConverterInterface>
      */
     public function __construct(
         public readonly ?string $path = null,

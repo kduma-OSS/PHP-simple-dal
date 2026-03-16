@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace KDuma\SimpleDAL\Adapter\Contracts\Tests\Concerns;
 
 use KDuma\SimpleDAL\Adapter\Contracts\StorageAdapterInterface;
+use KDuma\SimpleDAL\Contracts\EntityDefinitionInterface;
 use KDuma\SimpleDAL\Contracts\Exception\AttachmentNotFoundException;
 use KDuma\SimpleDAL\Contracts\Exception\RecordNotFoundException;
 
@@ -620,7 +621,7 @@ trait AdapterConformanceTests
      * Override this method in your test if your adapter requires a
      * more specialised definition object.
      *
-     * @param  string[] $indexedFields
+     * @param  string[]  $indexedFields
      */
     private function createEntityDefinition(
         string $name,
@@ -628,8 +629,9 @@ trait AdapterConformanceTests
         bool $hasAttachments,
         bool $hasTimestamps,
         array $indexedFields,
-    ): \KDuma\SimpleDAL\Contracts\EntityDefinitionInterface {
-        return new class ($name, $isSingleton, $hasAttachments, $hasTimestamps, $indexedFields) implements \KDuma\SimpleDAL\Contracts\EntityDefinitionInterface {
+    ): EntityDefinitionInterface {
+        return new class($name, $isSingleton, $hasAttachments, $hasTimestamps, $indexedFields) implements EntityDefinitionInterface
+        {
             public function __construct(
                 public readonly string $name,
                 public readonly bool $isSingleton,

@@ -9,7 +9,7 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__.'/../vendor/autoload.php';
 
 use KDuma\SimpleDAL\Adapter\Database\DatabaseAdapter;
 use KDuma\SimpleDAL\Contracts\Query\SortDirection;
@@ -35,7 +35,7 @@ $certs->create(['subject' => ['commonName' => 'example.com'],    'status' => 'ac
 $certs->create(['subject' => ['commonName' => 'test.com'],       'status' => 'active',  'not_after' => '2026-06-01', 'priority' => 3], id: 'cert-02');
 $certs->create(['subject' => ['commonName' => 'staging.com'],    'status' => 'revoked', 'not_after' => '2025-12-01', 'priority' => 2], id: 'cert-03');
 $certs->create(['subject' => ['commonName' => 'internal.local'], 'status' => 'active',  'not_after' => '2026-09-01', 'priority' => 4], id: 'cert-04');
-$certs->create(['subject' => ['commonName' => 'api.example.com'],'status' => 'expired', 'not_after' => '2025-01-01', 'priority' => 5], id: 'cert-05');
+$certs->create(['subject' => ['commonName' => 'api.example.com'], 'status' => 'expired', 'not_after' => '2025-01-01', 'priority' => 5], id: 'cert-05');
 
 // ── Simple equality filter ──
 

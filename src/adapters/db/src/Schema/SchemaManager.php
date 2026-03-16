@@ -59,13 +59,13 @@ final class SchemaManager
     }
 
     /**
-     * @param string[] $fields
+     * @param  string[]  $fields
      */
     private function createFieldIndexes(string $tableName, array $fields): void
     {
         foreach ($fields as $field) {
             $fieldSafe = str_replace('.', '_', $field);
-            $jsonPath = '$.' . $field;
+            $jsonPath = '$.'.$field;
 
             $this->pdo->exec(
                 "CREATE INDEX IF NOT EXISTS idx_{$tableName}_{$fieldSafe} ON {$tableName} (json_extract(data, '{$jsonPath}'))"

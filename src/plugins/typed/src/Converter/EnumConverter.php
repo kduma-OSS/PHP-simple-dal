@@ -9,7 +9,7 @@ use KDuma\SimpleDAL\Typed\Contracts\Converter\FieldConverterInterface;
 class EnumConverter implements FieldConverterInterface
 {
     /**
-     * @param class-string<\BackedEnum> $enumClass
+     * @param  class-string<\BackedEnum>  $enumClass
      */
     public function __construct(
         private readonly string $enumClass,

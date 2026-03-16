@@ -23,7 +23,7 @@ class TypedDataStore
     private array $stores = [];
 
     /**
-     * @param EntityDefinitionInterface[] $entities
+     * @param  EntityDefinitionInterface[]  $entities
      */
     public function __construct(
         StorageAdapterInterface $adapter,
@@ -40,7 +40,7 @@ class TypedDataStore
 
     public function collection(string $entity): TypedCollectionEntity
     {
-        if (!isset($this->stores[$entity])) {
+        if (! isset($this->stores[$entity])) {
             $inner = $this->inner->collection($entity);
             $def = $this->entityDefs[$entity] ?? null;
             $recordClass = ($def instanceof TypedCollectionDefinition) ? $def->recordClass : null;
@@ -53,7 +53,7 @@ class TypedDataStore
 
     public function singleton(string $entity): TypedSingletonEntity
     {
-        if (!isset($this->stores[$entity])) {
+        if (! isset($this->stores[$entity])) {
             $inner = $this->inner->singleton($entity);
             $def = $this->entityDefs[$entity] ?? null;
             $recordClass = ($def instanceof TypedSingletonDefinition) ? $def->recordClass : null;

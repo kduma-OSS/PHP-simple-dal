@@ -9,7 +9,7 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__.'/../vendor/autoload.php';
 
 use KDuma\SimpleDAL\Adapter\Database\DatabaseAdapter;
 use KDuma\SimpleDAL\DataStore;
@@ -18,7 +18,7 @@ use KDuma\SimpleDAL\Entity\SingletonEntityDefinition;
 
 // 1. Create adapter and data store
 $store = new DataStore(
-    adapter: new DatabaseAdapter(new PDO('sqlite:' . __DIR__ . '/demo.sqlite')),
+    adapter: new DatabaseAdapter(new PDO('sqlite:'.__DIR__.'/demo.sqlite')),
     entities: [
         new CollectionEntityDefinition(
             name: 'certificates',
@@ -52,7 +52,7 @@ echo "Found: {$found->get('subject.organization')}\n";
 
 // 4. Modify and save
 $found->set('status', 'revoked')
-      ->set('revoked_at', '2026-03-15T12:00:00Z');
+    ->set('revoked_at', '2026-03-15T12:00:00Z');
 $store->collection('certificates')->save($found);
 
 echo "Status: {$found->get('status')}\n"; // "revoked"
@@ -63,7 +63,7 @@ $store->collection('certificates')->update('cert-01', [
 ]);
 
 // 6. Check existence
-echo "Exists: " . ($store->collection('certificates')->has('cert-01') ? 'yes' : 'no') . "\n";
+echo 'Exists: '.($store->collection('certificates')->has('cert-01') ? 'yes' : 'no')."\n";
 
 // 7. Count records
 echo "Total: {$store->collection('certificates')->count()}\n";
@@ -73,7 +73,7 @@ $store->collection('certificates')->delete('cert-01');
 echo "After delete: {$store->collection('certificates')->count()} records\n";
 
 // Cleanup
-@unlink(__DIR__ . '/demo.sqlite-shm');
-@unlink(__DIR__ . '/demo.sqlite-wal');
-unlink(__DIR__ . '/demo.sqlite');
+@unlink(__DIR__.'/demo.sqlite-shm');
+@unlink(__DIR__.'/demo.sqlite-wal');
+unlink(__DIR__.'/demo.sqlite');
 echo "\nDone.\n";

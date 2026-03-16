@@ -12,7 +12,7 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__.'/../vendor/autoload.php';
 
 use KDuma\SimpleDAL\Adapter\Directory\DirectoryAdapter;
 use KDuma\SimpleDAL\DataStore;
@@ -23,7 +23,7 @@ use League\Flysystem\Local\LocalFilesystemAdapter;
 
 // ── Set up the directory adapter ──
 
-$dataDir = __DIR__ . '/data';
+$dataDir = __DIR__.'/data';
 @mkdir($dataDir, 0777, true);
 
 $filesystem = new Filesystem(new LocalFilesystemAdapter($dataDir));
@@ -75,7 +75,7 @@ $iterator = new RecursiveIteratorIterator(
 );
 
 foreach ($iterator as $file) {
-    $relativePath = str_replace($dataDir . '/', '', $file->getPathname());
+    $relativePath = str_replace($dataDir.'/', '', $file->getPathname());
     $indent = str_repeat('  ', $iterator->getDepth());
     $prefix = $file->isDir() ? '/' : '';
     echo "  {$indent}{$prefix}{$file->getFilename()}\n";
@@ -84,13 +84,13 @@ foreach ($iterator as $file) {
 // ── Show that JSON is pretty-printed with sorted keys ──
 
 echo "\nContents of certificates/cert-01/data.json:\n";
-echo file_get_contents($dataDir . '/certificates/cert-01/data.json') . "\n";
+echo file_get_contents($dataDir.'/certificates/cert-01/data.json')."\n";
 
 // ── Show the index file ──
 
-if (file_exists($dataDir . '/certificates/_index.json')) {
+if (file_exists($dataDir.'/certificates/_index.json')) {
     echo "Contents of certificates/_index.json:\n";
-    echo file_get_contents($dataDir . '/certificates/_index.json') . "\n";
+    echo file_get_contents($dataDir.'/certificates/_index.json')."\n";
 }
 
 // ── Cleanup ──

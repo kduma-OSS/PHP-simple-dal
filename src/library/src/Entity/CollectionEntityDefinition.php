@@ -13,7 +13,7 @@ final class CollectionEntityDefinition implements EntityDefinitionInterface
     }
 
     /**
-     * @param string[] $indexedFields
+     * @param  string[]  $indexedFields
      */
     public function __construct(
         public readonly string $name,

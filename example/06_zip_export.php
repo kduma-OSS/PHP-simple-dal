@@ -10,7 +10,7 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__.'/../vendor/autoload.php';
 
 use KDuma\SimpleDAL\Adapter\Database\DatabaseAdapter;
 use KDuma\SimpleDAL\Adapter\Zip\ZipAdapter;
@@ -52,7 +52,7 @@ echo "Created data in SQLite.\n";
 
 // ── Step 2: Export to ZIP ──
 
-$zipPath = __DIR__ . '/export.zip';
+$zipPath = __DIR__.'/export.zip';
 
 $zipStore = new DataStore(
     adapter: new ZipAdapter(
@@ -79,7 +79,7 @@ foreach ($sqliteStore->collection('certificates')->all() as $record) {
 }
 
 echo "Exported to {$zipPath}\n";
-echo "ZIP size: " . filesize($zipPath) . " bytes\n";
+echo 'ZIP size: '.filesize($zipPath)." bytes\n";
 
 // ── Step 3: Read back from ZIP ──
 

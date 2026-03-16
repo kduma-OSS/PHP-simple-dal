@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace KDuma\SimpleDAL\Store;
 
-use KDuma\SimpleDAL\Attachment\AttachmentStore;
 use KDuma\SimpleDAL\Adapter\Contracts\StorageAdapterInterface;
+use KDuma\SimpleDAL\Attachment\AttachmentStore;
 use KDuma\SimpleDAL\Contracts\AttachmentStoreInterface;
 use KDuma\SimpleDAL\Contracts\CollectionEntityInterface;
 use KDuma\SimpleDAL\Contracts\EntityDefinitionInterface;
@@ -41,7 +41,7 @@ final class CollectionEntityStore implements CollectionEntityInterface
             );
         }
 
-        $now = new \DateTimeImmutable();
+        $now = new \DateTimeImmutable;
 
         if ($this->definition->hasTimestamps) {
             $data['_createdAt'] = $now->format(\DateTimeInterface::RFC3339_EXTENDED);
@@ -67,7 +67,7 @@ final class CollectionEntityStore implements CollectionEntityInterface
 
     public function findOrNull(string $id): ?RecordInterface
     {
-        if (!$this->adapter->recordExists($this->definition->name, $id)) {
+        if (! $this->adapter->recordExists($this->definition->name, $id)) {
             return null;
         }
 
@@ -108,7 +108,7 @@ final class CollectionEntityStore implements CollectionEntityInterface
     public function save(RecordInterface $record): RecordInterface
     {
         $data = $record->data;
-        $now = new \DateTimeImmutable();
+        $now = new \DateTimeImmutable;
 
         if ($this->definition->hasTimestamps) {
             if ($record->createdAt !== null) {
@@ -132,7 +132,7 @@ final class CollectionEntityStore implements CollectionEntityInterface
     {
         $existing = $this->adapter->readRecord($this->definition->name, $id);
         $merged = Record::deepMerge($existing, $data);
-        $now = new \DateTimeImmutable();
+        $now = new \DateTimeImmutable;
 
         if ($this->definition->hasTimestamps) {
             $merged['_updatedAt'] = $now->format(\DateTimeInterface::RFC3339_EXTENDED);
@@ -147,7 +147,7 @@ final class CollectionEntityStore implements CollectionEntityInterface
     {
         // Ensure the record exists first.
         $existing = $this->adapter->readRecord($this->definition->name, $id);
-        $now = new \DateTimeImmutable();
+        $now = new \DateTimeImmutable;
 
         if ($this->definition->hasTimestamps) {
             // Preserve original createdAt.
@@ -165,7 +165,7 @@ final class CollectionEntityStore implements CollectionEntityInterface
 
     public function delete(string $id): void
     {
-        if (!$this->adapter->recordExists($this->definition->name, $id)) {
+        if (! $this->adapter->recordExists($this->definition->name, $id)) {
             throw new RecordNotFoundException(
                 sprintf('Record "%s" not found in entity "%s".', $id, $this->definition->name),
             );
@@ -213,7 +213,7 @@ final class CollectionEntityStore implements CollectionEntityInterface
             $current = $data;
 
             foreach ($segments as $segment) {
-                if (!is_array($current) || !array_key_exists($segment, $current)) {
+                if (! is_array($current) || ! array_key_exists($segment, $current)) {
                     break;
                 }
 
@@ -230,7 +230,7 @@ final class CollectionEntityStore implements CollectionEntityInterface
 
     private function validateId(string $id): void
     {
-        if (!preg_match(self::ID_PATTERN, $id)) {
+        if (! preg_match(self::ID_PATTERN, $id)) {
             throw new \InvalidArgumentException(
                 sprintf('Invalid record ID "%s". IDs must match the pattern [a-zA-Z0-9._-]+.', $id),
             );
@@ -261,7 +261,7 @@ final class CollectionEntityStore implements CollectionEntityInterface
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      * @return array<string, mixed>
      */
     private function stripMetaFields(array $data): array
@@ -288,7 +288,7 @@ final class CollectionEntityStore implements CollectionEntityInterface
 
         // Encode 48-bit timestamp into the first 6 bytes.
         $bytes = pack('N', ($time >> 16) & 0xFFFFFFFF)
-            . pack('n', $time & 0xFFFF);
+            .pack('n', $time & 0xFFFF);
 
         // Append 10 random bytes, then set version and variant bits.
         $bytes .= $random;

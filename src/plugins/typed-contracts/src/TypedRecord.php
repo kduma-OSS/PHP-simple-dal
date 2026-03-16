@@ -41,7 +41,7 @@ abstract class TypedRecord
         $current = $this->_extraData;
 
         foreach ($segments as $segment) {
-            if (!is_array($current) || !array_key_exists($segment, $current)) {
+            if (! is_array($current) || ! array_key_exists($segment, $current)) {
                 return $default;
             }
             $current = $current[$segment];
@@ -60,7 +60,7 @@ abstract class TypedRecord
         $current = &$this->_extraData;
 
         foreach (array_slice($segments, 0, -1) as $segment) {
-            if (!isset($current[$segment]) || !is_array($current[$segment])) {
+            if (! isset($current[$segment]) || ! is_array($current[$segment])) {
                 $current[$segment] = [];
             }
             $current = &$current[$segment];

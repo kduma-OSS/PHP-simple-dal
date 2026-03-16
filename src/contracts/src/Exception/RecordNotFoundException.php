@@ -4,6 +4,4 @@ declare(strict_types=1);
 
 namespace KDuma\SimpleDAL\Contracts\Exception;
 
-class RecordNotFoundException extends \RuntimeException implements DataStoreExceptionInterface
-{
-}
+class RecordNotFoundException extends \RuntimeException implements DataStoreExceptionInterface {}

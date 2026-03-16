@@ -14,7 +14,7 @@ interface AttachmentStoreInterface
     /**
      * Store an attachment from a stream resource.
      *
-     * @param resource $stream
+     * @param  resource  $stream
      */
     public function putStream(string $name, mixed $stream, string $mimeType = 'application/octet-stream'): AttachmentInterface;
 

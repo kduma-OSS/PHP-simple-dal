@@ -11,7 +11,8 @@ beforeEach(function () {
     $this->entityName = 'test_entity';
 
     // Initialize the entity tables so every test starts with a clean schema.
-    $definition = new class ('test_entity', false, true, true, ['status', 'meta.role']) implements EntityDefinitionInterface {
+    $definition = new class('test_entity', false, true, true, ['status', 'meta.role']) implements EntityDefinitionInterface
+    {
         public function __construct(
             public readonly string $name,
             public readonly bool $isSingleton,
@@ -30,17 +31,18 @@ beforeEach(function () {
 
 test('rejects invalid entity names', function () {
     $this->adapter->writeRecord('test_entity; DROP TABLE users', 'id-1', ['x' => 1]);
-})->throws(\InvalidArgumentException::class);
+})->throws(InvalidArgumentException::class);
 
 test('rejects entity names with special characters', function () {
     $this->adapter->writeRecord('test-entity', 'id-1', ['x' => 1]);
-})->throws(\InvalidArgumentException::class);
+})->throws(InvalidArgumentException::class);
 
 test('purge entity allows re-initialization', function () {
     $this->adapter->writeRecord($this->entityName, 'rec-1', ['a' => 1]);
     $this->adapter->purgeEntity($this->entityName);
 
-    $definition = new class ('test_entity', false, true, true, []) implements EntityDefinitionInterface {
+    $definition = new class('test_entity', false, true, true, []) implements EntityDefinitionInterface
+    {
         public function __construct(
             public readonly string $name,
             public readonly bool $isSingleton,

@@ -34,7 +34,7 @@ class UserTypedRecord extends TypedRecord
     public int $age;
 
     #[Field(converter: DateTimeConverter::class)]
-    public \DateTimeImmutable $registeredAt;
+    public DateTimeImmutable $registeredAt;
 
     #[Field]
     public ?string $bio;
@@ -61,8 +61,8 @@ test('typed record hydrates all field types correctly', function () {
             'bio' => 'Software engineer',
             'settings' => ['theme' => 'dark'],
         ],
-        _createdAt: new \DateTimeImmutable('2024-03-15T12:00:00+00:00'),
-        _updatedAt: new \DateTimeImmutable('2024-06-01T08:00:00+00:00'),
+        _createdAt: new DateTimeImmutable('2024-03-15T12:00:00+00:00'),
+        _updatedAt: new DateTimeImmutable('2024-06-01T08:00:00+00:00'),
     );
 
     $typed = TypedRecordHydrator::hydrateFromRecord(UserTypedRecord::class, $record);
@@ -73,7 +73,7 @@ test('typed record hydrates all field types correctly', function () {
     expect($typed->email)->toBe('alice@example.com');
     expect($typed->role)->toBe(RecordTestRole::Admin);
     expect($typed->age)->toBe(30);
-    expect($typed->registeredAt)->toBeInstanceOf(\DateTimeImmutable::class);
+    expect($typed->registeredAt)->toBeInstanceOf(DateTimeImmutable::class);
     expect($typed->registeredAt->format('Y-m-d'))->toBe('2024-03-15');
     expect($typed->bio)->toBe('Software engineer');
     expect($typed->theme)->toBe('dark');

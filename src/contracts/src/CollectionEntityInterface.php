@@ -13,8 +13,8 @@ interface CollectionEntityInterface
     /**
      * Create a new record. Returns the persisted record.
      *
-     * @param array<string, mixed> $data
-     * @param string|null $id Explicit ID, or null to auto-generate.
+     * @param  array<string, mixed>  $data
+     * @param  string|null  $id  Explicit ID, or null to auto-generate.
      *
      * @throws Exception\DuplicateRecordException If a record with the given ID already exists.
      */
@@ -59,7 +59,7 @@ interface CollectionEntityInterface
     /**
      * Shorthand: partial deep merge update by ID.
      *
-     * @param array<string, mixed> $data Fields to merge into the existing record.
+     * @param  array<string, mixed>  $data  Fields to merge into the existing record.
      *
      * @throws Exception\RecordNotFoundException
      */
@@ -68,7 +68,7 @@ interface CollectionEntityInterface
     /**
      * Full overwrite of a record's data by ID.
      *
-     * @param array<string, mixed> $data Complete replacement data.
+     * @param  array<string, mixed>  $data  Complete replacement data.
      *
      * @throws Exception\RecordNotFoundException
      */

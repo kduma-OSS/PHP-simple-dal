@@ -47,7 +47,7 @@ final class AttachmentStore implements AttachmentStoreInterface
 
     public function get(string $name): AttachmentInterface
     {
-        if (!$this->has($name)) {
+        if (! $this->has($name)) {
             throw new AttachmentNotFoundException(
                 sprintf('Attachment "%s" not found for record "%s" in entity "%s".', $name, $this->recordId, $this->entityName),
             );
@@ -58,7 +58,7 @@ final class AttachmentStore implements AttachmentStoreInterface
 
     public function getOrNull(string $name): ?AttachmentInterface
     {
-        if (!$this->has($name)) {
+        if (! $this->has($name)) {
             return null;
         }
 
@@ -82,7 +82,7 @@ final class AttachmentStore implements AttachmentStoreInterface
 
     public function delete(string $name): void
     {
-        if (!$this->has($name)) {
+        if (! $this->has($name)) {
             throw new AttachmentNotFoundException(
                 sprintf('Attachment "%s" not found for record "%s" in entity "%s".', $name, $this->recordId, $this->entityName),
             );
