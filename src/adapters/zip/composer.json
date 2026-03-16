@@ -5,14 +5,14 @@
     "license": "MIT",
     "require": {
         "php": "^8.4",
-        "kduma/simple-dal-adapter-contracts": "^0.0.1",
-        "kduma/simple-dal-directory-adapter": "^0.0.1",
+        "kduma/simple-dal-adapter-contracts": "^0.1",
+        "kduma/simple-dal-directory-adapter": "^0.1",
         "league/flysystem": "^3.0",
         "league/flysystem-ziparchive": "^3.0"
     },
     "require-dev": {
         "pestphp/pest": "^3.0",
-        "kduma/simple-dal": "^0.0.1"
+        "kduma/simple-dal": "^0.1"
     },
     "autoload": {
         "psr-4": {
@@ -26,7 +26,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "0.0.x-dev"
+            "dev-master": "0.1-dev"
         }
     },
     "config": {
