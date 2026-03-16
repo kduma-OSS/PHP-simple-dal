@@ -28,6 +28,13 @@ A PHP 8.4 Data Access Layer for storing JSON documents and binary attachments wi
 - [Attachments](#attachments)
 - [Error Handling](#error-handling)
 - [Switching Adapters](#switching-adapters)
+- [Typed Records Plugin](#typed-records-plugin)
+  - [Defining Typed Record Classes](#defining-typed-record-classes)
+  - [Field Converters](#field-converters)
+  - [Typed Entity Definitions](#typed-entity-definitions)
+  - [TypedDataStore](#typeddatastore)
+  - [Working with Typed Records](#working-with-typed-records)
+  - [Typed Attachments](#typed-attachments)
 
 ---
 
@@ -630,4 +637,211 @@ foreach ($source->collection('certificates')->all() as $record) {
             ->put($att->name, $att->contents(), $att->mimeType);
     }
 }
+```
+
+---
+
+## Typed Records Plugin
+
+The typed records plugin adds strongly-typed PHP record classes to Simple DAL. Instead of accessing data via `$record->get('field')`, you define a class with typed properties and `#[Field]` attributes. The plugin handles hydration and dehydration automatically.
+
+```bash
+# Install the plugin (pulls in simple-dal automatically)
+composer require kduma/simple-dal-typed
+```
+
+**Requirements:** PHP 8.4+ (uses property hooks)
+
+### Defining Typed Record Classes
+
+Extend `TypedRecord` and mark properties with the `#[Field]` attribute:
+
+```php
+use KDuma\SimpleDAL\Typed\Contracts\TypedRecord;
+use KDuma\SimpleDAL\Typed\Contracts\Attribute\Field;
+
+class CertificateRecord extends TypedRecord
+{
+    #[Field]
+    public string $serialNumber;          // maps to "serial_number" (auto snake_case)
+
+    #[Field(path: 'subject.common_name')]
+    public string $commonName;            // maps to nested "subject.common_name"
+
+    #[Field]
+    public CertificateStatus $status;     // BackedEnum -- auto converter
+
+    #[Field]
+    public ?string $revocationReason;     // nullable
+}
+```
+
+**Path mapping rules:**
+
+- No `path:` argument -- property name is converted from camelCase to snake_case (e.g. `$serialNumber` → `serial_number`)
+- Explicit `path:` -- used as-is, supports dot-notation for nested fields (e.g. `subject.common_name`)
+
+### Field Converters
+
+Converters transform values between PHP types and storage format.
+
+**Automatic converters:**
+
+- `BackedEnum`-typed properties are automatically converted using `EnumConverter` (no configuration needed)
+
+**Built-in converters:**
+
+```php
+use KDuma\SimpleDAL\Typed\Converter\DateTimeConverter;
+
+class CertificateRecord extends TypedRecord
+{
+    #[Field(converter: DateTimeConverter::class)]
+    public \DateTimeImmutable $notAfter;    // stored as ISO 8601 string
+}
+```
+
+**Custom converters** implement `FieldConverterInterface`:
+
+```php
+use KDuma\SimpleDAL\Typed\Contracts\Converter\FieldConverterInterface;
+
+class MoneyConverter implements FieldConverterInterface
+{
+    public function fromStorage(mixed $value): mixed
+    {
+        return new Money($value);
+    }
+
+    public function toStorage(mixed $value): mixed
+    {
+        return $value->cents;
+    }
+}
+```
+
+### Typed Entity Definitions
+
+Use `TypedCollectionDefinition` and `TypedSingletonDefinition` instead of the untyped variants. They accept the same parameters plus `recordClass` and `attachmentEnum`:
+
+```php
+use KDuma\SimpleDAL\Typed\Entity\TypedCollectionDefinition;
+use KDuma\SimpleDAL\Typed\Entity\TypedSingletonDefinition;
+
+// Collection with typed records and typed attachments
+new TypedCollectionDefinition(
+    name: 'certificates',
+    recordClass: CertificateRecord::class,
+    attachmentEnum: CertificateAttachment::class,  // optional
+    indexedFields: ['status', 'subject.common_name'],
+);
+
+// Singleton with typed records
+new TypedSingletonDefinition(
+    name: 'ca_config',
+    recordClass: CaConfigRecord::class,
+);
+```
+
+### TypedDataStore
+
+`TypedDataStore` wraps `DataStore` and returns typed records instead of generic `RecordInterface`:
+
+```php
+use KDuma\SimpleDAL\Adapter\Database\DatabaseAdapter;
+use KDuma\SimpleDAL\Typed\TypedDataStore;
+
+$store = new TypedDataStore(
+    adapter: new DatabaseAdapter(new PDO('sqlite:data.sqlite')),
+    entities: [
+        new TypedCollectionDefinition(
+            name: 'certificates',
+            recordClass: CertificateRecord::class,
+        ),
+        new TypedSingletonDefinition(
+            name: 'ca_config',
+            recordClass: CaConfigRecord::class,
+        ),
+    ],
+);
+
+$certs  = $store->collection('certificates');  // → TypedCollectionEntity
+$config = $store->singleton('ca_config');       // → TypedSingletonEntity
+```
+
+### Working with Typed Records
+
+The API mirrors the untyped `DataStore`, but all returned records are instances of your typed class:
+
+```php
+// Create -- pass raw data, get typed record back
+$cert = $store->collection('certificates')->create([
+    'serial_number' => '01',
+    'subject' => ['common_name' => 'example.com'],
+    'status' => 'active',
+    'not_after' => '2027-01-01T00:00:00+00:00',
+    'revocation_reason' => null,
+], id: 'cert-01');
+
+// Access typed properties directly
+echo $cert->commonName;              // "example.com"
+echo $cert->status->value;           // "active" (enum)
+echo $cert->notAfter->format('Y');   // "2027" (DateTimeImmutable)
+
+// Mutate and save
+$cert->status = CertificateStatus::Revoked;
+$cert->revocationReason = 'key_compromise';
+$cert = $store->collection('certificates')->save($cert);
+
+// Find, all, filter -- same API, typed results
+$cert = $store->collection('certificates')->find('cert-01');     // CertificateRecord
+$all  = $store->collection('certificates')->all();               // CertificateRecord[]
+```
+
+**Singletons** work the same way:
+
+```php
+$config = $store->singleton('ca_config');
+
+$config->set([
+    'issuer' => ['common_name' => 'My Root CA'],
+    'key_algorithm' => 'EC',
+    'curve' => 'P-384',
+]);
+
+$record = $config->get();       // CaConfigRecord
+echo $record->issuerName;       // "My Root CA"
+echo $record->keyAlgorithm;     // "EC"
+
+$record->keyAlgorithm = 'RSA';
+$record->curve = null;
+$config->save($record);
+```
+
+### Typed Attachments
+
+Define a string-backed enum for attachment names, then use it instead of raw strings:
+
+```php
+enum CertificateAttachment: string
+{
+    case Certificate = 'certificate.pem';
+    case PrivateKey = 'private_key.pem';
+}
+
+// Pass the enum in TypedCollectionDefinition
+new TypedCollectionDefinition(
+    name: 'certificates',
+    recordClass: CertificateRecord::class,
+    attachmentEnum: CertificateAttachment::class,
+);
+
+// Use enum values instead of strings
+$attachments = $store->collection('certificates')->attachments('cert-01');
+
+$attachments->put(CertificateAttachment::Certificate, $pemContent);
+$attachments->has(CertificateAttachment::PrivateKey);     // false
+$att = $attachments->get(CertificateAttachment::Certificate);
+echo $att->contents();
+$attachments->delete(CertificateAttachment::Certificate);
 ```
