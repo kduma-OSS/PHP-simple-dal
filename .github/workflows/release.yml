@@ -46,3 +46,13 @@ jobs:
 
       - name: Release
         run: vendor/bin/monorepo-builder release ${{ inputs.version }}
+
+      - name: Resolve release tag
+        id: tag
+        run: echo "tag=$(git describe --tags --abbrev=0)" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          generate_release_notes: true
