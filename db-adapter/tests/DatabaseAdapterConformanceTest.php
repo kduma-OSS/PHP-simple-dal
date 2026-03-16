@@ -6,7 +6,7 @@ namespace KDuma\SimpleDAL\Adapter\Database\Tests;
 
 use KDuma\SimpleDAL\Adapter\Database\DatabaseAdapter;
 use KDuma\SimpleDAL\Contracts\EntityDefinitionInterface;
-use KDuma\SimpleDAL\Contracts\Tests\Concerns\AdapterConformanceTests;
+use KDuma\SimpleDAL\Adapter\Contracts\Tests\Concerns\AdapterConformanceTests;
 use PHPUnit\Framework\TestCase;
 
 final class DatabaseAdapterConformanceTest extends TestCase

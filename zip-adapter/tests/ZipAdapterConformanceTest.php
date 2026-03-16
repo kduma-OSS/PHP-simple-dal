@@ -6,7 +6,7 @@ namespace KDuma\SimpleDAL\Adapter\Zip\Tests;
 
 use KDuma\SimpleDAL\Adapter\Zip\ZipAdapter;
 use KDuma\SimpleDAL\Contracts\EntityDefinitionInterface;
-use KDuma\SimpleDAL\Contracts\Tests\Concerns\AdapterConformanceTests;
+use KDuma\SimpleDAL\Adapter\Contracts\Tests\Concerns\AdapterConformanceTests;
 use League\Flysystem\Filesystem;
 use League\Flysystem\ZipArchive\FilesystemZipArchiveProvider;
 use League\Flysystem\ZipArchive\ZipArchiveAdapter as FlysystemZipArchiveAdapter;

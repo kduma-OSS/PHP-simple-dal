@@ -6,8 +6,8 @@
          cacheDirectory=".phpunit.cache"
 >
     <testsuites>
-        <testsuite name="Contracts">
-            <directory>contracts/tests</directory>
+        <testsuite name="Adapter Contracts">
+            <directory>adapter-contracts/tests</directory>
         </testsuite>
         <testsuite name="Library">
             <directory>library/tests</directory>
@@ -28,6 +28,7 @@
     <source>
         <include>
             <directory>contracts/src</directory>
+            <directory>adapter-contracts/src</directory>
             <directory>library/src</directory>
             <directory>db-adapter/src</directory>
             <directory>directory-adapter/src</directory>

@@ -1,25 +1,23 @@
 {
-    "name": "kduma/simple-dal-directory-adapter",
-    "description": "Simple DAL - Directory/filesystem adapter",
+    "name": "kduma/simple-dal-adapter-contracts",
+    "description": "Simple DAL - Adapter SPI contracts and conformance tests",
     "type": "library",
     "license": "MIT",
     "require": {
         "php": "^8.4",
-        "kduma/simple-dal-adapter-contracts": "^1.0",
-        "league/flysystem": "^3.0"
+        "kduma/simple-dal-contracts": "^1.0"
     },
     "require-dev": {
-        "pestphp/pest": "^3.0",
-        "kduma/simple-dal": "^1.0"
+        "pestphp/pest": "^3.0"
     },
     "autoload": {
         "psr-4": {
-            "KDuma\\SimpleDAL\\Adapter\\Directory\\": "src/"
+            "KDuma\\SimpleDAL\\Adapter\\Contracts\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "KDuma\\SimpleDAL\\Adapter\\Directory\\Tests\\": "tests/"
+            "KDuma\\SimpleDAL\\Adapter\\Contracts\\Tests\\": "tests/"
         }
     },
     "extra": {

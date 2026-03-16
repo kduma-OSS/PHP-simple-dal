@@ -7,6 +7,7 @@
         "php": "^8.4",
         "kduma/simple-dal-typed-contracts": "^1.0",
         "kduma/simple-dal-contracts": "^1.0",
+        "kduma/simple-dal-adapter-contracts": "^1.0",
         "kduma/simple-dal": "^1.0",
         "spatie/php-attribute-reader": "^1.0"
     },
@@ -26,7 +27,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "1.0.x-dev"
+            "dev-master": "1.0.x-dev"
         }
     },
     "config": {

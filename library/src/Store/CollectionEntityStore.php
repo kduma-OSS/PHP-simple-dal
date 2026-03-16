@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace KDuma\SimpleDAL\Store;
 
 use KDuma\SimpleDAL\Attachment\AttachmentStore;
-use KDuma\SimpleDAL\Contracts\Adapter\StorageAdapterInterface;
+use KDuma\SimpleDAL\Adapter\Contracts\StorageAdapterInterface;
 use KDuma\SimpleDAL\Contracts\AttachmentStoreInterface;
 use KDuma\SimpleDAL\Contracts\CollectionEntityInterface;
 use KDuma\SimpleDAL\Contracts\EntityDefinitionInterface;

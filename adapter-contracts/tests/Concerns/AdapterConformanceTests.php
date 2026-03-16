@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace KDuma\SimpleDAL\Contracts\Tests\Concerns;
+namespace KDuma\SimpleDAL\Adapter\Contracts\Tests\Concerns;
 
-use KDuma\SimpleDAL\Contracts\Adapter\StorageAdapterInterface;
+use KDuma\SimpleDAL\Adapter\Contracts\StorageAdapterInterface;
 use KDuma\SimpleDAL\Contracts\Exception\AttachmentNotFoundException;
 use KDuma\SimpleDAL\Contracts\Exception\RecordNotFoundException;
 

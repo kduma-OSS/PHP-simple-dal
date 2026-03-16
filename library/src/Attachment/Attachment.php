@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace KDuma\SimpleDAL\Attachment;
 
-use KDuma\SimpleDAL\Contracts\Adapter\StorageAdapterInterface;
+use KDuma\SimpleDAL\Adapter\Contracts\StorageAdapterInterface;
 use KDuma\SimpleDAL\Contracts\AttachmentInterface;
 
 final class Attachment implements AttachmentInterface

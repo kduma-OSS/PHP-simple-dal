@@ -6,7 +6,7 @@ namespace KDuma\SimpleDAL\Adapter\Directory\Tests;
 
 use KDuma\SimpleDAL\Adapter\Directory\DirectoryAdapter;
 use KDuma\SimpleDAL\Contracts\EntityDefinitionInterface;
-use KDuma\SimpleDAL\Contracts\Tests\Concerns\AdapterConformanceTests;
+use KDuma\SimpleDAL\Adapter\Contracts\Tests\Concerns\AdapterConformanceTests;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use PHPUnit\Framework\TestCase;

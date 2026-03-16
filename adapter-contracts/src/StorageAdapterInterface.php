@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace KDuma\SimpleDAL\Contracts\Adapter;
+namespace KDuma\SimpleDAL\Adapter\Contracts;
 
 use KDuma\SimpleDAL\Contracts\EntityDefinitionInterface;
 
