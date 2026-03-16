@@ -1,27 +1,25 @@
 {
-    "name": "kduma/simple-dal-zip-adapter",
-    "description": "Simple DAL - ZIP archive adapter",
+    "name": "kduma/simple-dal-db-adapter",
+    "description": "Simple DAL - SQLite database adapter",
     "type": "library",
     "license": "MIT",
     "require": {
         "php": "^8.4",
-        "kduma/simple-dal-adapter-contracts": "^1.0",
-        "kduma/simple-dal-directory-adapter": "^1.0",
-        "league/flysystem": "^3.0",
-        "league/flysystem-ziparchive": "^3.0"
+        "kduma/simple-dal-adapter-contracts": "^0.0.1",
+        "ext-pdo": "*"
     },
     "require-dev": {
         "pestphp/pest": "^3.0",
-        "kduma/simple-dal": "^1.0"
+        "kduma/simple-dal": "^0.0.1"
     },
     "autoload": {
         "psr-4": {
-            "KDuma\\SimpleDAL\\Adapter\\Zip\\": "src/"
+            "KDuma\\SimpleDAL\\Adapter\\Database\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "KDuma\\SimpleDAL\\Adapter\\Zip\\Tests\\": "tests/"
+            "KDuma\\SimpleDAL\\Adapter\\Database\\Tests\\": "tests/"
         }
     },
     "extra": {

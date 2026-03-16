@@ -7,34 +7,34 @@
 >
     <testsuites>
         <testsuite name="Adapter Contracts">
-            <directory>adapter-contracts/tests</directory>
+            <directory>src/adapters/contracts/tests</directory>
         </testsuite>
         <testsuite name="Library">
-            <directory>library/tests</directory>
+            <directory>src/library/tests</directory>
         </testsuite>
         <testsuite name="Database Adapter">
-            <directory>db-adapter/tests</directory>
+            <directory>src/adapters/db/tests</directory>
         </testsuite>
         <testsuite name="Directory Adapter">
-            <directory>directory-adapter/tests</directory>
+            <directory>src/adapters/directory/tests</directory>
         </testsuite>
         <testsuite name="ZIP Adapter">
-            <directory>zip-adapter/tests</directory>
+            <directory>src/adapters/zip/tests</directory>
         </testsuite>
         <testsuite name="Typed Plugin">
-            <directory>typed-dal-plugin/tests</directory>
+            <directory>src/plugins/typed/tests</directory>
         </testsuite>
     </testsuites>
     <source>
         <include>
-            <directory>contracts/src</directory>
-            <directory>adapter-contracts/src</directory>
-            <directory>library/src</directory>
-            <directory>db-adapter/src</directory>
-            <directory>directory-adapter/src</directory>
-            <directory>zip-adapter/src</directory>
-            <directory>typed-dal-plugin-contracts/src</directory>
-            <directory>typed-dal-plugin/src</directory>
+            <directory>src/contracts/src</directory>
+            <directory>src/adapters/contracts/src</directory>
+            <directory>src/library/src</directory>
+            <directory>src/adapters/db/src</directory>
+            <directory>src/adapters/directory/src</directory>
+            <directory>src/adapters/zip/src</directory>
+            <directory>src/plugins/typed-contracts/src</directory>
+            <directory>src/plugins/typed/src</directory>
         </include>
     </source>
 </phpunit>

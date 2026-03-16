@@ -1,25 +1,23 @@
 {
-    "name": "kduma/simple-dal-db-adapter",
-    "description": "Simple DAL - SQLite database adapter",
+    "name": "kduma/simple-dal-adapter-contracts",
+    "description": "Simple DAL - Adapter SPI contracts and conformance tests",
     "type": "library",
     "license": "MIT",
     "require": {
         "php": "^8.4",
-        "kduma/simple-dal-adapter-contracts": "^1.0",
-        "ext-pdo": "*"
+        "kduma/simple-dal-contracts": "^0.0.1"
     },
     "require-dev": {
-        "pestphp/pest": "^3.0",
-        "kduma/simple-dal": "^1.0"
+        "pestphp/pest": "^3.0"
     },
     "autoload": {
         "psr-4": {
-            "KDuma\\SimpleDAL\\Adapter\\Database\\": "src/"
+            "KDuma\\SimpleDAL\\Adapter\\Contracts\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "KDuma\\SimpleDAL\\Adapter\\Database\\Tests\\": "tests/"
+            "KDuma\\SimpleDAL\\Adapter\\Contracts\\Tests\\": "tests/"
         }
     },
     "extra": {

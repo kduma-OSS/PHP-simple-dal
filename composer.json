@@ -4,41 +4,50 @@
     "type": "project",
     "license": "MIT",
     "require": {
+        "ext-pdo": "*",
+        "league/flysystem": "^3.0",
+        "league/flysystem-ziparchive": "^3.0",
         "php": "^8.4",
-        "kduma/simple-dal": "@dev",
-        "kduma/simple-dal-contracts": "@dev",
-        "kduma/simple-dal-adapter-contracts": "@dev",
-        "kduma/simple-dal-db-adapter": "@dev",
-        "kduma/simple-dal-directory-adapter": "@dev",
-        "kduma/simple-dal-zip-adapter": "@dev",
-        "kduma/simple-dal-typed-contracts": "@dev",
-        "kduma/simple-dal-typed": "@dev"
+        "spatie/php-attribute-reader": "^1.0"
     },
     "require-dev": {
+        "laravel/pint": "^1.0",
+        "monorepo-php/monorepo": "^12.0",
         "pestphp/pest": "^3.0",
-        "phpstan/phpstan": "^2.0",
-        "laravel/pint": "^1.0"
+        "phpstan/phpstan": "^2.0"
+    },
+    "replace": {
+        "kduma/simple-dal": "self.version",
+        "kduma/simple-dal-adapter-contracts": "self.version",
+        "kduma/simple-dal-contracts": "self.version",
+        "kduma/simple-dal-db-adapter": "self.version",
+        "kduma/simple-dal-directory-adapter": "self.version",
+        "kduma/simple-dal-typed": "self.version",
+        "kduma/simple-dal-typed-contracts": "self.version",
+        "kduma/simple-dal-zip-adapter": "self.version"
+    },
+    "autoload": {
+        "psr-4": {
+            "KDuma\\SimpleDAL\\": "src/library/src/",
+            "KDuma\\SimpleDAL\\Adapter\\Contracts\\": "src/adapters/contracts/src/",
+            "KDuma\\SimpleDAL\\Adapter\\Database\\": "src/adapters/db/src/",
+            "KDuma\\SimpleDAL\\Adapter\\Directory\\": "src/adapters/directory/src/",
+            "KDuma\\SimpleDAL\\Adapter\\Zip\\": "src/adapters/zip/src/",
+            "KDuma\\SimpleDAL\\Contracts\\": "src/contracts/src/",
+            "KDuma\\SimpleDAL\\Typed\\": "src/plugins/typed/src/",
+            "KDuma\\SimpleDAL\\Typed\\Contracts\\": "src/plugins/typed-contracts/src/"
+        }
     },
     "autoload-dev": {
         "psr-4": {
-            "KDuma\\SimpleDAL\\Adapter\\Contracts\\Tests\\": "adapter-contracts/tests/",
-            "KDuma\\SimpleDAL\\Tests\\": "library/tests/",
-            "KDuma\\SimpleDAL\\Adapter\\Database\\Tests\\": "db-adapter/tests/",
-            "KDuma\\SimpleDAL\\Adapter\\Directory\\Tests\\": "directory-adapter/tests/",
-            "KDuma\\SimpleDAL\\Adapter\\Zip\\Tests\\": "zip-adapter/tests/",
-            "KDuma\\SimpleDAL\\Typed\\Tests\\": "typed-dal-plugin/tests/"
+            "KDuma\\SimpleDAL\\Adapter\\Contracts\\Tests\\": "src/adapters/contracts/tests/",
+            "KDuma\\SimpleDAL\\Adapter\\Database\\Tests\\": "src/adapters/db/tests/",
+            "KDuma\\SimpleDAL\\Adapter\\Directory\\Tests\\": "src/adapters/directory/tests/",
+            "KDuma\\SimpleDAL\\Adapter\\Zip\\Tests\\": "src/adapters/zip/tests/",
+            "KDuma\\SimpleDAL\\Tests\\": "src/library/tests/",
+            "KDuma\\SimpleDAL\\Typed\\Tests\\": "src/plugins/typed/tests/"
         }
     },
-    "repositories": [
-        { "type": "path", "url": "./contracts" },
-        { "type": "path", "url": "./adapter-contracts" },
-        { "type": "path", "url": "./library" },
-        { "type": "path", "url": "./db-adapter" },
-        { "type": "path", "url": "./directory-adapter" },
-        { "type": "path", "url": "./zip-adapter" },
-        { "type": "path", "url": "./typed-dal-plugin-contracts" },
-        { "type": "path", "url": "./typed-dal-plugin" }
-    ],
     "minimum-stability": "dev",
     "prefer-stable": true,
     "config": {

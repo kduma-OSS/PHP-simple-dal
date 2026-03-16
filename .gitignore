@@ -6,3 +6,4 @@ composer.lock
 .php-cs-fixer.cache
 phpstan-baseline.neon
 .DS_Store
+.idea

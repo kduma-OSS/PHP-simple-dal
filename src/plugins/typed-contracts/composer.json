@@ -5,7 +5,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.4",
-        "kduma/simple-dal-contracts": "^1.0"
+        "kduma/simple-dal-contracts": "^0.0.1"
     },
     "autoload": {
         "psr-4": {

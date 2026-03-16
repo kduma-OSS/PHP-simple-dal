@@ -1,0 +1,94 @@
+name: Packages Split
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - '*'
+
+jobs:
+  packages_split:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - local_path: 'src/contracts'
+            split_repository: 'PHP-simple-dal-contracts'
+          - local_path: 'src/adapters/contracts'
+            split_repository: 'PHP-simple-dal-adapter-contracts'
+          - local_path: 'src/library'
+            split_repository: 'PHP-simple-dal'
+          - local_path: 'src/adapters/db'
+            split_repository: 'PHP-simple-dal-db-adapter'
+          - local_path: 'src/adapters/directory'
+            split_repository: 'PHP-simple-dal-directory-adapter'
+          - local_path: 'src/adapters/zip'
+            split_repository: 'PHP-simple-dal-zip-adapter'
+          - local_path: 'src/plugins/typed-contracts'
+            split_repository: 'PHP-simple-dal-typed-contracts'
+          - local_path: 'src/plugins/typed'
+            split_repository: 'PHP-simple-dal-typed'
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.SPLIT_APP_ID }}
+          private-key: ${{ secrets.SPLIT_APP_PRIVATE_KEY }}
+          owner: kduma-OSS-splits
+
+      - name: Initialize split repo if empty
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          REPO="kduma-OSS-splits/${{ matrix.package.split_repository }}"
+          TMPDIR=$(mktemp -d)
+          git clone "https://x-access-token:${GH_TOKEN}@github.com/$REPO.git" "$TMPDIR" 2>&1 || true
+          # Check if the cloned repo has any commits
+          if ! git -C "$TMPDIR" rev-parse HEAD >/dev/null 2>&1; then
+            echo "Repository $REPO is empty, initializing with empty commit on master..."
+            git -C "$TMPDIR" checkout -b master
+            git -C "$TMPDIR" config user.name "github-actions[bot]"
+            git -C "$TMPDIR" config user.email "github-actions[bot]@users.noreply.github.com"
+            git -C "$TMPDIR" commit --allow-empty -m "Initial commit"
+            git -C "$TMPDIR" push origin master
+            echo "Initialized $REPO with master branch"
+          else
+            echo "Repository $REPO already has commits, skipping initialization"
+          fi
+          rm -rf "$TMPDIR"
+
+      - name: Split (no tag)
+        if: "!startsWith(github.ref, 'refs/tags/')"
+        uses: danharrin/monorepo-split-github-action@v2.4.0
+        env:
+          PAT: x-access-token:${{ steps.app-token.outputs.token }}
+        with:
+          package_directory: ${{ matrix.package.local_path }}
+          repository_organization: 'kduma-OSS-splits'
+          repository_name: ${{ matrix.package.split_repository }}
+          branch: 'master'
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Split (with tag)
+        if: "startsWith(github.ref, 'refs/tags/')"
+        uses: danharrin/monorepo-split-github-action@v2.4.0
+        env:
+          PAT: x-access-token:${{ steps.app-token.outputs.token }}
+        with:
+          tag: ${{ github.ref_name }}
+          package_directory: ${{ matrix.package.local_path }}
+          repository_organization: 'kduma-OSS-splits'
+          repository_name: ${{ matrix.package.split_repository }}
+          branch: 'master'
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'

@@ -1,25 +1,27 @@
 {
-    "name": "kduma/simple-dal-directory-adapter",
-    "description": "Simple DAL - Directory/filesystem adapter",
+    "name": "kduma/simple-dal-zip-adapter",
+    "description": "Simple DAL - ZIP archive adapter",
     "type": "library",
     "license": "MIT",
     "require": {
         "php": "^8.4",
-        "kduma/simple-dal-adapter-contracts": "^1.0",
-        "league/flysystem": "^3.0"
+        "kduma/simple-dal-adapter-contracts": "^0.0.1",
+        "kduma/simple-dal-directory-adapter": "^0.0.1",
+        "league/flysystem": "^3.0",
+        "league/flysystem-ziparchive": "^3.0"
     },
     "require-dev": {
         "pestphp/pest": "^3.0",
-        "kduma/simple-dal": "^1.0"
+        "kduma/simple-dal": "^0.0.1"
     },
     "autoload": {
         "psr-4": {
-            "KDuma\\SimpleDAL\\Adapter\\Directory\\": "src/"
+            "KDuma\\SimpleDAL\\Adapter\\Zip\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "KDuma\\SimpleDAL\\Adapter\\Directory\\Tests\\": "tests/"
+            "KDuma\\SimpleDAL\\Adapter\\Zip\\Tests\\": "tests/"
         }
     },
     "extra": {
