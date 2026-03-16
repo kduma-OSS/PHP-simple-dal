@@ -6,6 +6,12 @@ on:
       - master
     tags:
       - '*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to split (leave empty for branch-only split)'
+        required: false
+        type: string
 
 jobs:
   packages_split:
@@ -66,8 +72,23 @@ jobs:
           fi
           rm -rf "$TMPDIR"
 
+      - name: Resolve tag
+        id: resolve-tag
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && -n "${{ inputs.tag }}" ]]; then
+            echo "tag=${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            echo "tag=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout tag
+        if: steps.resolve-tag.outputs.tag != ''
+        run: git checkout "refs/tags/${{ steps.resolve-tag.outputs.tag }}"
+
       - name: Split (no tag)
-        if: "!startsWith(github.ref, 'refs/tags/')"
+        if: steps.resolve-tag.outputs.tag == ''
         uses: danharrin/monorepo-split-github-action@v2.4.0
         env:
           PAT: x-access-token:${{ steps.app-token.outputs.token }}
@@ -80,12 +101,12 @@ jobs:
           user_email: 'github-actions[bot]@users.noreply.github.com'
 
       - name: Split (with tag)
-        if: "startsWith(github.ref, 'refs/tags/')"
+        if: steps.resolve-tag.outputs.tag != ''
         uses: danharrin/monorepo-split-github-action@v2.4.0
         env:
           PAT: x-access-token:${{ steps.app-token.outputs.token }}
         with:
-          tag: ${{ github.ref_name }}
+          tag: ${{ steps.resolve-tag.outputs.tag }}
           package_directory: ${{ matrix.package.local_path }}
           repository_organization: 'kduma-OSS-splits'
           repository_name: ${{ matrix.package.split_repository }}
