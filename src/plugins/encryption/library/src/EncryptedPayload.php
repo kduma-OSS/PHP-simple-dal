@@ -33,7 +33,7 @@ class EncryptedPayload
 
     public static function encode(string $keyId, int $algorithm, string $encryptedPayload): string
     {
-        $writer = new BinaryWriter();
+        $writer = new BinaryWriter;
         $writer->writeBytes(BinaryString::fromString(self::MAGIC))
             ->writeByte(self::VERSION)
             ->writeByte($algorithm)

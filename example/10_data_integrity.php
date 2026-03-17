@@ -13,16 +13,16 @@ declare(strict_types=1);
 require __DIR__.'/../vendor/autoload.php';
 
 use KDuma\SimpleDAL\Adapter\Database\DatabaseAdapter;
-use KDuma\SimpleDAL\DataIntegrity\Exception\IntegrityException;
-use KDuma\SimpleDAL\DataIntegrity\FailureMode;
-use KDuma\SimpleDAL\DataIntegrity\IntegrityConfig;
-use KDuma\SimpleDAL\DataIntegrity\IntegrityMigrator;
-use KDuma\SimpleDAL\DataIntegrity\IntegrityPayload;
-use KDuma\SimpleDAL\DataIntegrity\IntegrityStorageAdapter;
-use KDuma\SimpleDAL\DataIntegrity\Sodium\Blake2bHashingAlgorithm;
-use KDuma\SimpleDAL\DataIntegrity\Sodium\Ed25519SigningAlgorithm;
 use KDuma\SimpleDAL\DataStore;
 use KDuma\SimpleDAL\Entity\CollectionEntityDefinition;
+use KDuma\SimpleDAL\Integrity\Exception\IntegrityException;
+use KDuma\SimpleDAL\Integrity\FailureMode;
+use KDuma\SimpleDAL\Integrity\IntegrityConfig;
+use KDuma\SimpleDAL\Integrity\IntegrityMigrator;
+use KDuma\SimpleDAL\Integrity\IntegrityPayload;
+use KDuma\SimpleDAL\Integrity\IntegrityStorageAdapter;
+use KDuma\SimpleDAL\Integrity\Sodium\Blake2bHashingAlgorithm;
+use KDuma\SimpleDAL\Integrity\Sodium\Ed25519SigningAlgorithm;
 
 // ── 1. Create hashers and signers ──
 

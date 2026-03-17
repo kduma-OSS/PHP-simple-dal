@@ -19,25 +19,31 @@ parameters:
 			path: src/adapters/flysystem/tests/ZipConformanceTest.php
 
 		-
-			message: '#^Parameter \$hasher of class KDuma\\SimpleDAL\\DataIntegrity\\IntegrityConfig constructor expects KDuma\\SimpleDAL\\DataIntegrity\\Contracts\\HashingAlgorithmInterface\|null, object given\.$#'
+			message: '#^Parameter \$hasher of class KDuma\\SimpleDAL\\Integrity\\IntegrityConfig constructor expects KDuma\\SimpleDAL\\Integrity\\Contracts\\HashingAlgorithmInterface\|null, object given\.$#'
 			identifier: argument.type
-			count: 5
-			path: src/plugins/data-integrity/library/tests/IntegrityMigratorTest.php
+			count: 6
+			path: src/plugins/integrity/library/tests/IntegrityMigratorTest.php
 
 		-
-			message: '#^Parameter \$signer of class KDuma\\SimpleDAL\\DataIntegrity\\IntegrityConfig constructor expects KDuma\\SimpleDAL\\DataIntegrity\\Contracts\\SigningAlgorithmInterface\|null, object given\.$#'
+			message: '#^Parameter \$signer of class KDuma\\SimpleDAL\\Integrity\\IntegrityConfig constructor expects KDuma\\SimpleDAL\\Integrity\\Contracts\\SigningAlgorithmInterface\|null, object given\.$#'
 			identifier: argument.type
 			count: 2
-			path: src/plugins/data-integrity/library/tests/IntegrityMigratorTest.php
+			path: src/plugins/integrity/library/tests/IntegrityMigratorTest.php
 
 		-
-			message: '#^Parameter \$hasher of class KDuma\\SimpleDAL\\DataIntegrity\\IntegrityConfig constructor expects KDuma\\SimpleDAL\\DataIntegrity\\Contracts\\HashingAlgorithmInterface\|null, object given\.$#'
+			message: '#^Cannot access offset .key_id. on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/plugins/integrity/library/tests/IntegrityMigratorTest.php
+
+		-
+			message: '#^Parameter \$hasher of class KDuma\\SimpleDAL\\Integrity\\IntegrityConfig constructor expects KDuma\\SimpleDAL\\Integrity\\Contracts\\HashingAlgorithmInterface\|null, object given\.$#'
 			identifier: argument.type
-			count: 15
-			path: src/plugins/data-integrity/library/tests/IntegrityStorageAdapterTest.php
+			count: 21
+			path: src/plugins/integrity/library/tests/IntegrityStorageAdapterTest.php
 
 		-
-			message: '#^Parameter \$signer of class KDuma\\SimpleDAL\\DataIntegrity\\IntegrityConfig constructor expects KDuma\\SimpleDAL\\DataIntegrity\\Contracts\\SigningAlgorithmInterface\|null, object given\.$#'
+			message: '#^Parameter \$signer of class KDuma\\SimpleDAL\\Integrity\\IntegrityConfig constructor expects KDuma\\SimpleDAL\\Integrity\\Contracts\\SigningAlgorithmInterface\|null, object given\.$#'
 			identifier: argument.type
 			count: 4
-			path: src/plugins/data-integrity/library/tests/IntegrityStorageAdapterTest.php
+			path: src/plugins/integrity/library/tests/IntegrityStorageAdapterTest.php

@@ -30,17 +30,17 @@
         <testsuite name="Encryption PhpSecLib">
             <directory>src/plugins/encryption/phpseclib/tests</directory>
         </testsuite>
-        <testsuite name="Data Integrity Plugin">
-            <directory>src/plugins/data-integrity/library/tests</directory>
+        <testsuite name="Integrity Plugin">
+            <directory>src/plugins/integrity/library/tests</directory>
         </testsuite>
-        <testsuite name="Data Integrity Sodium">
-            <directory>src/plugins/data-integrity/sodium/tests</directory>
+        <testsuite name="Integrity Sodium">
+            <directory>src/plugins/integrity/sodium/tests</directory>
         </testsuite>
-        <testsuite name="Data Integrity Hash">
-            <directory>src/plugins/data-integrity/hash/tests</directory>
+        <testsuite name="Integrity Hash">
+            <directory>src/plugins/integrity/hash/tests</directory>
         </testsuite>
-        <testsuite name="Data Integrity PhpSecLib">
-            <directory>src/plugins/data-integrity/phpseclib/tests</directory>
+        <testsuite name="Integrity PhpSecLib">
+            <directory>src/plugins/integrity/phpseclib/tests</directory>
         </testsuite>
     </testsuites>
     <source>
@@ -56,11 +56,11 @@
             <directory>src/plugins/encryption/library/src</directory>
             <directory>src/plugins/encryption/sodium/src</directory>
             <directory>src/plugins/encryption/phpseclib/src</directory>
-            <directory>src/plugins/data-integrity/contracts/src</directory>
-            <directory>src/plugins/data-integrity/library/src</directory>
-            <directory>src/plugins/data-integrity/sodium/src</directory>
-            <directory>src/plugins/data-integrity/hash/src</directory>
-            <directory>src/plugins/data-integrity/phpseclib/src</directory>
+            <directory>src/plugins/integrity/contracts/src</directory>
+            <directory>src/plugins/integrity/library/src</directory>
+            <directory>src/plugins/integrity/sodium/src</directory>
+            <directory>src/plugins/integrity/hash/src</directory>
+            <directory>src/plugins/integrity/phpseclib/src</directory>
         </include>
     </source>
 </phpunit>

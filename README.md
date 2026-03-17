@@ -96,28 +96,28 @@ composer require kduma/simple-dal-encryption kduma/simple-dal-encryption-phpsecl
 | `kduma/simple-dal-encryption-sodium` | Libsodium implementations (SecretBox, SealedBox) |
 | `kduma/simple-dal-encryption-phpseclib` | phpseclib3 implementations (RSA, AES) |
 
-### Data Integrity
+### Integrity
 
 Adds transparent checksum and signature verification to records and attachments. Every write computes a hash (and optionally a cryptographic signature); every read verifies it. Tamper detection is automatic -- if data has been modified outside the integrity adapter, an `IntegrityException` is thrown. Hashing and signing implementations are pluggable.
 
 ```bash
 # Core + libsodium (Blake2b, Ed25519)
-composer require kduma/simple-dal-data-integrity kduma/simple-dal-data-integrity-sodium
+composer require kduma/simple-dal-integrity kduma/simple-dal-integrity-sodium
 
 # Or with PHP hash/HMAC
-composer require kduma/simple-dal-data-integrity kduma/simple-dal-data-integrity-hash
+composer require kduma/simple-dal-integrity kduma/simple-dal-integrity-hash
 
 # Or with phpseclib (RSA, EC, DSA signing)
-composer require kduma/simple-dal-data-integrity kduma/simple-dal-data-integrity-phpseclib
+composer require kduma/simple-dal-integrity kduma/simple-dal-integrity-phpseclib
 ```
 
 | Package | Description |
 |---------|-------------|
-| `kduma/simple-dal-data-integrity` | Record and attachment integrity checksums and signatures |
-| `kduma/simple-dal-data-integrity-contracts` | Hashing and signing algorithm contracts |
-| `kduma/simple-dal-data-integrity-sodium` | Libsodium implementations (Blake2b, Ed25519) |
-| `kduma/simple-dal-data-integrity-hash` | PHP hash/HMAC implementations (SHA-256, HMAC-SHA256, etc.) |
-| `kduma/simple-dal-data-integrity-phpseclib` | phpseclib3 implementations (RSA, EC, DSA signing) |
+| `kduma/simple-dal-integrity` | Record and attachment integrity checksums and signatures |
+| `kduma/simple-dal-integrity-contracts` | Hashing and signing algorithm contracts |
+| `kduma/simple-dal-integrity-sodium` | Libsodium implementations (Blake2b, Ed25519) |
+| `kduma/simple-dal-integrity-hash` | PHP hash/HMAC implementations (SHA-256, HMAC-SHA256, etc.) |
+| `kduma/simple-dal-integrity-phpseclib` | phpseclib3 implementations (RSA, EC, DSA signing) |
 
 ## Examples
 
