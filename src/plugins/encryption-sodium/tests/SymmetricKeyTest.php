@@ -33,7 +33,7 @@ test('wrong key fails decryption', function () {
 
 test('rejects invalid key length', function () {
     new SymmetricKey('bad', 'too-short');
-})->throws(\InvalidArgumentException::class);
+})->throws(InvalidArgumentException::class);
 
 test('algorithm constant is 1', function () {
     $key = new SymmetricKey('test', sodium_crypto_secretbox_keygen());

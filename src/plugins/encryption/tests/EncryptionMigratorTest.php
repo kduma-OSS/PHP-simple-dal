@@ -16,7 +16,8 @@ beforeEach(function () {
     $this->keyA = new SymmetricKey('key-a', sodium_crypto_secretbox_keygen());
     $this->keyB = new SymmetricKey('key-b', sodium_crypto_secretbox_keygen());
 
-    $definition = new class ('test_entity', false, true, false, []) implements EntityDefinitionInterface {
+    $definition = new class('test_entity', false, true, false, []) implements EntityDefinitionInterface
+    {
         public function __construct(
             public readonly string $name,
             public readonly bool $isSingleton,

@@ -98,7 +98,7 @@ $privateKey = $store->collection('certificates')
     ->get('private_key.pem')
     ->contents();
 
-echo "Private key (decrypted): ".substr($privateKey, 0, 36)."...\n";
+echo 'Private key (decrypted): '.substr($privateKey, 0, 36)."...\n";
 
 // ── 6. Verify raw storage is encrypted ──
 
@@ -106,7 +106,7 @@ $rawPrivateKey = stream_get_contents($innerAdapter->readAttachment('certificates
 $rawCert = stream_get_contents($innerAdapter->readAttachment('certificates', 'cert-01', 'certificate.pem'));
 
 echo "\nRaw private_key.pem is encrypted: ".(EncryptedPayload::isEncrypted($rawPrivateKey) ? 'yes' : 'no')."\n";
-echo "Raw certificate.pem is encrypted: ".(EncryptedPayload::isEncrypted($rawCert) ? 'yes' : 'no')."\n";
+echo 'Raw certificate.pem is encrypted: '.(EncryptedPayload::isEncrypted($rawCert) ? 'yes' : 'no')."\n";
 
 // ── 7. Key rotation with migrator ──
 
@@ -147,7 +147,7 @@ echo "After migration, key ID: {$payload->keyId}\n";
 // Read with new config still works
 $newAdapter = new EncryptingStorageAdapter($innerAdapter, $newConfig);
 $decrypted = stream_get_contents($newAdapter->readAttachment('certificates', 'cert-01', 'private_key.pem'));
-echo "Decrypted with new key: ".substr($decrypted, 0, 36)."...\n";
+echo 'Decrypted with new key: '.substr($decrypted, 0, 36)."...\n";
 
 // Cleanup
 @unlink(__DIR__.'/demo_encryption.sqlite-shm');

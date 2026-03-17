@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 use KDuma\SimpleDAL\Adapter\Database\DatabaseAdapter;
 use KDuma\SimpleDAL\Contracts\EntityDefinitionInterface;
+use KDuma\SimpleDAL\Encryption\Contracts\Exception\DecryptionException;
 use KDuma\SimpleDAL\Encryption\EncryptedPayload;
 use KDuma\SimpleDAL\Encryption\EncryptingStorageAdapter;
 use KDuma\SimpleDAL\Encryption\EncryptionConfig;
 use KDuma\SimpleDAL\Encryption\EncryptionRule;
-use KDuma\SimpleDAL\Encryption\Contracts\Exception\DecryptionException;
 use KDuma\SimpleDAL\Encryption\Sodium\KeyPair;
 use KDuma\SimpleDAL\Encryption\Sodium\SymmetricKey;
 
@@ -24,7 +24,8 @@ beforeEach(function () {
         sodium_crypto_box_secretkey($keypair),
     );
 
-    $definition = new class ('test_entity', false, true, false, []) implements EntityDefinitionInterface {
+    $definition = new class('test_entity', false, true, false, []) implements EntityDefinitionInterface
+    {
         public function __construct(
             public readonly string $name,
             public readonly bool $isSingleton,
