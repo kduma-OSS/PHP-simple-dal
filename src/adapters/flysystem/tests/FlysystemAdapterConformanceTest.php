@@ -2,43 +2,35 @@
 
 declare(strict_types=1);
 
-namespace KDuma\SimpleDAL\Adapter\Zip\Tests;
+namespace KDuma\SimpleDAL\Adapter\Flysystem\Tests;
 
 use KDuma\SimpleDAL\Adapter\Contracts\Tests\Concerns\AdapterConformanceTests;
-use KDuma\SimpleDAL\Adapter\Zip\ZipAdapter;
+use KDuma\SimpleDAL\Adapter\Flysystem\FlysystemAdapter;
 use KDuma\SimpleDAL\Contracts\EntityDefinitionInterface;
 use League\Flysystem\Filesystem;
-use League\Flysystem\ZipArchive\FilesystemZipArchiveProvider;
-use League\Flysystem\ZipArchive\ZipArchiveAdapter as FlysystemZipArchiveAdapter;
+use League\Flysystem\Local\LocalFilesystemAdapter;
 use PHPUnit\Framework\TestCase;
 
-final class ZipAdapterConformanceTest extends TestCase
+final class FlysystemAdapterConformanceTest extends TestCase
 {
     use AdapterConformanceTests;
 
-    private ZipAdapter $adapter;
+    private FlysystemAdapter $adapter;
 
     private string $entityName;
 
     private string $tempDir;
 
-    private string $zipPath;
-
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->tempDir = sys_get_temp_dir().'/simple-dal-zip-test-'.uniqid();
+        $this->tempDir = sys_get_temp_dir().'/simple-dal-test-'.uniqid();
         mkdir($this->tempDir, 0777, true);
 
-        $this->zipPath = $this->tempDir.'/test.zip';
+        $flysystem = new Filesystem(new LocalFilesystemAdapter($this->tempDir));
 
-        $flysystemAdapter = new FlysystemZipArchiveAdapter(
-            new FilesystemZipArchiveProvider($this->zipPath),
-        );
-        $filesystem = new Filesystem($flysystemAdapter);
-
-        $this->adapter = new ZipAdapter($filesystem);
+        $this->adapter = new FlysystemAdapter($flysystem);
         $this->entityName = 'test_entity';
 
         $definition = new class('test_entity', false, true, false, ['status', 'meta.role']) implements EntityDefinitionInterface
@@ -57,11 +49,20 @@ final class ZipAdapterConformanceTest extends TestCase
 
     protected function tearDown(): void
     {
-        if (file_exists($this->zipPath)) {
-            unlink($this->zipPath);
-        }
-
         if (is_dir($this->tempDir)) {
+            $iterator = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($this->tempDir, \RecursiveDirectoryIterator::SKIP_DOTS),
+                \RecursiveIteratorIterator::CHILD_FIRST,
+            );
+
+            foreach ($iterator as $file) {
+                if ($file->isDir()) {
+                    rmdir($file->getPathname());
+                } else {
+                    unlink($file->getPathname());
+                }
+            }
+
             rmdir($this->tempDir);
         }
 

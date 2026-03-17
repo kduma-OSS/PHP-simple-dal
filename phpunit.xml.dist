@@ -15,11 +15,8 @@
         <testsuite name="Database Adapter">
             <directory>src/adapters/db/tests</directory>
         </testsuite>
-        <testsuite name="Directory Adapter">
-            <directory>src/adapters/directory/tests</directory>
-        </testsuite>
-        <testsuite name="ZIP Adapter">
-            <directory>src/adapters/zip/tests</directory>
+        <testsuite name="Flysystem Adapter">
+            <directory>src/adapters/flysystem/tests</directory>
         </testsuite>
         <testsuite name="Typed Plugin">
             <directory>src/plugins/typed/library/tests</directory>
@@ -52,8 +49,7 @@
             <directory>src/adapters/contracts/src</directory>
             <directory>src/library/src</directory>
             <directory>src/adapters/db/src</directory>
-            <directory>src/adapters/directory/src</directory>
-            <directory>src/adapters/zip/src</directory>
+            <directory>src/adapters/flysystem/src</directory>
             <directory>src/plugins/typed/contracts/src</directory>
             <directory>src/plugins/typed/library/src</directory>
             <directory>src/plugins/encryption/contracts/src</directory>

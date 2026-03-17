@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace KDuma\SimpleDAL\Adapter\Directory;
+namespace KDuma\SimpleDAL\Adapter\Flysystem;
 
 use KDuma\SimpleDAL\Adapter\Contracts\StorageAdapterInterface;
 use KDuma\SimpleDAL\Contracts\EntityDefinitionInterface;
@@ -10,7 +10,7 @@ use KDuma\SimpleDAL\Contracts\Exception\AttachmentNotFoundException;
 use KDuma\SimpleDAL\Contracts\Exception\RecordNotFoundException;
 use League\Flysystem\FilesystemOperator;
 
-final class DirectoryAdapter implements StorageAdapterInterface
+final class FlysystemAdapter implements StorageAdapterInterface
 {
     /** @var array<string, EntityDefinitionInterface> */
     private array $definitions = [];

@@ -13,8 +13,7 @@ declare(strict_types=1);
 require __DIR__.'/../vendor/autoload.php';
 
 use KDuma\SimpleDAL\Adapter\Database\DatabaseAdapter;
-use KDuma\SimpleDAL\Adapter\Directory\DirectoryAdapter;
-use KDuma\SimpleDAL\Adapter\Zip\ZipAdapter;
+use KDuma\SimpleDAL\Adapter\Flysystem\FlysystemAdapter;
 use KDuma\SimpleDAL\Contracts\DataStoreInterface;
 use KDuma\SimpleDAL\DataStore;
 use KDuma\SimpleDAL\Entity\CollectionEntityDefinition;
@@ -52,14 +51,14 @@ seedAndQuery(new DataStore(
     entities: $entities,
 ));
 
-// ── Directory adapter ──
+// ── Flysystem adapter (local directory) ──
 
-echo "\n=== Directory ===\n";
+echo "\n=== Flysystem (local) ===\n";
 $dir = __DIR__.'/adapter-demo';
 @mkdir($dir, 0777, true);
 
 seedAndQuery(new DataStore(
-    adapter: new DirectoryAdapter(new Filesystem(new LocalFilesystemAdapter($dir))),
+    adapter: new FlysystemAdapter(new Filesystem(new LocalFilesystemAdapter($dir))),
     entities: $entities,
 ));
 
@@ -73,13 +72,13 @@ foreach ($it as $f) {
 }
 rmdir($dir);
 
-// ── ZIP adapter ──
+// ── Flysystem adapter (ZIP) ──
 
-echo "\n=== ZIP ===\n";
+echo "\n=== Flysystem (ZIP) ===\n";
 $zipPath = __DIR__.'/adapter-demo.zip';
 
 seedAndQuery(new DataStore(
-    adapter: new ZipAdapter(
+    adapter: new FlysystemAdapter(
         new Filesystem(new ZipArchiveAdapter(new FilesystemZipArchiveProvider($zipPath))),
     ),
     entities: $entities,

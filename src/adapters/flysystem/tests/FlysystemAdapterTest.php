@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use KDuma\SimpleDAL\Adapter\Directory\DirectoryAdapter;
+use KDuma\SimpleDAL\Adapter\Flysystem\FlysystemAdapter;
 use KDuma\SimpleDAL\Contracts\EntityDefinitionInterface;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Local\LocalFilesystemAdapter;
@@ -13,7 +13,7 @@ beforeEach(function () {
 
     $flysystem = new Filesystem(new LocalFilesystemAdapter($this->tempDir));
 
-    $this->adapter = new DirectoryAdapter($flysystem);
+    $this->adapter = new FlysystemAdapter($flysystem);
     $this->entityName = 'test_entity';
 
     $definition = new class('test_entity', false, true, false, ['status', 'meta.role']) implements EntityDefinitionInterface
@@ -50,7 +50,7 @@ afterEach(function () {
 });
 
 // ---------------------------------------------------------------
-//  Directory-specific tests
+//  Flysystem-specific tests
 // ---------------------------------------------------------------
 
 test('record data.json exists in the record directory', function () {

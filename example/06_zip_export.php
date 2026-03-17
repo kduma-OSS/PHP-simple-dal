@@ -13,7 +13,7 @@ declare(strict_types=1);
 require __DIR__.'/../vendor/autoload.php';
 
 use KDuma\SimpleDAL\Adapter\Database\DatabaseAdapter;
-use KDuma\SimpleDAL\Adapter\Zip\ZipAdapter;
+use KDuma\SimpleDAL\Adapter\Flysystem\FlysystemAdapter;
 use KDuma\SimpleDAL\DataStore;
 use KDuma\SimpleDAL\Entity\CollectionEntityDefinition;
 use KDuma\SimpleDAL\Entity\SingletonEntityDefinition;
@@ -55,7 +55,7 @@ echo "Created data in SQLite.\n";
 $zipPath = __DIR__.'/export.zip';
 
 $zipStore = new DataStore(
-    adapter: new ZipAdapter(
+    adapter: new FlysystemAdapter(
         new Filesystem(new ZipArchiveAdapter(new FilesystemZipArchiveProvider($zipPath))),
     ),
     entities: $entities,
@@ -84,7 +84,7 @@ echo 'ZIP size: '.filesize($zipPath)." bytes\n";
 // ── Step 3: Read back from ZIP ──
 
 $readStore = new DataStore(
-    adapter: new ZipAdapter(
+    adapter: new FlysystemAdapter(
         new Filesystem(new ZipArchiveAdapter(new FilesystemZipArchiveProvider($zipPath))),
     ),
     entities: $entities,

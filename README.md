@@ -9,7 +9,9 @@ A PHP 8.4 Data Access Layer for storing JSON documents and binary attachments wi
 Install the core library and the adapter(s) you need:
 
 ```bash
-composer require kduma/simple-dal kduma/simple-dal-db-adapter
+composer require kduma/simple-dal kduma/simple-dal-db-adapter          # SQLite
+# or
+composer require kduma/simple-dal kduma/simple-dal-flysystem-adapter  # Flysystem
 ```
 
 ## Quick Start
@@ -58,8 +60,7 @@ $store->collection('certificates')->save($cert);
 | Package | Description |
 |---------|-------------|
 | `kduma/simple-dal-db-adapter` | SQLite database adapter |
-| `kduma/simple-dal-directory-adapter` | Directory/filesystem adapter (git-friendly) |
-| `kduma/simple-dal-zip-adapter` | ZIP archive adapter |
+| `kduma/simple-dal-flysystem-adapter` | Flysystem adapter (local, ZIP, S3, etc.) |
 
 ## Plugins
 
@@ -126,7 +127,7 @@ composer require kduma/simple-dal-data-integrity kduma/simple-dal-data-integrity
 | [02_singleton.php](example/02_singleton.php) | Singleton entities |
 | [03_filtering.php](example/03_filtering.php) | Filtering and searching |
 | [04_attachments.php](example/04_attachments.php) | Binary attachments |
-| [05_directory_adapter.php](example/05_directory_adapter.php) | Directory adapter (git-friendly) |
+| [05_flysystem_adapter.php](example/05_flysystem_adapter.php) | Flysystem adapter (local directory) |
 | [06_zip_export.php](example/06_zip_export.php) | ZIP export/import |
 | [07_adapter_switching.php](example/07_adapter_switching.php) | Switching adapters |
 | [08_typed_records.php](example/08_typed_records.php) | Typed records plugin |

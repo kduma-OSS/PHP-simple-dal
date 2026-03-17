@@ -8,8 +8,7 @@ A PHP 8.4 Data Access Layer for storing JSON documents and binary attachments wi
 - [Quick Start](#quick-start)
 - [Adapters](#adapters)
   - [SQLite](#sqlite-adapter)
-  - [Directory (git-friendly)](#directory-adapter)
-  - [ZIP Archive](#zip-adapter)
+  - [Flysystem (directory, ZIP, S3, etc.)](#flysystem-adapter)
 - [Entity Definitions](#entity-definitions)
   - [Collection Entities](#collection-entities)
   - [Singleton Entities](#singleton-entities)
@@ -61,8 +60,7 @@ composer require kduma/simple-dal
 
 # Pick one or more adapters:
 composer require kduma/simple-dal-db-adapter          # SQLite
-composer require kduma/simple-dal-directory-adapter    # Directory/files
-composer require kduma/simple-dal-zip-adapter          # ZIP archive
+composer require kduma/simple-dal-flysystem-adapter    # Flysystem (directory, ZIP, S3, etc.)
 ```
 
 **Requirements:** PHP 8.4+
@@ -131,21 +129,38 @@ $adapter = new DatabaseAdapter(new PDO('sqlite:/path/to/data.sqlite'));
 - Expression indexes created for declared `indexedFields`
 - Requires `ext-pdo`
 
-### Directory Adapter
+### Flysystem Adapter
 
-Stores each record as a self-contained directory with `data.json` and attachment files alongside it. Designed for git-friendly workflows.
+Stores each record as a self-contained directory with `data.json` and attachment files alongside it. Works with any [Flysystem](https://flysystem.thephpleague.com/) filesystem -- local directories, ZIP archives, S3, and more.
+
+**Local directory** (git-friendly):
 
 ```php
-use KDuma\SimpleDAL\Adapter\Directory\DirectoryAdapter;
+use KDuma\SimpleDAL\Adapter\Flysystem\FlysystemAdapter;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 
-$adapter = new DirectoryAdapter(
+$adapter = new FlysystemAdapter(
     new Filesystem(new LocalFilesystemAdapter('/path/to/data')),
 );
 ```
 
-**File layout on disk:**
+**ZIP archive** (for export, import, backups):
+
+```php
+use KDuma\SimpleDAL\Adapter\Flysystem\FlysystemAdapter;
+use League\Flysystem\Filesystem;
+use League\Flysystem\ZipArchive\FilesystemZipArchiveProvider;
+use League\Flysystem\ZipArchive\ZipArchiveAdapter;
+
+$adapter = new FlysystemAdapter(
+    new Filesystem(
+        new ZipArchiveAdapter(new FilesystemZipArchiveProvider('/path/to/archive.zip')),
+    ),
+);
+```
+
+**File layout:**
 
 ```
 data/
@@ -163,28 +178,6 @@ data/
 - Sidecar `_index.json` maps indexed field values to record IDs for faster equality lookups
 - Non-indexed filters scan all records in memory
 - Requires `league/flysystem ^3.0`
-
-### ZIP Adapter
-
-Same layout as the directory adapter, but inside a ZIP archive. Useful for export, import, and backups.
-
-```php
-use KDuma\SimpleDAL\Adapter\Zip\ZipAdapter;
-use League\Flysystem\Filesystem;
-use League\Flysystem\ZipArchive\FilesystemZipArchiveProvider;
-use League\Flysystem\ZipArchive\ZipArchiveAdapter;
-
-$adapter = new ZipAdapter(
-    new Filesystem(
-        new ZipArchiveAdapter(new FilesystemZipArchiveProvider('/path/to/archive.zip')),
-    ),
-);
-```
-
-- Internally delegates to `DirectoryAdapter` -- identical file layout inside the ZIP
-- Full read-write support
-- Not recommended for concurrent access (ZIP rewrites the entire archive on close)
-- Requires `league/flysystem ^3.0` and `league/flysystem-ziparchive ^3.0`
 
 ---
 
@@ -626,13 +619,13 @@ $store = new DataStore(
 
 // Directory
 $store = new DataStore(
-    adapter: new DirectoryAdapter(new Filesystem(new LocalFilesystemAdapter('/data'))),
+    adapter: new FlysystemAdapter(new Filesystem(new LocalFilesystemAdapter('/data'))),
     entities: $entities,
 );
 
 // ZIP
 $store = new DataStore(
-    adapter: new ZipAdapter(new Filesystem(new ZipArchiveAdapter(new FilesystemZipArchiveProvider('data.zip')))),
+    adapter: new FlysystemAdapter(new Filesystem(new ZipArchiveAdapter(new FilesystemZipArchiveProvider('data.zip')))),
     entities: $entities,
 );
 ```

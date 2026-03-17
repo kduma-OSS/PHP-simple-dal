@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Directory adapter — git-friendly file storage.
+ * Flysystem adapter — git-friendly file storage.
  *
  * Each record is stored as a self-contained directory:
  *   {base}/{entity}/{id}/data.json      (pretty-printed, sorted keys)
@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 require __DIR__.'/../vendor/autoload.php';
 
-use KDuma\SimpleDAL\Adapter\Directory\DirectoryAdapter;
+use KDuma\SimpleDAL\Adapter\Flysystem\FlysystemAdapter;
 use KDuma\SimpleDAL\DataStore;
 use KDuma\SimpleDAL\Entity\CollectionEntityDefinition;
 use KDuma\SimpleDAL\Entity\SingletonEntityDefinition;
@@ -29,7 +29,7 @@ $dataDir = __DIR__.'/data';
 $filesystem = new Filesystem(new LocalFilesystemAdapter($dataDir));
 
 $store = new DataStore(
-    adapter: new DirectoryAdapter($filesystem),
+    adapter: new FlysystemAdapter($filesystem),
     entities: [
         new CollectionEntityDefinition(
             name: 'certificates',

@@ -1,6 +1,6 @@
 {
-    "name": "kduma/simple-dal-directory-adapter",
-    "description": "Simple DAL - Directory/filesystem adapter",
+    "name": "kduma/simple-dal-flysystem-adapter",
+    "description": "Simple DAL - Flysystem adapter (local, ZIP, S3, etc.)",
     "type": "library",
     "license": "MIT",
     "keywords": [
@@ -23,14 +23,17 @@
         "pestphp/pest": "^3.0",
         "kduma/simple-dal": "^0.1"
     },
+    "suggest": {
+        "league/flysystem-ziparchive": "For ZIP archive storage"
+    },
     "autoload": {
         "psr-4": {
-            "KDuma\\SimpleDAL\\Adapter\\Directory\\": "src/"
+            "KDuma\\SimpleDAL\\Adapter\\Flysystem\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "KDuma\\SimpleDAL\\Adapter\\Directory\\Tests\\": "tests/"
+            "KDuma\\SimpleDAL\\Adapter\\Flysystem\\Tests\\": "tests/"
         }
     },
     "extra": {
