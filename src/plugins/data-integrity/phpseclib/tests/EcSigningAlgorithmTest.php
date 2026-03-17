@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use KDuma\SimpleDAL\DataIntegrity\PhpSecLib\EcSigningAlgorithm;
 use phpseclib3\Crypt\EC;
+use phpseclib3\Crypt\EC\PublicKey;
 
 test('sign and verify round-trip with Ed25519', function () {
     $privateKey = EC::createKey('Ed25519');
@@ -30,7 +31,7 @@ test('sign and verify round-trip with P-256 (ECDSA)', function () {
 test('verify-only mode throws on sign', function () {
     $privateKey = EC::createKey('Ed25519');
     $publicKey = $privateKey->getPublicKey();
-    assert($publicKey instanceof \phpseclib3\Crypt\EC\PublicKey);
+    assert($publicKey instanceof PublicKey);
 
     $algo = new EcSigningAlgorithm('ec-key', $publicKey);
 

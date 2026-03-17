@@ -51,7 +51,7 @@ class TypedRecordHydrator
             if ($field->converter !== null) {
                 /** @var class-string<FieldConverterInterface> $converterClass */
                 $converterClass = $field->converter;
-                $converter = new $converterClass();
+                $converter = new $converterClass;
             } else {
                 // Auto-detect backed enum
                 $type = $prop->getType();

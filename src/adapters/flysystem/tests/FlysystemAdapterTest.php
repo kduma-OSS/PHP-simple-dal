@@ -39,7 +39,7 @@ afterEach(function () {
         );
 
         foreach ($iterator as $file) {
-            assert($file instanceof \SplFileInfo);
+            assert($file instanceof SplFileInfo);
             if ($file->isDir()) {
                 rmdir($file->getPathname());
             } else {

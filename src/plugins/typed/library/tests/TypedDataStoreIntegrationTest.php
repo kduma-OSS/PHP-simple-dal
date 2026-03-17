@@ -95,7 +95,7 @@ beforeEach(function () {
 // -----------------------------------------------------------------
 
 /**
- * @param array<string> $tags
+ * @param  array<string>  $tags
  */
 function makeArticle(TypedDataStore $store, string $title = 'Test', IntegrationStatus $status = IntegrationStatus::Draft, ?string $body = null, ?DateTimeImmutable $publishedAt = null, array $tags = []): ArticleRecord
 {

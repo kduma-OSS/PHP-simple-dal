@@ -5,6 +5,8 @@ declare(strict_types=1);
 use KDuma\SimpleDAL\Encryption\Contracts\Exception\DecryptionException;
 use KDuma\SimpleDAL\Encryption\PhpSecLib\RsaAlgorithm;
 use phpseclib3\Crypt\RSA;
+use phpseclib3\Crypt\RSA\PrivateKey;
+use phpseclib3\Crypt\RSA\PublicKey;
 
 test('encrypt and decrypt round-trip with RSA OAEP', function () {
     $privateKey = RSA::createKey(2048);
@@ -20,7 +22,7 @@ test('encrypt and decrypt round-trip with RSA OAEP', function () {
 test('encrypt-only mode throws on decrypt', function () {
     $privateKey = RSA::createKey(2048);
     $publicKey = $privateKey->getPublicKey();
-    assert($publicKey instanceof \phpseclib3\Crypt\RSA\PublicKey);
+    assert($publicKey instanceof PublicKey);
 
     $key = new RsaAlgorithm('rsa-key', $publicKey);
 
@@ -41,7 +43,7 @@ test('wrong key fails decryption', function () {
 
 test('encrypt and decrypt with PKCS1 padding', function () {
     $privateKey = RSA::createKey(2048)->withPadding(RSA::ENCRYPTION_PKCS1);
-    assert($privateKey instanceof \phpseclib3\Crypt\RSA\PrivateKey);
+    assert($privateKey instanceof PrivateKey);
 
     $key = new RsaAlgorithm('rsa-pkcs1', $privateKey);
 

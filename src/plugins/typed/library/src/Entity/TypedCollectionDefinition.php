@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace KDuma\SimpleDAL\Typed\Entity;
 
 use KDuma\SimpleDAL\Contracts\EntityDefinitionInterface;
+use KDuma\SimpleDAL\Typed\Contracts\TypedRecord;
 
 class TypedCollectionDefinition implements EntityDefinitionInterface
 {
@@ -14,7 +15,7 @@ class TypedCollectionDefinition implements EntityDefinitionInterface
 
     /**
      * @param  string  $name  Entity name.
-     * @param  class-string<\KDuma\SimpleDAL\Typed\Contracts\TypedRecord>|null  $recordClass  TypedRecord subclass for hydration.
+     * @param  class-string<TypedRecord>|null  $recordClass  TypedRecord subclass for hydration.
      * @param  class-string<\BackedEnum>|null  $attachmentEnum  Enum class for typed attachments.
      * @param  bool  $hasAttachments  Whether the entity supports attachments.
      * @param  bool  $hasTimestamps  Whether the entity tracks timestamps.

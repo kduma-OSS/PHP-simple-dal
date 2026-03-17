@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace KDuma\SimpleDAL\Typed\Contracts;
 
+use KDuma\SimpleDAL\Typed\FieldMapping;
+
 abstract class TypedRecord
 {
     public readonly string $id;
@@ -15,7 +17,7 @@ abstract class TypedRecord
     /** @var array<string, mixed> Non-mapped extra data fields */
     private array $_extraData = [];
 
-    /** @var list<\KDuma\SimpleDAL\Typed\FieldMapping> Field mappings -- set by the hydrator, not by the constructor */
+    /** @var list<FieldMapping> Field mappings -- set by the hydrator, not by the constructor */
     private array $_fieldMappings = [];
 
     /**
@@ -73,6 +75,7 @@ abstract class TypedRecord
 
     /**
      * @internal
+     *
      * @param  array<string, mixed>  $data
      */
     public function _setExtraData(array $data): void
@@ -82,6 +85,7 @@ abstract class TypedRecord
 
     /**
      * @internal
+     *
      * @return array<string, mixed>
      */
     public function _getExtraData(): array
@@ -91,7 +95,8 @@ abstract class TypedRecord
 
     /**
      * @internal
-     * @param  list<\KDuma\SimpleDAL\Typed\FieldMapping>  $mappings
+     *
+     * @param  list<FieldMapping>  $mappings
      */
     public function _setFieldMappings(array $mappings): void
     {
@@ -100,7 +105,8 @@ abstract class TypedRecord
 
     /**
      * @internal
-     * @return list<\KDuma\SimpleDAL\Typed\FieldMapping>
+     *
+     * @return list<FieldMapping>
      */
     public function _getFieldMappings(): array
     {

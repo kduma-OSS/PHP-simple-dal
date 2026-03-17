@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 use KDuma\SimpleDAL\DataIntegrity\PhpSecLib\RsaSigningAlgorithm;
 use phpseclib3\Crypt\RSA;
+use phpseclib3\Crypt\RSA\PrivateKey;
+use phpseclib3\Crypt\RSA\PublicKey;
 
 test('sign and verify round-trip with RSA', function () {
     $privateKey = RSA::createKey(2048);
@@ -19,7 +21,7 @@ test('sign and verify round-trip with RSA', function () {
 test('verify-only mode throws on sign', function () {
     $privateKey = RSA::createKey(2048);
     $publicKey = $privateKey->getPublicKey();
-    assert($publicKey instanceof \phpseclib3\Crypt\RSA\PublicKey);
+    assert($publicKey instanceof PublicKey);
 
     $algo = new RsaSigningAlgorithm('rsa-key', $publicKey);
 
@@ -48,7 +50,7 @@ test('algorithm constant is 2', function () {
 
 test('works with PSS padding', function () {
     $privateKey = RSA::createKey(2048)->withPadding(RSA::SIGNATURE_PSS);
-    assert($privateKey instanceof \phpseclib3\Crypt\RSA\PrivateKey);
+    assert($privateKey instanceof PrivateKey);
 
     $algo = new RsaSigningAlgorithm('rsa-pss', $privateKey);
 
