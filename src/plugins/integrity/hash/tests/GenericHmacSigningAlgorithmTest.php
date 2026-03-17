@@ -3,7 +3,9 @@
 declare(strict_types=1);
 
 use KDuma\SimpleDAL\Integrity\Hash\Signer\GenericHmacSigningAlgorithm;
+use KDuma\SimpleDAL\Integrity\Hash\Signer\HmacSha1SigningAlgorithm;
 use KDuma\SimpleDAL\Integrity\Hash\Signer\HmacSha256SigningAlgorithm;
+use KDuma\SimpleDAL\Integrity\Hash\Signer\HmacSha512SigningAlgorithm;
 
 test('sign and verify round-trip', function () {
     $signer = new GenericHmacSigningAlgorithm('key1', 'my-secret-key');
@@ -44,6 +46,30 @@ test('convenience class HmacSha256SigningAlgorithm works', function () {
     $signer = new HmacSha256SigningAlgorithm('key1', 'my-secret');
 
     expect($signer->algorithm)->toBe(129);
+    expect($signer->id)->toBe('key1');
+
+    $signature = $signer->sign('test message');
+
+    expect($signer->verify('test message', $signature))->toBeTrue();
+    expect($signer->verify('wrong message', $signature))->toBeFalse();
+});
+
+test('convenience class HmacSha1SigningAlgorithm works', function () {
+    $signer = new HmacSha1SigningAlgorithm('key1', 'my-secret');
+
+    expect($signer->algorithm)->toBe(128);
+    expect($signer->id)->toBe('key1');
+
+    $signature = $signer->sign('test message');
+
+    expect($signer->verify('test message', $signature))->toBeTrue();
+    expect($signer->verify('wrong message', $signature))->toBeFalse();
+});
+
+test('convenience class HmacSha512SigningAlgorithm works', function () {
+    $signer = new HmacSha512SigningAlgorithm('key1', 'my-secret');
+
+    expect($signer->algorithm)->toBe(130);
     expect($signer->id)->toBe('key1');
 
     $signature = $signer->sign('test message');

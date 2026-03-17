@@ -41,3 +41,19 @@ test('algorithm constant is 2', function () {
     expect($key->algorithm)->toBe(2);
     expect(SealedBoxAlgorithm::ALGORITHM)->toBe(2);
 });
+
+test('invalid public key size throws', function () {
+    new SealedBoxAlgorithm('test', 'too-short');
+})->throws(InvalidArgumentException::class, 'Public key must be');
+
+test('invalid secret key size throws', function () {
+    $kp = sodium_crypto_box_keypair();
+    new SealedBoxAlgorithm('test', sodium_crypto_box_publickey($kp), 'too-short');
+})->throws(InvalidArgumentException::class, 'Secret key must be');
+
+test('decryption with corrupted payload throws', function () {
+    $kp = sodium_crypto_box_keypair();
+    $key = new SealedBoxAlgorithm('test', sodium_crypto_box_publickey($kp), sodium_crypto_box_secretkey($kp));
+
+    $key->decrypt('corrupted-data-that-is-long-enough-to-avoid-trivial-rejection-by-sodium');
+})->throws(DecryptionException::class);
