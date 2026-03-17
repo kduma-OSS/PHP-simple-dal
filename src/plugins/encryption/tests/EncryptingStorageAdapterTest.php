@@ -9,16 +9,16 @@ use KDuma\SimpleDAL\Encryption\EncryptedPayload;
 use KDuma\SimpleDAL\Encryption\EncryptingStorageAdapter;
 use KDuma\SimpleDAL\Encryption\EncryptionConfig;
 use KDuma\SimpleDAL\Encryption\EncryptionRule;
-use KDuma\SimpleDAL\Encryption\Sodium\KeyPair;
-use KDuma\SimpleDAL\Encryption\Sodium\SymmetricKey;
+use KDuma\SimpleDAL\Encryption\Sodium\SealedBoxAlgorithm;
+use KDuma\SimpleDAL\Encryption\Sodium\SecretBoxAlgorithm;
 
 beforeEach(function () {
     $this->pdo = new PDO('sqlite::memory:');
     $this->inner = new DatabaseAdapter($this->pdo);
-    $this->symmetricKey = new SymmetricKey('sym-key', sodium_crypto_secretbox_keygen());
+    $this->symmetricKey = new SecretBoxAlgorithm('sym-key', sodium_crypto_secretbox_keygen());
 
     $keypair = sodium_crypto_box_keypair();
-    $this->asymmetricKey = new KeyPair(
+    $this->asymmetricKey = new SealedBoxAlgorithm(
         'asym-key',
         sodium_crypto_box_publickey($keypair),
         sodium_crypto_box_secretkey($keypair),

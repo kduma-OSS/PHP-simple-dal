@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 use KDuma\SimpleDAL\Encryption\Contracts\Exception\DecryptionException;
 use KDuma\SimpleDAL\Encryption\EncryptedPayload;
-use KDuma\SimpleDAL\Encryption\Sodium\SymmetricKey;
+use KDuma\SimpleDAL\Encryption\Sodium\SecretBoxAlgorithm;
 
 test('encode and decode round-trip with secretbox algorithm', function () {
-    $encoded = EncryptedPayload::encode('my-key', SymmetricKey::ALGORITHM, 'encrypted-data');
+    $encoded = EncryptedPayload::encode('my-key', SecretBoxAlgorithm::ALGORITHM, 'encrypted-data');
     $decoded = EncryptedPayload::decode($encoded);
 
     expect($decoded->keyId)->toBe('my-key');
-    expect($decoded->algorithm)->toBe(SymmetricKey::ALGORITHM);
+    expect($decoded->algorithm)->toBe(SecretBoxAlgorithm::ALGORITHM);
     expect($decoded->payload)->toBe('encrypted-data');
 });
 
@@ -25,7 +25,7 @@ test('encode and decode round-trip with sealed box algorithm', function () {
 });
 
 test('isEncrypted returns true for encrypted data', function () {
-    $encoded = EncryptedPayload::encode('key', SymmetricKey::ALGORITHM, 'data');
+    $encoded = EncryptedPayload::encode('key', SecretBoxAlgorithm::ALGORITHM, 'data');
 
     expect(EncryptedPayload::isEncrypted($encoded))->toBeTrue();
 });
@@ -46,7 +46,7 @@ test('decode throws on non-encrypted data', function () {
 
 test('decode handles long key IDs', function () {
     $longKeyId = str_repeat('k', 1000);
-    $encoded = EncryptedPayload::encode($longKeyId, SymmetricKey::ALGORITHM, 'data');
+    $encoded = EncryptedPayload::encode($longKeyId, SecretBoxAlgorithm::ALGORITHM, 'data');
     $decoded = EncryptedPayload::decode($encoded);
 
     expect($decoded->keyId)->toBe($longKeyId);

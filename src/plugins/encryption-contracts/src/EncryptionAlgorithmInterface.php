@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace KDuma\SimpleDAL\Encryption\Contracts;
 
-interface EncryptionKeyInterface
+interface EncryptionAlgorithmInterface
 {
     public string $id { get; }
 

@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace KDuma\SimpleDAL\Encryption\PhpSecLib;
 
-use KDuma\SimpleDAL\Encryption\Contracts\EncryptionKeyInterface;
+use KDuma\SimpleDAL\Encryption\Contracts\EncryptionAlgorithmInterface;
 use KDuma\SimpleDAL\Encryption\Contracts\Exception\DecryptionException;
 use phpseclib3\Crypt\RSA\PrivateKey;
 use phpseclib3\Crypt\RSA\PublicKey;
 
-class RsaEncryptionKey implements EncryptionKeyInterface
+class RsaAlgorithm implements EncryptionAlgorithmInterface
 {
     public const int ALGORITHM = 4;
 

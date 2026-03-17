@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace KDuma\SimpleDAL\Encryption\Sodium;
 
-use KDuma\SimpleDAL\Encryption\Contracts\EncryptionKeyInterface;
+use KDuma\SimpleDAL\Encryption\Contracts\EncryptionAlgorithmInterface;
 use KDuma\SimpleDAL\Encryption\Contracts\Exception\DecryptionException;
 
-class SymmetricKey implements EncryptionKeyInterface
+class SecretBoxAlgorithm implements EncryptionAlgorithmInterface
 {
     public const int ALGORITHM = 1;
 

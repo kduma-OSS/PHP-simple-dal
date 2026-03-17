@@ -19,19 +19,19 @@ use KDuma\SimpleDAL\Encryption\EncryptingStorageAdapter;
 use KDuma\SimpleDAL\Encryption\EncryptionConfig;
 use KDuma\SimpleDAL\Encryption\EncryptionMigrator;
 use KDuma\SimpleDAL\Encryption\EncryptionRule;
-use KDuma\SimpleDAL\Encryption\Sodium\KeyPair;
-use KDuma\SimpleDAL\Encryption\Sodium\SymmetricKey;
+use KDuma\SimpleDAL\Encryption\Sodium\SealedBoxAlgorithm;
+use KDuma\SimpleDAL\Encryption\Sodium\SecretBoxAlgorithm;
 use KDuma\SimpleDAL\Entity\CollectionEntityDefinition;
 
 // ── 1. Generate keys ──
 
-$symmetricKey = new SymmetricKey(
+$symmetricKey = new SecretBoxAlgorithm(
     id: 'master',
     key: sodium_crypto_secretbox_keygen(),
 );
 
 $keypair = sodium_crypto_box_keypair();
-$asymmetricKey = new KeyPair(
+$asymmetricKey = new SealedBoxAlgorithm(
     id: 'sealed',
     publicKey: sodium_crypto_box_publickey($keypair),
     secretKey: sodium_crypto_box_secretkey($keypair),
@@ -110,7 +110,7 @@ echo 'Raw certificate.pem is encrypted: '.(EncryptedPayload::isEncrypted($rawCer
 
 // ── 7. Key rotation with migrator ──
 
-$newKey = new SymmetricKey(
+$newKey = new SecretBoxAlgorithm(
     id: 'master-v2',
     key: sodium_crypto_secretbox_keygen(),
 );

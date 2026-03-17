@@ -8,13 +8,13 @@ use KDuma\SimpleDAL\Encryption\EncryptedPayload;
 use KDuma\SimpleDAL\Encryption\EncryptionConfig;
 use KDuma\SimpleDAL\Encryption\EncryptionMigrator;
 use KDuma\SimpleDAL\Encryption\EncryptionRule;
-use KDuma\SimpleDAL\Encryption\Sodium\SymmetricKey;
+use KDuma\SimpleDAL\Encryption\Sodium\SecretBoxAlgorithm;
 
 beforeEach(function () {
     $this->pdo = new PDO('sqlite::memory:');
     $this->adapter = new DatabaseAdapter($this->pdo);
-    $this->keyA = new SymmetricKey('key-a', sodium_crypto_secretbox_keygen());
-    $this->keyB = new SymmetricKey('key-b', sodium_crypto_secretbox_keygen());
+    $this->keyA = new SecretBoxAlgorithm('key-a', sodium_crypto_secretbox_keygen());
+    $this->keyB = new SecretBoxAlgorithm('key-b', sodium_crypto_secretbox_keygen());
 
     $definition = new class('test_entity', false, true, false, []) implements EntityDefinitionInterface
     {

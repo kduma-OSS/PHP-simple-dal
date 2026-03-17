@@ -880,9 +880,9 @@ composer require kduma/simple-dal-encryption kduma/simple-dal-encryption-phpsecl
 **Symmetric** (`SymmetricKey`) -- uses `sodium_crypto_secretbox` (XSalsa20-Poly1305). Same key for encrypt and decrypt.
 
 ```php
-use KDuma\SimpleDAL\Encryption\Sodium\SymmetricKey;
+use KDuma\SimpleDAL\Encryption\Sodium\SecretBoxAlgorithm;
 
-$key = new SymmetricKey(
+$key = new SecretBoxAlgorithm(
     id: 'master',
     key: sodium_crypto_secretbox_keygen(),  // 32 bytes
 );
@@ -891,11 +891,11 @@ $key = new SymmetricKey(
 **Asymmetric** (`KeyPair`) -- uses `sodium_crypto_box_seal` (X25519+XSalsa20-Poly1305). Encrypt with public key only; decrypt requires the secret key.
 
 ```php
-use KDuma\SimpleDAL\Encryption\Sodium\KeyPair;
+use KDuma\SimpleDAL\Encryption\Sodium\SealedBoxAlgorithm;
 
 $keypair = sodium_crypto_box_keypair();
 
-$key = new KeyPair(
+$key = new SealedBoxAlgorithm(
     id: 'sealed',
     publicKey: sodium_crypto_box_publickey($keypair),
     secretKey: sodium_crypto_box_secretkey($keypair),  // optional — omit for encrypt-only
@@ -1008,14 +1008,14 @@ The `kduma/simple-dal-encryption-phpseclib` package provides key implementations
 **RSA encryption** (OAEP or PKCS1 padding):
 
 ```php
-use KDuma\SimpleDAL\Encryption\PhpSecLib\RsaEncryptionKey;
+use KDuma\SimpleDAL\Encryption\PhpSecLib\RsaAlgorithm;
 use phpseclib3\Crypt\RSA;
 
 $privateKey = RSA::createKey(2048);
 $publicKey = $privateKey->getPublicKey();
 
 // Configure padding/hash before passing (immutable API)
-$key = new RsaEncryptionKey(
+$key = new RsaAlgorithm(
     id: 'rsa-key',
     publicKey: $publicKey->withPadding(RSA::ENCRYPTION_OAEP)->withHash('sha256'),
     privateKey: $privateKey->withPadding(RSA::ENCRYPTION_OAEP)->withHash('sha256'),
@@ -1025,13 +1025,13 @@ $key = new RsaEncryptionKey(
 **Symmetric encryption** (AES, ChaCha20, etc.):
 
 ```php
-use KDuma\SimpleDAL\Encryption\PhpSecLib\SymmetricEncryptionKey;
+use KDuma\SimpleDAL\Encryption\PhpSecLib\AesAlgorithm;
 use phpseclib3\Crypt\AES;
 
 $cipher = new AES('ctr');
 $cipher->setKey($key32bytes);
 
-$key = new SymmetricEncryptionKey(id: 'aes-key', cipher: $cipher);
+$key = new AesAlgorithm(id: 'aes-key', cipher: $cipher);
 ```
 
 Both key types work interchangeably with sodium keys in `EncryptionConfig`.

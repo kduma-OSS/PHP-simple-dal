@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-use KDuma\SimpleDAL\Encryption\PhpSecLib\SymmetricEncryptionKey;
+use KDuma\SimpleDAL\Encryption\PhpSecLib\AesAlgorithm;
 use phpseclib3\Crypt\AES;
 
 test('encrypt and decrypt round-trip with AES-CTR', function () {
     $cipher = new AES('ctr');
     $cipher->setKey(random_bytes(32));
 
-    $key = new SymmetricEncryptionKey('aes-key', $cipher);
+    $key = new AesAlgorithm('aes-key', $cipher);
 
     $ciphertext = $key->encrypt('hello world');
     $plaintext = $key->decrypt($ciphertext);
@@ -21,7 +21,7 @@ test('different encryptions produce different ciphertexts', function () {
     $cipher = new AES('ctr');
     $cipher->setKey(random_bytes(32));
 
-    $key = new SymmetricEncryptionKey('aes-key', $cipher);
+    $key = new AesAlgorithm('aes-key', $cipher);
 
     $a = $key->encrypt('same');
     $b = $key->encrypt('same');
@@ -33,7 +33,7 @@ test('encrypt and decrypt with AES-CBC', function () {
     $cipher = new AES('cbc');
     $cipher->setKey(random_bytes(32));
 
-    $key = new SymmetricEncryptionKey('aes-cbc', $cipher);
+    $key = new AesAlgorithm('aes-cbc', $cipher);
 
     $ciphertext = $key->encrypt('cbc mode test');
     $plaintext = $key->decrypt($ciphertext);
@@ -45,8 +45,8 @@ test('algorithm constant is 3', function () {
     $cipher = new AES('ctr');
     $cipher->setKey(random_bytes(32));
 
-    $key = new SymmetricEncryptionKey('test', $cipher);
+    $key = new AesAlgorithm('test', $cipher);
 
     expect($key->algorithm)->toBe(3);
-    expect(SymmetricEncryptionKey::ALGORITHM)->toBe(3);
+    expect(AesAlgorithm::ALGORITHM)->toBe(3);
 });
