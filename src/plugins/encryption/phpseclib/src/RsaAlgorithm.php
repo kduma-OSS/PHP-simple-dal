@@ -59,7 +59,7 @@ class RsaAlgorithm implements EncryptionAlgorithmInterface
 
         try {
             $plaintext = $this->privateKey->decrypt($payload);
-        } catch (\RuntimeException $e) {
+        } catch (\RuntimeException|\OutOfRangeException $e) {
             throw new DecryptionException('RSA decryption failed — wrong key or corrupted data.', 0, $e);
         }
 

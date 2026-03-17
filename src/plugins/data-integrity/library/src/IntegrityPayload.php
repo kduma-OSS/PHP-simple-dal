@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 namespace KDuma\SimpleDAL\DataIntegrity;
 
+use KDuma\BinaryTools\BinaryReader;
+use KDuma\BinaryTools\BinaryString;
+use KDuma\BinaryTools\BinaryWriter;
+use KDuma\BinaryTools\IntType;
 use KDuma\SimpleDAL\Contracts\Exception\CorruptedDataException;
+use RuntimeException;
 
 class IntegrityPayload
 {
@@ -41,27 +46,25 @@ class IntegrityPayload
         $hasSig = $signingAlgorithm !== null && $keyId !== null && $signature !== null;
         $flags = ($hasHash ? 0x01 : 0x00) | ($hasSig ? 0x02 : 0x00);
 
-        $result = self::MAGIC
-            .chr(self::VERSION)
-            .chr($flags);
+        $writer = new BinaryWriter();
+        $writer->writeBytes(BinaryString::fromString(self::MAGIC))
+            ->writeByte(self::VERSION)
+            ->writeByte($flags);
 
         if ($hasHash) {
-            $result .= chr($hashAlgorithm)
-                .pack('n', strlen($hash))
-                .$hash;
+            $writer->writeByte($hashAlgorithm)
+                ->writeBytesWith(BinaryString::fromString($hash), length: IntType::UINT16);
         }
 
         if ($hasSig) {
-            $result .= chr($signingAlgorithm)
-                .pack('n', strlen($keyId))
-                .$keyId
-                .pack('n', strlen($signature))
-                .$signature;
+            $writer->writeByte($signingAlgorithm)
+                ->writeBytesWith(BinaryString::fromString($keyId), length: IntType::UINT16)
+                ->writeBytesWith(BinaryString::fromString($signature), length: IntType::UINT16);
         }
 
-        $result .= $content;
+        $writer->writeBytes(BinaryString::fromString($content));
 
-        return $result;
+        return $writer->getBuffer()->toString();
     }
 
     public static function decode(string $data): self
@@ -70,99 +73,44 @@ class IntegrityPayload
             throw new CorruptedDataException('Data is not an integrity payload — missing magic header.');
         }
 
-        $offset = strlen(self::MAGIC);
+        try {
+            $reader = new BinaryReader(BinaryString::fromString($data));
+            $reader->skip(strlen(self::MAGIC));
 
-        $version = ord($data[$offset++]);
-        if ($version !== self::VERSION) {
-            throw new CorruptedDataException("Unsupported integrity version: {$version}.");
+            $version = $reader->readByte();
+            if ($version !== self::VERSION) {
+                throw new CorruptedDataException("Unsupported integrity version: {$version}.");
+            }
+
+            $flags = $reader->readByte();
+            $hasHash = ($flags & 0x01) !== 0;
+            $hasSig = ($flags & 0x02) !== 0;
+
+            $hash = null;
+            $hashAlgorithm = null;
+
+            if ($hasHash) {
+                $hashAlgorithm = $reader->readByte();
+                $hash = $reader->readBytesWith(length: IntType::UINT16)->toString();
+            }
+
+            $signingAlgorithm = null;
+            $keyId = null;
+            $signature = null;
+
+            if ($hasSig) {
+                $signingAlgorithm = $reader->readByte();
+                $keyId = $reader->readBytesWith(length: IntType::UINT16)->toString();
+                $signature = $reader->readBytesWith(length: IntType::UINT16)->toString();
+            }
+
+            $payload = $reader->remaining_data->toString();
+
+            return new self($hash, $hashAlgorithm, $signingAlgorithm, $keyId, $signature, $payload);
+        } catch (CorruptedDataException $e) {
+            throw $e;
+        } catch (RuntimeException $e) {
+            throw new CorruptedDataException('Integrity payload is truncated — '.$e->getMessage());
         }
-
-        $flags = ord($data[$offset++]);
-        $hasHash = ($flags & 0x01) !== 0;
-        $hasSig = ($flags & 0x02) !== 0;
-
-        $hash = null;
-        $hashAlgorithm = null;
-
-        if ($hasHash) {
-            if (strlen($data) < $offset + 1) {
-                throw new CorruptedDataException('Integrity payload is truncated — missing hash algorithm.');
-            }
-
-            $hashAlgorithm = ord($data[$offset++]);
-
-            if (strlen($data) < $offset + 2) {
-                throw new CorruptedDataException('Integrity payload is truncated — missing hash length.');
-            }
-
-            $hashLenUnpacked = unpack('n', substr($data, $offset, 2));
-            if ($hashLenUnpacked === false) {
-                throw new CorruptedDataException('Integrity payload is truncated — cannot read hash length.');
-            }
-            /** @var int $hashLen */
-            $hashLen = $hashLenUnpacked[1];
-            $offset += 2;
-
-            if (strlen($data) < $offset + $hashLen) {
-                throw new CorruptedDataException('Integrity payload is truncated — hash extends beyond data.');
-            }
-
-            $hash = substr($data, $offset, $hashLen);
-            $offset += $hashLen;
-        }
-
-        $signingAlgorithm = null;
-        $keyId = null;
-        $signature = null;
-
-        if ($hasSig) {
-            if (strlen($data) < $offset + 1) {
-                throw new CorruptedDataException('Integrity payload is truncated — missing signing algorithm.');
-            }
-
-            $signingAlgorithm = ord($data[$offset++]);
-
-            if (strlen($data) < $offset + 2) {
-                throw new CorruptedDataException('Integrity payload is truncated — missing key ID length.');
-            }
-
-            $keyIdLenUnpacked = unpack('n', substr($data, $offset, 2));
-            if ($keyIdLenUnpacked === false) {
-                throw new CorruptedDataException('Integrity payload is truncated — cannot read key ID length.');
-            }
-            /** @var int $keyIdLen */
-            $keyIdLen = $keyIdLenUnpacked[1];
-            $offset += 2;
-
-            if (strlen($data) < $offset + $keyIdLen) {
-                throw new CorruptedDataException('Integrity payload is truncated — key ID extends beyond data.');
-            }
-
-            $keyId = substr($data, $offset, $keyIdLen);
-            $offset += $keyIdLen;
-
-            if (strlen($data) < $offset + 2) {
-                throw new CorruptedDataException('Integrity payload is truncated — missing signature length.');
-            }
-
-            $signatureLenUnpacked = unpack('n', substr($data, $offset, 2));
-            if ($signatureLenUnpacked === false) {
-                throw new CorruptedDataException('Integrity payload is truncated — cannot read signature length.');
-            }
-            /** @var int $signatureLen */
-            $signatureLen = $signatureLenUnpacked[1];
-            $offset += 2;
-
-            if (strlen($data) < $offset + $signatureLen) {
-                throw new CorruptedDataException('Integrity payload is truncated — signature extends beyond data.');
-            }
-
-            $signature = substr($data, $offset, $signatureLen);
-            $offset += $signatureLen;
-        }
-
-        $payload = substr($data, $offset);
-
-        return new self($hash, $hashAlgorithm, $signingAlgorithm, $keyId, $signature, $payload);
     }
 }

@@ -20,7 +20,8 @@
         "league/flysystem-ziparchive": "^3.0",
         "php": "^8.4",
         "phpseclib/phpseclib": "^3.0",
-        "spatie/php-attribute-reader": "^1.0"
+        "spatie/php-attribute-reader": "^1.0",
+        "kduma/binary-tools": "^0.0.4"
     },
     "require-dev": {
         "imsuperlative/phpstan-pest": "^0.5.0",

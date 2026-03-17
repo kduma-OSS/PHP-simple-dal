@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 namespace KDuma\SimpleDAL\Encryption;
 
+use KDuma\BinaryTools\BinaryReader;
+use KDuma\BinaryTools\BinaryString;
+use KDuma\BinaryTools\BinaryWriter;
+use KDuma\BinaryTools\IntType;
 use KDuma\SimpleDAL\Encryption\Contracts\Exception\DecryptionException;
+use RuntimeException;
 
 class EncryptedPayload
 {
@@ -28,15 +33,14 @@ class EncryptedPayload
 
     public static function encode(string $keyId, int $algorithm, string $encryptedPayload): string
     {
-        $keyIdBytes = $keyId;
-        $keyIdLen = strlen($keyIdBytes);
+        $writer = new BinaryWriter();
+        $writer->writeBytes(BinaryString::fromString(self::MAGIC))
+            ->writeByte(self::VERSION)
+            ->writeByte($algorithm)
+            ->writeBytesWith(BinaryString::fromString($keyId), length: IntType::UINT16)
+            ->writeBytes(BinaryString::fromString($encryptedPayload));
 
-        return self::MAGIC
-            .chr(self::VERSION)
-            .chr($algorithm)
-            .pack('n', $keyIdLen)
-            .$keyIdBytes
-            .$encryptedPayload;
+        return $writer->getBuffer()->toString();
     }
 
     public static function decode(string $data): self
@@ -45,31 +49,24 @@ class EncryptedPayload
             throw new DecryptionException('Data is not an encrypted payload — missing magic header.');
         }
 
-        $offset = strlen(self::MAGIC);
+        try {
+            $reader = new BinaryReader(BinaryString::fromString($data));
+            $reader->skip(strlen(self::MAGIC));
 
-        $version = ord($data[$offset++]);
-        if ($version !== self::VERSION) {
-            throw new DecryptionException("Unsupported encryption version: {$version}.");
+            $version = $reader->readByte();
+            if ($version !== self::VERSION) {
+                throw new DecryptionException("Unsupported encryption version: {$version}.");
+            }
+
+            $algorithm = $reader->readByte();
+            $keyId = $reader->readBytesWith(length: IntType::UINT16)->toString();
+            $payload = $reader->remaining_data->toString();
+
+            return new self($keyId, $algorithm, $payload);
+        } catch (DecryptionException $e) {
+            throw $e;
+        } catch (RuntimeException $e) {
+            throw new DecryptionException('Encrypted payload is truncated — '.$e->getMessage());
         }
-
-        $algorithm = ord($data[$offset++]);
-
-        $unpacked = unpack('nkeyIdLen', substr($data, $offset, 2));
-        if ($unpacked === false || ! is_int($unpacked['keyIdLen'])) {
-            throw new DecryptionException('Failed to unpack key ID length from encrypted payload.');
-        }
-        $keyIdLen = $unpacked['keyIdLen'];
-        $offset += 2;
-
-        if (strlen($data) < $offset + $keyIdLen) {
-            throw new DecryptionException('Encrypted payload is truncated — key ID extends beyond data.');
-        }
-
-        $keyId = substr($data, $offset, $keyIdLen);
-        $offset += $keyIdLen;
-
-        $payload = substr($data, $offset);
-
-        return new self($keyId, $algorithm, $payload);
     }
 }
