@@ -1011,15 +1011,12 @@ The `kduma/simple-dal-encryption-phpseclib` package provides key implementations
 use KDuma\SimpleDAL\Encryption\PhpSecLib\RsaAlgorithm;
 use phpseclib3\Crypt\RSA;
 
-$privateKey = RSA::createKey(2048);
-$publicKey = $privateKey->getPublicKey();
+// Pass a PrivateKey for encrypt + decrypt
+$privateKey = RSA::createKey(2048)->withPadding(RSA::ENCRYPTION_OAEP)->withHash('sha256');
+$key = new RsaAlgorithm(id: 'rsa-key', key: $privateKey);
 
-// Configure padding/hash before passing (immutable API)
-$key = new RsaAlgorithm(
-    id: 'rsa-key',
-    publicKey: $publicKey->withPadding(RSA::ENCRYPTION_OAEP)->withHash('sha256'),
-    privateKey: $privateKey->withPadding(RSA::ENCRYPTION_OAEP)->withHash('sha256'),
-);
+// Or pass a PublicKey for encrypt-only
+$key = new RsaAlgorithm(id: 'rsa-key', key: $privateKey->getPublicKey());
 ```
 
 **Symmetric encryption** (AES, ChaCha20, etc.):

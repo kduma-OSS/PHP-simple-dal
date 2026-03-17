@@ -17,15 +17,26 @@ class RsaAlgorithm implements EncryptionAlgorithmInterface
         get => self::ALGORITHM;
     }
 
+    private readonly PublicKey $publicKey;
+
+    private readonly ?PrivateKey $privateKey;
+
     /**
-     * @param  PublicKey  $publicKey  Pre-configured RSA public key (use withPadding/withHash before passing)
-     * @param  PrivateKey|null  $privateKey  Pre-configured RSA private key (null = encrypt-only)
+     * @param  PublicKey|PrivateKey  $key  Pass a PrivateKey for encrypt+decrypt, or a PublicKey for encrypt-only.
+     *                                     Configure padding/hash before passing (e.g. withPadding, withHash).
      */
     public function __construct(
         public readonly string $id,
-        private readonly PublicKey $publicKey,
-        private readonly ?PrivateKey $privateKey = null,
-    ) {}
+        PublicKey|PrivateKey $key,
+    ) {
+        if ($key instanceof PrivateKey) {
+            $this->privateKey = $key;
+            $this->publicKey = $key->getPublicKey();
+        } else {
+            $this->publicKey = $key;
+            $this->privateKey = null;
+        }
+    }
 
     public function encrypt(string $plaintext): string
     {
