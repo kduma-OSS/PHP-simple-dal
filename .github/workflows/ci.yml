@@ -35,3 +35,6 @@ jobs:
 
       - name: Check code style
         run: vendor/bin/pint --test
+
+      - name: Static analysis
+        run: vendor/bin/phpstan analyse --no-progress --memory-limit=512M
