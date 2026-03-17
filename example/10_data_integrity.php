@@ -28,7 +28,12 @@ use KDuma\SimpleDAL\Entity\CollectionEntityDefinition;
 
 $hasher = new Blake2bHashingAlgorithm;
 
-$signer = Ed25519SigningAlgorithm::generate(id: 'signing-key-01');
+$keypair = sodium_crypto_sign_keypair();
+$signer = new Ed25519SigningAlgorithm(
+    id: 'signing-key-01',
+    secretKey: sodium_crypto_sign_secretkey($keypair),
+    publicKey: sodium_crypto_sign_publickey($keypair),
+);
 
 echo "Blake2b hasher and Ed25519 signing key created.\n";
 

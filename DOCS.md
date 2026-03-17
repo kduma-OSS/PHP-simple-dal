@@ -1103,10 +1103,7 @@ Signing algorithms implement `SigningAlgorithmInterface` and add a cryptographic
 ```php
 use KDuma\SimpleDAL\DataIntegrity\Sodium\Ed25519SigningAlgorithm;
 
-// Generate a new keypair
-$signer = Ed25519SigningAlgorithm::generate(id: 'signing-key-01');
-
-// Or construct from existing keys
+// Construct from existing keys
 $signer = new Ed25519SigningAlgorithm(
     id: 'signing-key-01',
     secretKey: $secretKeyBytes,   // 64 bytes, null for verify-only

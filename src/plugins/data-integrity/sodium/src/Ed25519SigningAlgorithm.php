@@ -36,18 +36,6 @@ class Ed25519SigningAlgorithm implements SigningAlgorithmInterface
         }
     }
 
-    public static function generate(string $id): self
-    {
-        $keypair = sodium_crypto_sign_keypair();
-
-        /** @var non-empty-string $secretKey */
-        $secretKey = sodium_crypto_sign_secretkey($keypair);
-        /** @var non-empty-string $publicKey */
-        $publicKey = sodium_crypto_sign_publickey($keypair);
-
-        return new self($id, $secretKey, $publicKey);
-    }
-
     /**
      * @param  non-empty-string  $publicKey
      */
