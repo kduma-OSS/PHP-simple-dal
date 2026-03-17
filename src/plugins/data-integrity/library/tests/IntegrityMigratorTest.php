@@ -103,11 +103,30 @@ test('adds integrity to unprotected records', function () {
     expect($data)->toBe(['name' => 'Alice']);
 });
 
-test('adds integrity to unprotected attachments', function () {
+test('adds integrity to unprotected attachments (detached)', function () {
     $this->adapter->writeRecord('test_entity', 'rec-1', ['x' => 1]);
     $this->adapter->writeAttachment('test_entity', 'rec-1', 'file.txt', 'plaintext');
 
     $config = new IntegrityConfig(hasher: $this->hasher);
+
+    (new IntegrityMigrator($this->adapter, $config))->migrate(['test_entity']);
+
+    // Raw file is unchanged, sidecar exists
+    $stream = $this->adapter->readAttachment('test_entity', 'rec-1', 'file.txt');
+    expect(stream_get_contents($stream))->toBe('plaintext');
+    expect($this->adapter->attachmentExists('test_entity', 'rec-1', 'file.txt.sig'))->toBeTrue();
+
+    // Verify the integrity adapter can read it
+    $adapter = new IntegrityStorageAdapter($this->adapter, $config);
+    $result = $adapter->readAttachment('test_entity', 'rec-1', 'file.txt');
+    expect(stream_get_contents($result))->toBe('plaintext');
+});
+
+test('adds integrity to unprotected attachments (inline)', function () {
+    $this->adapter->writeRecord('test_entity', 'rec-1', ['x' => 1]);
+    $this->adapter->writeAttachment('test_entity', 'rec-1', 'file.txt', 'plaintext');
+
+    $config = new IntegrityConfig(hasher: $this->hasher, detachedAttachments: false);
 
     (new IntegrityMigrator($this->adapter, $config))->migrate(['test_entity']);
 
@@ -116,7 +135,6 @@ test('adds integrity to unprotected attachments', function () {
 
     expect(IntegrityPayload::hasIntegrity($rawData))->toBeTrue();
 
-    // Verify the integrity adapter can read it
     $adapter = new IntegrityStorageAdapter($this->adapter, $config);
     $result = $adapter->readAttachment('test_entity', 'rec-1', 'file.txt');
     expect(stream_get_contents($result))->toBe('plaintext');
@@ -171,11 +189,10 @@ test('re-signs with different config', function () {
     assert(is_array($integrityAfter));
     expect($integrityAfter['key_id'])->toBe('signer-b');
 
-    // Verify attachment was also re-signed
-    $stream = $this->adapter->readAttachment('test_entity', 'rec-1', 'file.txt');
-    $rawAttachment = stream_get_contents($stream);
-    $payload = IntegrityPayload::decode($rawAttachment);
-    expect($payload->keyId)->toBe('signer-b');
+    // Verify attachment sidecar was also re-signed
+    $sigStream = $this->adapter->readAttachment('test_entity', 'rec-1', 'file.txt.sig');
+    $sigJson = json_decode(stream_get_contents($sigStream), true);
+    expect($sigJson['key_id'])->toBe('signer-b');
 
     // Verify integrity adapter with new config can read it
     $adapterB = new IntegrityStorageAdapter($this->adapter, $configB);

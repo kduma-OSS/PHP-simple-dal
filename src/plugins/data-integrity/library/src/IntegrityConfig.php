@@ -15,5 +15,6 @@ class IntegrityConfig
         public readonly FailureMode $onChecksumFailure = FailureMode::Throw,
         public readonly FailureMode $onSignatureFailure = FailureMode::Throw,
         public readonly FailureMode $onMissingIntegrity = FailureMode::Throw,
+        public readonly bool $detachedAttachments = true,
     ) {}
 }

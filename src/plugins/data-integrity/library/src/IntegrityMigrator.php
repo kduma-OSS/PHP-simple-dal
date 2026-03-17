@@ -77,6 +77,9 @@ class IntegrityMigrator
     {
         $attachmentNames = $this->adapter->listAttachments($entityName, $recordId);
 
+        // Filter out .sig sidecar files — we handle them as part of the main attachment
+        $attachmentNames = array_values(array_filter($attachmentNames, fn (string $n) => ! str_ends_with($n, '.sig')));
+
         foreach ($attachmentNames as $name) {
             $this->migrateAttachment($entityName, $recordId, $name);
         }
@@ -91,11 +94,18 @@ class IntegrityMigrator
             fclose($stream);
         }
 
-        // Extract content from existing integrity payload if present
+        // Extract content: check inline envelope first, then detached sidecar
         $content = $rawData;
+        $hadInline = false;
+        $hadDetached = false;
+
         if (IntegrityPayload::hasIntegrity($rawData)) {
             $payload = IntegrityPayload::decode($rawData);
             $content = $payload->payload;
+            $hadInline = true;
+        } elseif ($this->adapter->attachmentExists($entityName, $recordId, $name.'.sig')) {
+            $hadDetached = true;
+            // Content is already raw — no extraction needed
         }
 
         // Compute new integrity
@@ -117,25 +127,56 @@ class IntegrityMigrator
             $signature = $this->config->signer->sign($content);
         }
 
-        if ($hash === null && $signature === null) {
-            $newData = $content;
+        $hasIntegrity = $hash !== null || $signature !== null;
+
+        if ($this->config->detachedAttachments) {
+            // Target: detached mode
+            // Write raw content (remove inline envelope if it had one)
+            if ($hadInline) {
+                $this->adapter->writeAttachment($entityName, $recordId, $name, $content);
+            }
+
+            if ($hasIntegrity) {
+                $sidecar = [];
+
+                if ($hash !== null) {
+                    $sidecar['algorithm'] = $hashAlgorithm;
+                    $sidecar['hash'] = base64_encode($hash);
+                }
+
+                if ($signature !== null) {
+                    $sidecar['signing_algorithm'] = $signingAlgorithm;
+                    $sidecar['key_id'] = $keyId;
+                    $sidecar['signature'] = base64_encode($signature);
+                }
+
+                $this->adapter->writeAttachment(
+                    $entityName,
+                    $recordId,
+                    $name.'.sig',
+                    json_encode($sidecar, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+                );
+            } elseif ($hadDetached) {
+                // No integrity needed, remove old sidecar
+                $this->adapter->deleteAttachment($entityName, $recordId, $name.'.sig');
+            }
         } else {
-            $newData = IntegrityPayload::encode(
-                $content,
-                $hash,
-                $hashAlgorithm,
-                $signingAlgorithm,
-                $keyId,
-                $signature,
-            );
-        }
+            // Target: inline mode
+            // Remove detached sidecar if it exists
+            if ($hadDetached) {
+                $this->adapter->deleteAttachment($entityName, $recordId, $name.'.sig');
+            }
 
-        // Skip if unchanged
-        if ($newData === $rawData) {
-            return;
+            if ($hasIntegrity) {
+                $newData = IntegrityPayload::encode($content, $hash, $hashAlgorithm, $signingAlgorithm, $keyId, $signature);
+                if ($newData !== $rawData) {
+                    $this->adapter->writeAttachment($entityName, $recordId, $name, $newData);
+                }
+            } elseif ($hadInline) {
+                // No integrity needed, write raw content
+                $this->adapter->writeAttachment($entityName, $recordId, $name, $content);
+            }
         }
-
-        $this->adapter->writeAttachment($entityName, $recordId, $name, $newData);
     }
 
     /**

@@ -1165,8 +1165,16 @@ $config = new IntegrityConfig(
     onChecksumFailure: FailureMode::Throw,        // default: Throw
     onSignatureFailure: FailureMode::Throw,       // default: Throw
     onMissingIntegrity: FailureMode::Throw,       // default: Throw
+    detachedAttachments: true,                    // default: true
 );
 ```
+
+**`detachedAttachments`** controls how attachment integrity is stored:
+
+- `true` (default): Integrity metadata is stored in a sidecar file (`file.txt.sig`) alongside the raw attachment. The original attachment remains unmodified — readable by external tools.
+- `false`: Integrity metadata is embedded inline by wrapping the attachment content in a binary envelope.
+
+Reading auto-detects both modes transparently, so data written in either mode can be read regardless of the current setting.
 
 ### IntegrityStorageAdapter
 

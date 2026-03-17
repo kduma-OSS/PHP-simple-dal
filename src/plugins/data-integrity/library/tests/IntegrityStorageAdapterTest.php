@@ -159,9 +159,10 @@ test('write and read attachment round-trip with checksum', function () {
     expect(stream_get_contents($stream))->toBe('hello world');
 });
 
-test('raw attachment contains integrity header', function () {
+test('inline: raw attachment contains integrity header', function () {
     $adapter = new IntegrityStorageAdapter($this->inner, new IntegrityConfig(
         hasher: $this->hasher,
+        detachedAttachments: false,
     ));
 
     $this->inner->writeRecord('test_entity', 'rec-1', ['x' => 1]);
@@ -174,9 +175,10 @@ test('raw attachment contains integrity header', function () {
     expect(IntegrityPayload::hasIntegrity($rawData))->toBeTrue();
 });
 
-test('tampered attachment triggers IntegrityException', function () {
+test('inline: tampered attachment triggers IntegrityException', function () {
     $adapter = new IntegrityStorageAdapter($this->inner, new IntegrityConfig(
         hasher: $this->hasher,
+        detachedAttachments: false,
     ));
 
     $this->inner->writeRecord('test_entity', 'rec-1', ['x' => 1]);
@@ -197,6 +199,85 @@ test('tampered attachment triggers IntegrityException', function () {
 
     $adapter->readAttachment('test_entity', 'rec-1', 'file.txt');
 })->throws(IntegrityException::class);
+
+test('detached: sidecar .sig file exists after write', function () {
+    $adapter = new IntegrityStorageAdapter($this->inner, new IntegrityConfig(
+        hasher: $this->hasher,
+    ));
+
+    $this->inner->writeRecord('test_entity', 'rec-1', ['x' => 1]);
+    $adapter->writeAttachment('test_entity', 'rec-1', 'file.txt', 'content');
+
+    // Raw attachment is unmodified
+    $stream = $this->inner->readAttachment('test_entity', 'rec-1', 'file.txt');
+    expect(stream_get_contents($stream))->toBe('content');
+
+    // Sidecar exists as JSON
+    expect($this->inner->attachmentExists('test_entity', 'rec-1', 'file.txt.sig'))->toBeTrue();
+    $sigStream = $this->inner->readAttachment('test_entity', 'rec-1', 'file.txt.sig');
+    $sigData = json_decode(stream_get_contents($sigStream), true);
+    expect($sigData)->toHaveKey('hash');
+    expect($sigData)->toHaveKey('algorithm');
+});
+
+test('detached: listAttachments hides .sig files', function () {
+    $adapter = new IntegrityStorageAdapter($this->inner, new IntegrityConfig(
+        hasher: $this->hasher,
+    ));
+
+    $this->inner->writeRecord('test_entity', 'rec-1', ['x' => 1]);
+    $adapter->writeAttachment('test_entity', 'rec-1', 'file.txt', 'content');
+
+    $names = $adapter->listAttachments('test_entity', 'rec-1');
+    expect($names)->toBe(['file.txt']);
+});
+
+test('detached: deleteAttachment removes sidecar', function () {
+    $adapter = new IntegrityStorageAdapter($this->inner, new IntegrityConfig(
+        hasher: $this->hasher,
+    ));
+
+    $this->inner->writeRecord('test_entity', 'rec-1', ['x' => 1]);
+    $adapter->writeAttachment('test_entity', 'rec-1', 'file.txt', 'content');
+    $adapter->deleteAttachment('test_entity', 'rec-1', 'file.txt');
+
+    expect($this->inner->attachmentExists('test_entity', 'rec-1', 'file.txt'))->toBeFalse();
+    expect($this->inner->attachmentExists('test_entity', 'rec-1', 'file.txt.sig'))->toBeFalse();
+});
+
+test('detached: tampered attachment triggers IntegrityException', function () {
+    $adapter = new IntegrityStorageAdapter($this->inner, new IntegrityConfig(
+        hasher: $this->hasher,
+    ));
+
+    $this->inner->writeRecord('test_entity', 'rec-1', ['x' => 1]);
+    $adapter->writeAttachment('test_entity', 'rec-1', 'file.txt', 'original');
+
+    // Tamper with the raw file (sidecar still has old hash)
+    $this->inner->writeAttachment('test_entity', 'rec-1', 'file.txt', 'tampered');
+
+    $adapter->readAttachment('test_entity', 'rec-1', 'file.txt');
+})->throws(IntegrityException::class);
+
+test('cross-mode: inline data readable with detached config', function () {
+    // Write inline
+    $inlineAdapter = new IntegrityStorageAdapter($this->inner, new IntegrityConfig(
+        hasher: $this->hasher,
+        detachedAttachments: false,
+    ));
+
+    $this->inner->writeRecord('test_entity', 'rec-1', ['x' => 1]);
+    $inlineAdapter->writeAttachment('test_entity', 'rec-1', 'file.txt', 'data');
+
+    // Read with detached config — should auto-detect inline
+    $detachedAdapter = new IntegrityStorageAdapter($this->inner, new IntegrityConfig(
+        hasher: $this->hasher,
+        detachedAttachments: true,
+    ));
+
+    $stream = $detachedAdapter->readAttachment('test_entity', 'rec-1', 'file.txt');
+    expect(stream_get_contents($stream))->toBe('data');
+});
 
 test('non-integrity attachment passes through when onMissingIntegrity is Ignore', function () {
     $adapter = new IntegrityStorageAdapter($this->inner, new IntegrityConfig(

@@ -122,16 +122,42 @@ class IntegrityStorageAdapter implements StorageAdapterInterface
             return;
         }
 
-        $encoded = IntegrityPayload::encode(
-            $contents,
-            $hash,
-            $hashAlgorithm,
-            $signingAlgorithm,
-            $keyId,
-            $signature,
-        );
+        if ($this->config->detachedAttachments) {
+            // Detached mode: write raw content + JSON sidecar .sig file
+            $this->inner->writeAttachment($entityName, $recordId, $name, $contents);
 
-        $this->inner->writeAttachment($entityName, $recordId, $name, $encoded);
+            $sidecar = [];
+
+            if ($hash !== null) {
+                $sidecar['algorithm'] = $hashAlgorithm;
+                $sidecar['hash'] = base64_encode($hash);
+            }
+
+            if ($signature !== null) {
+                $sidecar['signing_algorithm'] = $signingAlgorithm;
+                $sidecar['key_id'] = $keyId;
+                $sidecar['signature'] = base64_encode($signature);
+            }
+
+            $this->inner->writeAttachment(
+                $entityName,
+                $recordId,
+                $name.'.sig',
+                json_encode($sidecar, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+            );
+        } else {
+            // Inline mode: wrap content in integrity envelope
+            $encoded = IntegrityPayload::encode(
+                $contents,
+                $hash,
+                $hashAlgorithm,
+                $signingAlgorithm,
+                $keyId,
+                $signature,
+            );
+
+            $this->inner->writeAttachment($entityName, $recordId, $name, $encoded);
+        }
     }
 
     public function readAttachment(string $entityName, string $recordId, string $name): mixed
@@ -149,7 +175,28 @@ class IntegrityStorageAdapter implements StorageAdapterInterface
 
         $data = $raw;
 
-        if (! IntegrityPayload::hasIntegrity($data)) {
+        if (IntegrityPayload::hasIntegrity($data)) {
+            // Inline mode: integrity envelope wraps the content
+            $payload = IntegrityPayload::decode($data);
+            $this->verifyAttachmentPayload($entityName, $recordId, $name, $payload->payload, $payload);
+            $data = $payload->payload;
+        } elseif ($this->inner->attachmentExists($entityName, $recordId, $name.'.sig')) {
+            // Detached mode: JSON sidecar .sig file contains integrity metadata
+            $sigStream = $this->inner->readAttachment($entityName, $recordId, $name.'.sig');
+            $sigRaw = stream_get_contents($sigStream);
+
+            if (is_resource($sigStream)) {
+                fclose($sigStream);
+            }
+
+            if ($sigRaw !== false) {
+                /** @var array{algorithm?: int, hash?: string, signing_algorithm?: int, key_id?: string, signature?: string} $integrity */
+                $integrity = json_decode($sigRaw, true, 512, JSON_THROW_ON_ERROR);
+
+                $this->verifyDetachedIntegrity($entityName, $recordId, $name, $data, $integrity);
+            }
+        } else {
+            // No integrity metadata found
             if ($this->config->onMissingIntegrity === FailureMode::Throw) {
                 throw new IntegrityException(
                     $entityName,
@@ -159,37 +206,6 @@ class IntegrityStorageAdapter implements StorageAdapterInterface
                     "Missing integrity metadata for attachment '{$name}' on record '{$recordId}' in entity '{$entityName}'.",
                 );
             }
-        }
-
-        if (IntegrityPayload::hasIntegrity($data)) {
-            $payload = IntegrityPayload::decode($data);
-
-            // Verify checksum if present
-            if ($payload->hash !== null && $this->config->hasher !== null) {
-                $actualHash = $this->config->hasher->hash($payload->payload);
-                if (! hash_equals($payload->hash, $actualHash)) {
-                    if ($this->config->onChecksumFailure === FailureMode::Throw) {
-                        throw new IntegrityException($entityName, $recordId, $payload->hash, $actualHash);
-                    }
-                }
-            }
-
-            // Verify signature if present
-            if ($payload->signature !== null && $this->config->signer !== null) {
-                if (! $this->config->signer->verify($payload->payload, $payload->signature)) {
-                    if ($this->config->onSignatureFailure === FailureMode::Throw) {
-                        throw new IntegrityException(
-                            $entityName,
-                            $recordId,
-                            '',
-                            '',
-                            "Signature verification failed for attachment '{$name}' on record '{$recordId}' in entity '{$entityName}'.",
-                        );
-                    }
-                }
-            }
-
-            $data = $payload->payload;
         }
 
         $result = fopen('php://memory', 'r+');
@@ -205,6 +221,11 @@ class IntegrityStorageAdapter implements StorageAdapterInterface
     public function deleteAttachment(string $entityName, string $recordId, string $name): void
     {
         $this->inner->deleteAttachment($entityName, $recordId, $name);
+
+        // Also delete detached sidecar if it exists
+        if ($this->inner->attachmentExists($entityName, $recordId, $name.'.sig')) {
+            $this->inner->deleteAttachment($entityName, $recordId, $name.'.sig');
+        }
     }
 
     public function deleteAllAttachments(string $entityName, string $recordId): void
@@ -214,7 +235,10 @@ class IntegrityStorageAdapter implements StorageAdapterInterface
 
     public function listAttachments(string $entityName, string $recordId): array
     {
-        return $this->inner->listAttachments($entityName, $recordId);
+        $names = $this->inner->listAttachments($entityName, $recordId);
+
+        // Filter out .sig sidecar files
+        return array_values(array_filter($names, fn (string $n) => ! str_ends_with($n, '.sig')));
     }
 
     public function attachmentExists(string $entityName, string $recordId, string $name): bool
@@ -230,6 +254,69 @@ class IntegrityStorageAdapter implements StorageAdapterInterface
     public function purgeEntity(string $entityName): void
     {
         $this->inner->purgeEntity($entityName);
+    }
+
+    /**
+     * Verify hash and signature for an inline attachment payload.
+     */
+    private function verifyAttachmentPayload(string $entityName, string $recordId, string $name, string $content, IntegrityPayload $payload): void
+    {
+        if ($payload->hash !== null && $this->config->hasher !== null) {
+            $actualHash = $this->config->hasher->hash($content);
+            if (! hash_equals($payload->hash, $actualHash)) {
+                if ($this->config->onChecksumFailure === FailureMode::Throw) {
+                    throw new IntegrityException($entityName, $recordId, $payload->hash, $actualHash);
+                }
+            }
+        }
+
+        if ($payload->signature !== null && $this->config->signer !== null) {
+            if (! $this->config->signer->verify($content, $payload->signature)) {
+                if ($this->config->onSignatureFailure === FailureMode::Throw) {
+                    throw new IntegrityException(
+                        $entityName,
+                        $recordId,
+                        '',
+                        '',
+                        "Signature verification failed for attachment '{$name}' on record '{$recordId}' in entity '{$entityName}'.",
+                    );
+                }
+            }
+        }
+    }
+
+    /**
+     * Verify hash and signature from a detached JSON sidecar.
+     *
+     * @param  array{algorithm?: int, hash?: string, signing_algorithm?: int, key_id?: string, signature?: string}  $integrity
+     */
+    private function verifyDetachedIntegrity(string $entityName, string $recordId, string $name, string $content, array $integrity): void
+    {
+        if (isset($integrity['hash']) && $this->config->hasher !== null) {
+            $expectedHash = base64_decode($integrity['hash']);
+            $actualHash = $this->config->hasher->hash($content);
+
+            if (! hash_equals($expectedHash, $actualHash)) {
+                if ($this->config->onChecksumFailure === FailureMode::Throw) {
+                    throw new IntegrityException($entityName, $recordId, $expectedHash, $actualHash);
+                }
+            }
+        }
+
+        if (isset($integrity['signature']) && $this->config->signer !== null) {
+            $signature = base64_decode($integrity['signature']);
+            if (! $this->config->signer->verify($content, $signature)) {
+                if ($this->config->onSignatureFailure === FailureMode::Throw) {
+                    throw new IntegrityException(
+                        $entityName,
+                        $recordId,
+                        '',
+                        '',
+                        "Signature verification failed for attachment '{$name}' on record '{$recordId}' in entity '{$entityName}'.",
+                    );
+                }
+            }
+        }
     }
 
     /**
