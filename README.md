@@ -49,18 +49,18 @@ $store->collection('certificates')->save($cert);
 
 ### Core
 
-| Package | Description |
-|---------|-------------|
-| `kduma/simple-dal` | Core library |
-| `kduma/simple-dal-contracts` | Contracts and interfaces |
-| `kduma/simple-dal-adapter-contracts` | Adapter SPI contracts and conformance tests |
+| Package | Description | Packagist |
+|---------|-------------|-----------|
+| `kduma/simple-dal` | Core library | [![Packagist Version](https://img.shields.io/packagist/v/kduma/simple-dal?style=plastic)](https://packagist.org/packages/kduma/simple-dal) [![Packagist Downloads](https://img.shields.io/packagist/dt/kduma/simple-dal?style=plastic)](https://packagist.org/packages/kduma/simple-dal) |
+| `kduma/simple-dal-contracts` | Contracts and interfaces | [![Packagist Version](https://img.shields.io/packagist/v/kduma/simple-dal-contracts?style=plastic)](https://packagist.org/packages/kduma/simple-dal-contracts) [![Packagist Downloads](https://img.shields.io/packagist/dt/kduma/simple-dal-contracts?style=plastic)](https://packagist.org/packages/kduma/simple-dal-contracts) |
+| `kduma/simple-dal-adapter-contracts` | Adapter SPI contracts and conformance tests | [![Packagist Version](https://img.shields.io/packagist/v/kduma/simple-dal-adapter-contracts?style=plastic)](https://packagist.org/packages/kduma/simple-dal-adapter-contracts) [![Packagist Downloads](https://img.shields.io/packagist/dt/kduma/simple-dal-adapter-contracts?style=plastic)](https://packagist.org/packages/kduma/simple-dal-adapter-contracts) |
 
 ### Adapters
 
-| Package | Description |
-|---------|-------------|
-| `kduma/simple-dal-db-adapter` | SQLite database adapter |
-| `kduma/simple-dal-flysystem-adapter` | Flysystem adapter (local, ZIP, S3, etc.) |
+| Package | Description | Packagist |
+|---------|-------------|-----------|
+| `kduma/simple-dal-db-adapter` | SQLite database adapter | [![Packagist Version](https://img.shields.io/packagist/v/kduma/simple-dal-db-adapter?style=plastic)](https://packagist.org/packages/kduma/simple-dal-db-adapter) [![Packagist Downloads](https://img.shields.io/packagist/dt/kduma/simple-dal-db-adapter?style=plastic)](https://packagist.org/packages/kduma/simple-dal-db-adapter) |
+| `kduma/simple-dal-flysystem-adapter` | Flysystem adapter (local, ZIP, S3, etc.) | [![Packagist Version](https://img.shields.io/packagist/v/kduma/simple-dal-flysystem-adapter?style=plastic)](https://packagist.org/packages/kduma/simple-dal-flysystem-adapter) [![Packagist Downloads](https://img.shields.io/packagist/dt/kduma/simple-dal-flysystem-adapter?style=plastic)](https://packagist.org/packages/kduma/simple-dal-flysystem-adapter) |
 
 ## Plugins
 
@@ -72,10 +72,10 @@ Adds strongly-typed PHP record classes to Simple DAL. Define a class with `#[Fie
 composer require kduma/simple-dal-typed
 ```
 
-| Package | Description |
-|---------|-------------|
-| `kduma/simple-dal-typed` | Typed records with auto-mapping and converters |
-| `kduma/simple-dal-typed-contracts` | Typed records contracts and interfaces |
+| Package | Description | Packagist |
+|---------|-------------|-----------|
+| `kduma/simple-dal-typed` | Typed records with auto-mapping and converters | [![Packagist Version](https://img.shields.io/packagist/v/kduma/simple-dal-typed?style=plastic)](https://packagist.org/packages/kduma/simple-dal-typed) [![Packagist Downloads](https://img.shields.io/packagist/dt/kduma/simple-dal-typed?style=plastic)](https://packagist.org/packages/kduma/simple-dal-typed) |
+| `kduma/simple-dal-typed-contracts` | Typed records contracts and interfaces | [![Packagist Version](https://img.shields.io/packagist/v/kduma/simple-dal-typed-contracts?style=plastic)](https://packagist.org/packages/kduma/simple-dal-typed-contracts) [![Packagist Downloads](https://img.shields.io/packagist/dt/kduma/simple-dal-typed-contracts?style=plastic)](https://packagist.org/packages/kduma/simple-dal-typed-contracts) |
 
 ### Encryption
 
@@ -89,12 +89,12 @@ composer require kduma/simple-dal-encryption kduma/simple-dal-encryption-sodium
 composer require kduma/simple-dal-encryption kduma/simple-dal-encryption-phpseclib
 ```
 
-| Package | Description |
-|---------|-------------|
-| `kduma/simple-dal-encryption` | Selective attachment encryption |
-| `kduma/simple-dal-encryption-contracts` | Encryption algorithm contracts |
-| `kduma/simple-dal-encryption-sodium` | Libsodium implementations (SecretBox, SealedBox) |
-| `kduma/simple-dal-encryption-phpseclib` | phpseclib3 implementations (RSA, AES) |
+| Package | Description | Packagist |
+|---------|-------------|-----------|
+| `kduma/simple-dal-encryption` | Selective attachment encryption | [![Packagist Version](https://img.shields.io/packagist/v/kduma/simple-dal-encryption?style=plastic)](https://packagist.org/packages/kduma/simple-dal-encryption) [![Packagist Downloads](https://img.shields.io/packagist/dt/kduma/simple-dal-encryption?style=plastic)](https://packagist.org/packages/kduma/simple-dal-encryption) |
+| `kduma/simple-dal-encryption-contracts` | Encryption algorithm contracts | [![Packagist Version](https://img.shields.io/packagist/v/kduma/simple-dal-encryption-contracts?style=plastic)](https://packagist.org/packages/kduma/simple-dal-encryption-contracts) [![Packagist Downloads](https://img.shields.io/packagist/dt/kduma/simple-dal-encryption-contracts?style=plastic)](https://packagist.org/packages/kduma/simple-dal-encryption-contracts) |
+| `kduma/simple-dal-encryption-sodium` | Libsodium implementations (SecretBox, SealedBox) | [![Packagist Version](https://img.shields.io/packagist/v/kduma/simple-dal-encryption-sodium?style=plastic)](https://packagist.org/packages/kduma/simple-dal-encryption-sodium) [![Packagist Downloads](https://img.shields.io/packagist/dt/kduma/simple-dal-encryption-sodium?style=plastic)](https://packagist.org/packages/kduma/simple-dal-encryption-sodium) |
+| `kduma/simple-dal-encryption-phpseclib` | phpseclib3 implementations (RSA, AES) | [![Packagist Version](https://img.shields.io/packagist/v/kduma/simple-dal-encryption-phpseclib?style=plastic)](https://packagist.org/packages/kduma/simple-dal-encryption-phpseclib) [![Packagist Downloads](https://img.shields.io/packagist/dt/kduma/simple-dal-encryption-phpseclib?style=plastic)](https://packagist.org/packages/kduma/simple-dal-encryption-phpseclib) |
 
 ### Integrity
 
@@ -111,13 +111,13 @@ composer require kduma/simple-dal-integrity kduma/simple-dal-integrity-hash
 composer require kduma/simple-dal-integrity kduma/simple-dal-integrity-phpseclib
 ```
 
-| Package | Description |
-|---------|-------------|
-| `kduma/simple-dal-integrity` | Record and attachment integrity checksums and signatures |
-| `kduma/simple-dal-integrity-contracts` | Hashing and signing algorithm contracts |
-| `kduma/simple-dal-integrity-sodium` | Libsodium implementations (Blake2b, Ed25519) |
-| `kduma/simple-dal-integrity-hash` | PHP hash/HMAC implementations (SHA-256, HMAC-SHA256, etc.) |
-| `kduma/simple-dal-integrity-phpseclib` | phpseclib3 implementations (RSA, EC, DSA signing) |
+| Package | Description | Packagist |
+|---------|-------------|-----------|
+| `kduma/simple-dal-integrity` | Record and attachment integrity checksums and signatures | [![Packagist Version](https://img.shields.io/packagist/v/kduma/simple-dal-integrity?style=plastic)](https://packagist.org/packages/kduma/simple-dal-integrity) [![Packagist Downloads](https://img.shields.io/packagist/dt/kduma/simple-dal-integrity?style=plastic)](https://packagist.org/packages/kduma/simple-dal-integrity) |
+| `kduma/simple-dal-integrity-contracts` | Hashing and signing algorithm contracts | [![Packagist Version](https://img.shields.io/packagist/v/kduma/simple-dal-integrity-contracts?style=plastic)](https://packagist.org/packages/kduma/simple-dal-integrity-contracts) [![Packagist Downloads](https://img.shields.io/packagist/dt/kduma/simple-dal-integrity-contracts?style=plastic)](https://packagist.org/packages/kduma/simple-dal-integrity-contracts) |
+| `kduma/simple-dal-integrity-sodium` | Libsodium implementations (Blake2b, Ed25519) | [![Packagist Version](https://img.shields.io/packagist/v/kduma/simple-dal-integrity-sodium?style=plastic)](https://packagist.org/packages/kduma/simple-dal-integrity-sodium) [![Packagist Downloads](https://img.shields.io/packagist/dt/kduma/simple-dal-integrity-sodium?style=plastic)](https://packagist.org/packages/kduma/simple-dal-integrity-sodium) |
+| `kduma/simple-dal-integrity-hash` | PHP hash/HMAC implementations (SHA-256, HMAC-SHA256, etc.) | [![Packagist Version](https://img.shields.io/packagist/v/kduma/simple-dal-integrity-hash?style=plastic)](https://packagist.org/packages/kduma/simple-dal-integrity-hash) [![Packagist Downloads](https://img.shields.io/packagist/dt/kduma/simple-dal-integrity-hash?style=plastic)](https://packagist.org/packages/kduma/simple-dal-integrity-hash) |
+| `kduma/simple-dal-integrity-phpseclib` | phpseclib3 implementations (RSA, EC, DSA signing) | [![Packagist Version](https://img.shields.io/packagist/v/kduma/simple-dal-integrity-phpseclib?style=plastic)](https://packagist.org/packages/kduma/simple-dal-integrity-phpseclib) [![Packagist Downloads](https://img.shields.io/packagist/dt/kduma/simple-dal-integrity-phpseclib?style=plastic)](https://packagist.org/packages/kduma/simple-dal-integrity-phpseclib) |
 
 ## Examples
 
