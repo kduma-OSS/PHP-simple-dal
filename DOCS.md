@@ -35,6 +35,11 @@ A PHP 8.4 Data Access Layer for storing JSON documents and binary attachments wi
   - [TypedDataStore](#typeddatastore)
   - [Working with Typed Records](#working-with-typed-records)
   - [Typed Attachments](#typed-attachments)
+- [Encryption Plugin](#encryption-plugin)
+  - [Key Types](#key-types)
+  - [Encryption Rules](#encryption-rules)
+  - [EncryptingStorageAdapter](#encryptingstorageadapter)
+  - [Key Rotation](#key-rotation)
 
 ---
 
@@ -853,3 +858,180 @@ $att = $attachments->get(CertificateAttachment::Certificate);
 echo $att->contents();
 $attachments->delete(CertificateAttachment::Certificate);
 ```
+
+---
+
+## Encryption Plugin
+
+The encryption plugin adds transparent, selective encryption of attachments using libsodium. Attachments are encrypted on write and decrypted on read, based on configurable rules. Multiple keys, key rotation, and both symmetric and asymmetric encryption are supported.
+
+```bash
+# Core + libsodium keys
+composer require kduma/simple-dal-encryption kduma/simple-dal-encryption-sodium
+
+# Or with phpseclib keys (RSA, AES)
+composer require kduma/simple-dal-encryption kduma/simple-dal-encryption-phpseclib
+```
+
+**Requirements:** PHP 8.4+. Sodium keys need `ext-sodium`. PhpSecLib keys need `phpseclib/phpseclib ^3.0`.
+
+### Key Types
+
+**Symmetric** (`SymmetricKey`) -- uses `sodium_crypto_secretbox` (XSalsa20-Poly1305). Same key for encrypt and decrypt.
+
+```php
+use KDuma\SimpleDAL\Encryption\Sodium\SymmetricKey;
+
+$key = new SymmetricKey(
+    id: 'master',
+    key: sodium_crypto_secretbox_keygen(),  // 32 bytes
+);
+```
+
+**Asymmetric** (`KeyPair`) -- uses `sodium_crypto_box_seal` (X25519+XSalsa20-Poly1305). Encrypt with public key only; decrypt requires the secret key.
+
+```php
+use KDuma\SimpleDAL\Encryption\Sodium\KeyPair;
+
+$keypair = sodium_crypto_box_keypair();
+
+$key = new KeyPair(
+    id: 'sealed',
+    publicKey: sodium_crypto_box_publickey($keypair),
+    secretKey: sodium_crypto_box_secretkey($keypair),  // optional — omit for encrypt-only
+);
+```
+
+### Encryption Rules
+
+Rules define which attachments to encrypt and with which key. Rules are evaluated in order; the first match wins.
+
+```php
+use KDuma\SimpleDAL\Encryption\EncryptionConfig;
+use KDuma\SimpleDAL\Encryption\EncryptionRule;
+
+$config = new EncryptionConfig(
+    keys: [$masterKey, $sealedKey],
+    rules: [
+        // Encrypt specific attachment by name
+        new EncryptionRule(
+            keyId: 'master',
+            entityName: 'certificates',
+            attachmentNames: 'private_key.pem',
+        ),
+
+        // Encrypt multiple attachments (accepts BackedEnum values)
+        new EncryptionRule(
+            keyId: 'master',
+            entityName: 'certificates',
+            attachmentNames: [CertAttachment::PrivateKey, CertAttachment::Certificate],
+        ),
+
+        // Encrypt all attachments in an entity
+        new EncryptionRule(
+            keyId: 'sealed',
+            entityName: 'secrets',
+        ),
+
+        // Encrypt only for specific record IDs
+        new EncryptionRule(
+            keyId: 'master',
+            entityName: 'users',
+            attachmentNames: 'avatar.png',
+            recordIds: ['user-1', 'user-2'],
+        ),
+    ],
+);
+```
+
+### EncryptingStorageAdapter
+
+Wrap any adapter with `EncryptingStorageAdapter` for transparent encryption:
+
+```php
+use KDuma\SimpleDAL\Encryption\EncryptingStorageAdapter;
+
+$adapter = new EncryptingStorageAdapter(
+    inner: new DatabaseAdapter(new PDO('sqlite:data.sqlite')),
+    config: $config,
+);
+
+// Use $adapter as the adapter for DataStore — everything else is unchanged
+$store = new DataStore(adapter: $adapter, entities: [...]);
+
+// Attachments matching rules are encrypted/decrypted transparently
+$store->collection('certificates')
+    ->attachments('cert-01')
+    ->put('private_key.pem', $pemContent);  // encrypted in storage
+
+$content = $store->collection('certificates')
+    ->attachments('cert-01')
+    ->get('private_key.pem')
+    ->contents();  // decrypted on read
+```
+
+Non-matching attachments pass through as plaintext. Listing records, reading record data, and other operations are never affected by encryption.
+
+If an attachment is encrypted but the required key is missing from the config, a `DecryptionException` is thrown on `readAttachment()`.
+
+### Key Rotation
+
+Use `EncryptionMigrator` to re-encrypt attachments after changing keys or rules:
+
+```php
+use KDuma\SimpleDAL\Encryption\EncryptionMigrator;
+
+$newConfig = new EncryptionConfig(
+    keys: [
+        $newKey,       // active key
+        $oldKey,       // kept for decrypting existing data
+    ],
+    rules: [
+        new EncryptionRule(keyId: 'new-key', entityName: 'certificates'),
+    ],
+);
+
+$migrator = new EncryptionMigrator($innerAdapter, $newConfig);
+$migrator->migrate(['certificates', 'secrets']);
+```
+
+The migrator handles all transitions:
+- Unencrypted to encrypted (new rule added)
+- Key A to key B (rule changed)
+- Encrypted to unencrypted (rule removed)
+- Already correct (skipped)
+
+### PhpSecLib Keys
+
+The `kduma/simple-dal-encryption-phpseclib` package provides key implementations using [phpseclib3](https://phpseclib.com/):
+
+**RSA encryption** (OAEP or PKCS1 padding):
+
+```php
+use KDuma\SimpleDAL\Encryption\PhpSecLib\RsaEncryptionKey;
+use phpseclib3\Crypt\RSA;
+
+$privateKey = RSA::createKey(2048);
+$publicKey = $privateKey->getPublicKey();
+
+// Configure padding/hash before passing (immutable API)
+$key = new RsaEncryptionKey(
+    id: 'rsa-key',
+    publicKey: $publicKey->withPadding(RSA::ENCRYPTION_OAEP)->withHash('sha256'),
+    privateKey: $privateKey->withPadding(RSA::ENCRYPTION_OAEP)->withHash('sha256'),
+);
+```
+
+**Symmetric encryption** (AES, ChaCha20, etc.):
+
+```php
+use KDuma\SimpleDAL\Encryption\PhpSecLib\SymmetricEncryptionKey;
+use phpseclib3\Crypt\AES;
+
+$cipher = new AES('ctr');
+$cipher->setKey($key32bytes);
+
+$key = new SymmetricEncryptionKey(id: 'aes-key', cipher: $cipher);
+```
+
+Both key types work interchangeably with sodium keys in `EncryptionConfig`.

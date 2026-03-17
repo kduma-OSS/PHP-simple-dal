@@ -37,6 +37,14 @@ jobs:
             split_repository: 'PHP-simple-dal-typed-contracts'
           - local_path: 'src/plugins/typed'
             split_repository: 'PHP-simple-dal-typed'
+          - local_path: 'src/plugins/encryption-contracts'
+            split_repository: 'PHP-simple-dal-encryption-contracts'
+          - local_path: 'src/plugins/encryption'
+            split_repository: 'PHP-simple-dal-encryption'
+          - local_path: 'src/plugins/encryption-sodium'
+            split_repository: 'PHP-simple-dal-encryption-sodium'
+          - local_path: 'src/plugins/encryption-phpseclib'
+            split_repository: 'PHP-simple-dal-encryption-phpseclib'
 
     steps:
       - uses: actions/checkout@v5

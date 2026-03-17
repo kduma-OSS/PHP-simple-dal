@@ -24,6 +24,15 @@
         <testsuite name="Typed Plugin">
             <directory>src/plugins/typed/tests</directory>
         </testsuite>
+        <testsuite name="Encryption Plugin">
+            <directory>src/plugins/encryption/tests</directory>
+        </testsuite>
+        <testsuite name="Encryption Sodium">
+            <directory>src/plugins/encryption-sodium/tests</directory>
+        </testsuite>
+        <testsuite name="Encryption PhpSecLib">
+            <directory>src/plugins/encryption-phpseclib/tests</directory>
+        </testsuite>
     </testsuites>
     <source>
         <include>
@@ -35,6 +44,10 @@
             <directory>src/adapters/zip/src</directory>
             <directory>src/plugins/typed-contracts/src</directory>
             <directory>src/plugins/typed/src</directory>
+            <directory>src/plugins/encryption/src</directory>
+            <directory>src/plugins/encryption-contracts/src</directory>
+            <directory>src/plugins/encryption-sodium/src</directory>
+            <directory>src/plugins/encryption-phpseclib/src</directory>
         </include>
     </source>
 </phpunit>
