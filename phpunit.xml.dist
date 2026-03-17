@@ -22,28 +22,28 @@
             <directory>src/adapters/zip/tests</directory>
         </testsuite>
         <testsuite name="Typed Plugin">
-            <directory>src/plugins/typed/tests</directory>
+            <directory>src/plugins/typed/library/tests</directory>
         </testsuite>
         <testsuite name="Encryption Plugin">
-            <directory>src/plugins/encryption/tests</directory>
+            <directory>src/plugins/encryption/library/tests</directory>
         </testsuite>
         <testsuite name="Encryption Sodium">
-            <directory>src/plugins/encryption-sodium/tests</directory>
+            <directory>src/plugins/encryption/sodium/tests</directory>
         </testsuite>
         <testsuite name="Encryption PhpSecLib">
-            <directory>src/plugins/encryption-phpseclib/tests</directory>
+            <directory>src/plugins/encryption/phpseclib/tests</directory>
         </testsuite>
         <testsuite name="Data Integrity Plugin">
-            <directory>src/plugins/data-integrity/tests</directory>
+            <directory>src/plugins/data-integrity/library/tests</directory>
         </testsuite>
         <testsuite name="Data Integrity Sodium">
-            <directory>src/plugins/data-integrity-sodium/tests</directory>
+            <directory>src/plugins/data-integrity/sodium/tests</directory>
         </testsuite>
         <testsuite name="Data Integrity Hash">
-            <directory>src/plugins/data-integrity-hash/tests</directory>
+            <directory>src/plugins/data-integrity/hash/tests</directory>
         </testsuite>
         <testsuite name="Data Integrity PhpSecLib">
-            <directory>src/plugins/data-integrity-phpseclib/tests</directory>
+            <directory>src/plugins/data-integrity/phpseclib/tests</directory>
         </testsuite>
     </testsuites>
     <source>
@@ -54,17 +54,17 @@
             <directory>src/adapters/db/src</directory>
             <directory>src/adapters/directory/src</directory>
             <directory>src/adapters/zip/src</directory>
-            <directory>src/plugins/typed-contracts/src</directory>
-            <directory>src/plugins/typed/src</directory>
-            <directory>src/plugins/encryption/src</directory>
-            <directory>src/plugins/encryption-contracts/src</directory>
-            <directory>src/plugins/encryption-sodium/src</directory>
-            <directory>src/plugins/encryption-phpseclib/src</directory>
-            <directory>src/plugins/data-integrity-contracts/src</directory>
-            <directory>src/plugins/data-integrity/src</directory>
-            <directory>src/plugins/data-integrity-sodium/src</directory>
-            <directory>src/plugins/data-integrity-hash/src</directory>
-            <directory>src/plugins/data-integrity-phpseclib/src</directory>
+            <directory>src/plugins/typed/contracts/src</directory>
+            <directory>src/plugins/typed/library/src</directory>
+            <directory>src/plugins/encryption/contracts/src</directory>
+            <directory>src/plugins/encryption/library/src</directory>
+            <directory>src/plugins/encryption/sodium/src</directory>
+            <directory>src/plugins/encryption/phpseclib/src</directory>
+            <directory>src/plugins/data-integrity/contracts/src</directory>
+            <directory>src/plugins/data-integrity/library/src</directory>
+            <directory>src/plugins/data-integrity/sodium/src</directory>
+            <directory>src/plugins/data-integrity/hash/src</directory>
+            <directory>src/plugins/data-integrity/phpseclib/src</directory>
         </include>
     </source>
 </phpunit>
