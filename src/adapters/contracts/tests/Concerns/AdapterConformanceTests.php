@@ -76,7 +76,7 @@ trait AdapterConformanceTests
 
     public function test_list_record_ids_empty(): void
     {
-        expect($this->adapter()->listRecordIds($this->entity()))->toBe([]);
+        expect($this->adapter()->listRecordIds($this->entity()))->toBeEmpty();
     }
 
     public function test_list_record_ids_with_one_record(): void
@@ -416,7 +416,7 @@ trait AdapterConformanceTests
     {
         $results = $this->adapter()->findRecords($this->entity());
 
-        expect($results)->toBe([]);
+        expect($results)->toBeEmpty();
     }
 
     public function test_find_records_returns_full_record_data(): void
@@ -477,7 +477,7 @@ trait AdapterConformanceTests
     {
         $this->adapter()->writeRecord($this->entity(), 'rec-1', ['x' => 1]);
 
-        expect($this->adapter()->listAttachments($this->entity(), 'rec-1'))->toBe([]);
+        expect($this->adapter()->listAttachments($this->entity(), 'rec-1'))->toBeEmpty();
     }
 
     public function test_list_attachments_with_one(): void
@@ -538,7 +538,7 @@ trait AdapterConformanceTests
 
         $this->adapter()->deleteAllAttachments($this->entity(), 'rec-1');
 
-        expect($this->adapter()->listAttachments($this->entity(), 'rec-1'))->toBe([]);
+        expect($this->adapter()->listAttachments($this->entity(), 'rec-1'))->toBeEmpty();
     }
 
     public function test_delete_record_cascades_attachments(): void
@@ -555,7 +555,7 @@ trait AdapterConformanceTests
         // Some adapters may throw if the record is gone; we accept both behaviours.
         try {
             $list = $this->adapter()->listAttachments($this->entity(), 'rec-1');
-            expect($list)->toBe([]);
+            expect($list)->toBeEmpty();
         } catch (RecordNotFoundException) {
             // Also acceptable – the record is gone.
             expect(true)->toBeTrue();
@@ -607,8 +607,8 @@ trait AdapterConformanceTests
 
         $this->adapter()->purgeEntity($this->entity());
 
-        expect($this->adapter()->listRecordIds($this->entity()))->toBe([]);
-        expect($this->adapter()->findRecords($this->entity()))->toBe([]);
+        expect($this->adapter()->listRecordIds($this->entity()))->toBeEmpty();
+        expect($this->adapter()->findRecords($this->entity()))->toBeEmpty();
     }
 
     // ---------------------------------------------------------------

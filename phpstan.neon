@@ -1,0 +1,6 @@
+includes:
+    - vendor/imsuperlative/phpstan-pest/extension.neon
+
+parameters:
+    paths:
+        - src

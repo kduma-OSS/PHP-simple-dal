@@ -287,7 +287,7 @@ test('typed attachments list and deleteAll', function () {
 
     $attachments->deleteAll();
 
-    expect($attachments->list())->toHaveCount(0);
+    expect($attachments->list())->toBeEmpty();
 });
 
 test('typed attachments delete single', function () {
