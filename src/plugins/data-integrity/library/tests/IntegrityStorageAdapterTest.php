@@ -197,12 +197,12 @@ test('tampered attachment triggers IntegrityException', function () {
     $adapter->readAttachment('test_entity', 'rec-1', 'file.txt');
 })->throws(IntegrityException::class);
 
-test('non-integrity data passes through as legacy data', function () {
+test('non-integrity attachment passes through when onMissingIntegrity is Ignore', function () {
     $adapter = new IntegrityStorageAdapter($this->inner, new IntegrityConfig(
         hasher: $this->hasher,
+        onMissingIntegrity: FailureMode::Ignore,
     ));
 
-    // Write plaintext directly via inner adapter (legacy)
     $this->inner->writeRecord('test_entity', 'rec-1', ['x' => 1]);
     $this->inner->writeAttachment('test_entity', 'rec-1', 'legacy.txt', 'plain data');
 
@@ -211,17 +211,36 @@ test('non-integrity data passes through as legacy data', function () {
     expect(stream_get_contents($stream))->toBe('plain data');
 });
 
-test('non-integrity record data passes through as legacy data', function () {
+test('non-integrity record passes through when onMissingIntegrity is Ignore', function () {
     $adapter = new IntegrityStorageAdapter($this->inner, new IntegrityConfig(
         hasher: $this->hasher,
+        onMissingIntegrity: FailureMode::Ignore,
     ));
 
-    // Write directly via inner adapter (legacy — no _integrity)
     $this->inner->writeRecord('test_entity', 'rec-1', ['x' => 1]);
     $data = $adapter->readRecord('test_entity', 'rec-1');
 
     expect($data)->toBe(['x' => 1]);
 });
+
+test('missing integrity on record throws by default', function () {
+    $adapter = new IntegrityStorageAdapter($this->inner, new IntegrityConfig(
+        hasher: $this->hasher,
+    ));
+
+    $this->inner->writeRecord('test_entity', 'rec-1', ['x' => 1]);
+    $adapter->readRecord('test_entity', 'rec-1');
+})->throws(IntegrityException::class, 'Missing integrity');
+
+test('missing integrity on attachment throws by default', function () {
+    $adapter = new IntegrityStorageAdapter($this->inner, new IntegrityConfig(
+        hasher: $this->hasher,
+    ));
+
+    $this->inner->writeRecord('test_entity', 'rec-1', ['x' => 1]);
+    $this->inner->writeAttachment('test_entity', 'rec-1', 'file.txt', 'plain');
+    $adapter->readAttachment('test_entity', 'rec-1', 'file.txt');
+})->throws(IntegrityException::class, 'Missing integrity');
 
 test('findRecords results have _integrity stripped', function () {
     $adapter = new IntegrityStorageAdapter($this->inner, new IntegrityConfig(

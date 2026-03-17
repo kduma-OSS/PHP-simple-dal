@@ -14,5 +14,6 @@ class IntegrityConfig
         public readonly ?SigningAlgorithmInterface $signer = null,
         public readonly FailureMode $onChecksumFailure = FailureMode::Throw,
         public readonly FailureMode $onSignatureFailure = FailureMode::Throw,
+        public readonly FailureMode $onMissingIntegrity = FailureMode::Throw,
     ) {}
 }

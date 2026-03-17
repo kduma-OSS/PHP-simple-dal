@@ -1164,6 +1164,7 @@ $config = new IntegrityConfig(
     signer: $signer,                              // optional — null for hash-only
     onChecksumFailure: FailureMode::Throw,        // default: Throw
     onSignatureFailure: FailureMode::Throw,       // default: Throw
+    onMissingIntegrity: FailureMode::Throw,       // default: Throw
 );
 ```
 
@@ -1215,8 +1216,9 @@ Checksum and signature failures are configured independently:
 $config = new IntegrityConfig(
     hasher: $hasher,
     signer: $signer,
-    onChecksumFailure: FailureMode::Throw,   // hash mismatch → exception
-    onSignatureFailure: FailureMode::Ignore,  // bad signature → return data anyway
+    onChecksumFailure: FailureMode::Throw,    // hash mismatch → exception
+    onSignatureFailure: FailureMode::Ignore,   // bad signature → return data anyway
+    onMissingIntegrity: FailureMode::Ignore,   // unprotected data → pass through (useful during migration)
 );
 ```
 

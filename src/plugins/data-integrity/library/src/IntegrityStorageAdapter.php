@@ -149,6 +149,18 @@ class IntegrityStorageAdapter implements StorageAdapterInterface
 
         $data = $raw;
 
+        if (! IntegrityPayload::hasIntegrity($data)) {
+            if ($this->config->onMissingIntegrity === FailureMode::Throw) {
+                throw new IntegrityException(
+                    $entityName,
+                    $recordId,
+                    '',
+                    '',
+                    "Missing integrity metadata for attachment '{$name}' on record '{$recordId}' in entity '{$entityName}'.",
+                );
+            }
+        }
+
         if (IntegrityPayload::hasIntegrity($data)) {
             $payload = IntegrityPayload::decode($data);
 
@@ -229,6 +241,16 @@ class IntegrityStorageAdapter implements StorageAdapterInterface
     private function verifyAndStripIntegrity(string $entityName, string $recordId, array $data): array
     {
         if (! isset($data['_integrity'])) {
+            if ($this->config->onMissingIntegrity === FailureMode::Throw) {
+                throw new IntegrityException(
+                    $entityName,
+                    $recordId,
+                    '',
+                    '',
+                    "Missing integrity metadata for record '{$recordId}' in entity '{$entityName}'.",
+                );
+            }
+
             return $data;
         }
 
