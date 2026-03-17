@@ -33,6 +33,18 @@
         <testsuite name="Encryption PhpSecLib">
             <directory>src/plugins/encryption-phpseclib/tests</directory>
         </testsuite>
+        <testsuite name="Data Integrity Plugin">
+            <directory>src/plugins/data-integrity/tests</directory>
+        </testsuite>
+        <testsuite name="Data Integrity Sodium">
+            <directory>src/plugins/data-integrity-sodium/tests</directory>
+        </testsuite>
+        <testsuite name="Data Integrity Hash">
+            <directory>src/plugins/data-integrity-hash/tests</directory>
+        </testsuite>
+        <testsuite name="Data Integrity PhpSecLib">
+            <directory>src/plugins/data-integrity-phpseclib/tests</directory>
+        </testsuite>
     </testsuites>
     <source>
         <include>
@@ -48,6 +60,11 @@
             <directory>src/plugins/encryption-contracts/src</directory>
             <directory>src/plugins/encryption-sodium/src</directory>
             <directory>src/plugins/encryption-phpseclib/src</directory>
+            <directory>src/plugins/data-integrity-contracts/src</directory>
+            <directory>src/plugins/data-integrity/src</directory>
+            <directory>src/plugins/data-integrity-sodium/src</directory>
+            <directory>src/plugins/data-integrity-hash/src</directory>
+            <directory>src/plugins/data-integrity-phpseclib/src</directory>
         </include>
     </source>
 </phpunit>

@@ -40,6 +40,14 @@ A PHP 8.4 Data Access Layer for storing JSON documents and binary attachments wi
   - [Encryption Rules](#encryption-rules)
   - [EncryptingStorageAdapter](#encryptingstorageadapter)
   - [Key Rotation](#key-rotation)
+- [Data Integrity Plugin](#data-integrity-plugin)
+  - [Hashing Algorithms](#hashing-algorithms)
+  - [Signing Algorithms](#signing-algorithms)
+  - [IntegrityConfig](#integrityconfig)
+  - [IntegrityStorageAdapter](#integritystorageadapter)
+  - [Tamper Detection (FailureMode)](#tamper-detection-failuremode)
+  - [Migrating Existing Data](#migrating-existing-data)
+  - [Stacking with Encryption](#stacking-with-encryption)
 
 ---
 
@@ -1032,3 +1040,243 @@ $key = new AesAlgorithm(id: 'aes-key', cipher: $cipher);
 ```
 
 Both key types work interchangeably with sodium keys in `EncryptionConfig`.
+
+---
+
+## Data Integrity Plugin
+
+The data integrity plugin adds transparent checksum and signature verification to records and attachments. Every write computes a hash (and optionally a cryptographic signature); every read verifies it. If data has been tampered with, an `IntegrityException` is thrown.
+
+```bash
+# Core plugin (always required)
+composer require kduma/simple-dal-data-integrity
+
+# Pick a hashing / signing provider:
+composer require kduma/simple-dal-data-integrity-sodium    # Blake2b + Ed25519
+composer require kduma/simple-dal-data-integrity-hash      # PHP hash() / hash_hmac()
+composer require kduma/simple-dal-data-integrity-phpseclib  # RSA, EC, DSA via phpseclib3
+```
+
+**Requirements:** PHP 8.4+. Sodium algorithms need `ext-sodium`. PhpSecLib algorithms need `phpseclib/phpseclib ^3.0`.
+
+### Hashing Algorithms
+
+Hashing algorithms implement `HashingAlgorithmInterface` and compute a checksum for each record and attachment.
+
+**Libsodium -- Blake2b** (`kduma/simple-dal-data-integrity-sodium`):
+
+```php
+use KDuma\SimpleDAL\DataIntegrity\Sodium\Blake2bHashingAlgorithm;
+
+$hasher = new Blake2bHashingAlgorithm();
+```
+
+Uses `sodium_crypto_generichash()` (BLAKE2b, 32-byte output). No configuration needed.
+
+**PHP hash() extensions** (`kduma/simple-dal-data-integrity-hash`):
+
+```php
+use KDuma\SimpleDAL\DataIntegrity\Hash\Hasher\Sha256HashingAlgorithm;
+use KDuma\SimpleDAL\DataIntegrity\Hash\Hasher\Sha512HashingAlgorithm;
+use KDuma\SimpleDAL\DataIntegrity\Hash\Hasher\Sha3_256HashingAlgorithm;
+use KDuma\SimpleDAL\DataIntegrity\Hash\Hasher\Sha1HashingAlgorithm;
+use KDuma\SimpleDAL\DataIntegrity\Hash\Hasher\Md5HashingAlgorithm;
+use KDuma\SimpleDAL\DataIntegrity\Hash\Hasher\Crc32HashingAlgorithm;
+
+$hasher = new Sha256HashingAlgorithm();   // recommended default
+```
+
+Convenience classes for common algorithms. All use PHP's built-in `hash()` function. For custom algorithms, use `GenericPhpHashingAlgorithm` directly:
+
+```php
+use KDuma\SimpleDAL\DataIntegrity\Hash\Hasher\GenericPhpHashingAlgorithm;
+
+$hasher = new GenericPhpHashingAlgorithm('sha384', algorithmId: 200);
+```
+
+### Signing Algorithms
+
+Signing algorithms implement `SigningAlgorithmInterface` and add a cryptographic signature alongside the hash. Signing is optional -- you can use hashing alone for checksum-only integrity.
+
+**Ed25519** (`kduma/simple-dal-data-integrity-sodium`):
+
+```php
+use KDuma\SimpleDAL\DataIntegrity\Sodium\Ed25519SigningAlgorithm;
+
+// Generate a new keypair
+$signer = Ed25519SigningAlgorithm::generate(id: 'signing-key-01');
+
+// Or construct from existing keys
+$signer = new Ed25519SigningAlgorithm(
+    id: 'signing-key-01',
+    secretKey: $secretKeyBytes,   // 64 bytes, null for verify-only
+    publicKey: $publicKeyBytes,   // 32 bytes
+);
+
+// Verify-only (no secret key — cannot sign, only verify)
+$verifier = Ed25519SigningAlgorithm::verifyOnly(id: 'signing-key-01', publicKey: $publicKeyBytes);
+```
+
+**HMAC** (`kduma/simple-dal-data-integrity-hash`):
+
+```php
+use KDuma\SimpleDAL\DataIntegrity\Hash\Signer\HmacSha256SigningAlgorithm;
+use KDuma\SimpleDAL\DataIntegrity\Hash\Signer\HmacSha512SigningAlgorithm;
+use KDuma\SimpleDAL\DataIntegrity\Hash\Signer\HmacSha1SigningAlgorithm;
+
+$signer = new HmacSha256SigningAlgorithm(id: 'hmac-key', secret: $sharedSecret);
+```
+
+For custom HMAC algorithms, use `GenericHmacSigningAlgorithm`:
+
+```php
+use KDuma\SimpleDAL\DataIntegrity\Hash\Signer\GenericHmacSigningAlgorithm;
+
+$signer = new GenericHmacSigningAlgorithm(
+    id: 'custom-hmac',
+    secret: $sharedSecret,
+    algo: 'sha384',
+    algorithmId: 200,
+);
+```
+
+**phpseclib3 (RSA, EC, DSA)** (`kduma/simple-dal-data-integrity-phpseclib`):
+
+```php
+use KDuma\SimpleDAL\DataIntegrity\PhpSecLib\RsaSigningAlgorithm;
+use KDuma\SimpleDAL\DataIntegrity\PhpSecLib\EcSigningAlgorithm;
+use KDuma\SimpleDAL\DataIntegrity\PhpSecLib\DsaSigningAlgorithm;
+use phpseclib3\Crypt\RSA;
+use phpseclib3\Crypt\EC;
+
+// RSA signing
+$rsaKey = RSA::createKey(2048);
+$signer = new RsaSigningAlgorithm(id: 'rsa-sign', key: $rsaKey);
+
+// EC signing (ECDSA)
+$ecKey = EC::createKey('secp256r1');
+$signer = new EcSigningAlgorithm(id: 'ec-sign', key: $ecKey);
+
+// Verify-only — pass a PublicKey
+$verifier = new RsaSigningAlgorithm(id: 'rsa-sign', key: $rsaKey->getPublicKey());
+```
+
+### IntegrityConfig
+
+`IntegrityConfig` holds the hashing algorithm, optional signing algorithm, and failure modes:
+
+```php
+use KDuma\SimpleDAL\DataIntegrity\IntegrityConfig;
+use KDuma\SimpleDAL\DataIntegrity\FailureMode;
+
+$config = new IntegrityConfig(
+    hasher: $hasher,                              // optional — null for sign-only
+    signer: $signer,                              // optional — null for hash-only
+    onChecksumFailure: FailureMode::Throw,        // default: Throw
+    onSignatureFailure: FailureMode::Throw,       // default: Throw
+);
+```
+
+### IntegrityStorageAdapter
+
+Wrap any adapter with `IntegrityStorageAdapter` for transparent integrity protection:
+
+```php
+use KDuma\SimpleDAL\DataIntegrity\IntegrityStorageAdapter;
+
+$adapter = new IntegrityStorageAdapter(
+    inner: new DatabaseAdapter(new PDO('sqlite:data.sqlite')),
+    config: $config,
+);
+
+// Use $adapter as the adapter for DataStore — everything else is unchanged
+$store = new DataStore(adapter: $adapter, entities: [...]);
+
+// Records get an _integrity metadata field (stripped on read)
+$store->collection('documents')->create(['title' => 'Report'], 'doc-01');
+
+// Attachments are wrapped in an integrity envelope (unwrapped on read)
+$store->collection('documents')
+    ->attachments('doc-01')
+    ->put('report.pdf', $pdfContent);
+
+// Reading verifies integrity transparently
+$record = $store->collection('documents')->find('doc-01');
+$content = $store->collection('documents')
+    ->attachments('doc-01')
+    ->get('report.pdf')
+    ->contents();
+```
+
+Records are protected by embedding an `_integrity` field in the stored JSON (hash, algorithm, and optional signature). This field is automatically stripped when reading. Attachments are protected by wrapping the binary content in an integrity envelope with a magic header.
+
+### Tamper Detection (FailureMode)
+
+`FailureMode` controls what happens when verification fails:
+
+| Mode | Behavior |
+|------|----------|
+| `FailureMode::Throw` | Throws `IntegrityException` (default) |
+| `FailureMode::Ignore` | Silently returns the data as-is |
+
+Checksum and signature failures are configured independently:
+
+```php
+$config = new IntegrityConfig(
+    hasher: $hasher,
+    signer: $signer,
+    onChecksumFailure: FailureMode::Throw,   // hash mismatch → exception
+    onSignatureFailure: FailureMode::Ignore,  // bad signature → return data anyway
+);
+```
+
+`IntegrityException` extends `CorruptedDataException` and exposes `entityName`, `recordId`, `expectedHash`, and `actualHash` properties for programmatic inspection:
+
+```php
+use KDuma\SimpleDAL\DataIntegrity\Exception\IntegrityException;
+
+try {
+    $record = $store->collection('documents')->find('doc-01');
+} catch (IntegrityException $e) {
+    echo "Tampered: {$e->entityName}/{$e->recordId}";
+    echo "Expected: ".bin2hex($e->expectedHash);
+    echo "Got: ".bin2hex($e->actualHash);
+}
+```
+
+### Migrating Existing Data
+
+Use `IntegrityMigrator` to add integrity protection to existing unprotected data, or to re-hash/re-sign after changing algorithms:
+
+```php
+use KDuma\SimpleDAL\DataIntegrity\IntegrityMigrator;
+
+$migrator = new IntegrityMigrator($innerAdapter, $config);
+$migrator->migrate(['documents', 'certificates']);
+```
+
+The migrator processes every record and attachment in the listed entities:
+- **Unprotected data** -- adds integrity metadata (hash + optional signature)
+- **Already protected** -- re-computes with the current config (algorithm change, key rotation)
+- **Unchanged** -- skipped (no unnecessary writes)
+
+### Stacking with Encryption
+
+The integrity and encryption adapters can be stacked. Apply integrity first (inner), then encryption (outer), so that integrity protects the plaintext and encryption protects everything:
+
+```php
+use KDuma\SimpleDAL\DataIntegrity\IntegrityStorageAdapter;
+use KDuma\SimpleDAL\Encryption\EncryptingStorageAdapter;
+
+$innerAdapter = new DatabaseAdapter(new PDO('sqlite:data.sqlite'));
+
+// 1. Integrity wraps the raw adapter
+$integrityAdapter = new IntegrityStorageAdapter($innerAdapter, $integrityConfig);
+
+// 2. Encryption wraps the integrity adapter
+$encryptedAdapter = new EncryptingStorageAdapter($integrityAdapter, $encryptionConfig);
+
+$store = new DataStore(adapter: $encryptedAdapter, entities: [...]);
+```
+
+With this ordering, reads flow: storage -> decrypt -> verify integrity -> application. Writes flow: application -> compute integrity -> encrypt -> storage.

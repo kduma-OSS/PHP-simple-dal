@@ -45,6 +45,16 @@ jobs:
             split_repository: 'PHP-simple-dal-encryption-sodium'
           - local_path: 'src/plugins/encryption-phpseclib'
             split_repository: 'PHP-simple-dal-encryption-phpseclib'
+          - local_path: 'src/plugins/data-integrity-contracts'
+            split_repository: 'PHP-simple-dal-data-integrity-contracts'
+          - local_path: 'src/plugins/data-integrity'
+            split_repository: 'PHP-simple-dal-data-integrity'
+          - local_path: 'src/plugins/data-integrity-sodium'
+            split_repository: 'PHP-simple-dal-data-integrity-sodium'
+          - local_path: 'src/plugins/data-integrity-hash'
+            split_repository: 'PHP-simple-dal-data-integrity-hash'
+          - local_path: 'src/plugins/data-integrity-phpseclib'
+            split_repository: 'PHP-simple-dal-data-integrity-phpseclib'
 
     steps:
       - uses: actions/checkout@v5

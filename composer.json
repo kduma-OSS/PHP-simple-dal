@@ -40,6 +40,11 @@
         "kduma/simple-dal-encryption-contracts": "self.version",
         "kduma/simple-dal-encryption-phpseclib": "self.version",
         "kduma/simple-dal-encryption-sodium": "self.version",
+        "kduma/simple-dal-data-integrity": "self.version",
+        "kduma/simple-dal-data-integrity-contracts": "self.version",
+        "kduma/simple-dal-data-integrity-hash": "self.version",
+        "kduma/simple-dal-data-integrity-phpseclib": "self.version",
+        "kduma/simple-dal-data-integrity-sodium": "self.version",
         "kduma/simple-dal-zip-adapter": "self.version"
     },
     "autoload": {
@@ -54,6 +59,11 @@
             "KDuma\\SimpleDAL\\Encryption\\Contracts\\": "src/plugins/encryption-contracts/src/",
             "KDuma\\SimpleDAL\\Encryption\\PhpSecLib\\": "src/plugins/encryption-phpseclib/src/",
             "KDuma\\SimpleDAL\\Encryption\\Sodium\\": "src/plugins/encryption-sodium/src/",
+            "KDuma\\SimpleDAL\\DataIntegrity\\": "src/plugins/data-integrity/src/",
+            "KDuma\\SimpleDAL\\DataIntegrity\\Contracts\\": "src/plugins/data-integrity-contracts/src/",
+            "KDuma\\SimpleDAL\\DataIntegrity\\Hash\\": "src/plugins/data-integrity-hash/src/",
+            "KDuma\\SimpleDAL\\DataIntegrity\\PhpSecLib\\": "src/plugins/data-integrity-phpseclib/src/",
+            "KDuma\\SimpleDAL\\DataIntegrity\\Sodium\\": "src/plugins/data-integrity-sodium/src/",
             "KDuma\\SimpleDAL\\Typed\\": "src/plugins/typed/src/",
             "KDuma\\SimpleDAL\\Typed\\Contracts\\": "src/plugins/typed-contracts/src/"
         }
@@ -66,6 +76,10 @@
             "KDuma\\SimpleDAL\\Adapter\\Zip\\Tests\\": "src/adapters/zip/tests/",
             "KDuma\\SimpleDAL\\Encryption\\PhpSecLib\\Tests\\": "src/plugins/encryption-phpseclib/tests/",
             "KDuma\\SimpleDAL\\Encryption\\Sodium\\Tests\\": "src/plugins/encryption-sodium/tests/",
+            "KDuma\\SimpleDAL\\DataIntegrity\\Hash\\Tests\\": "src/plugins/data-integrity-hash/tests/",
+            "KDuma\\SimpleDAL\\DataIntegrity\\PhpSecLib\\Tests\\": "src/plugins/data-integrity-phpseclib/tests/",
+            "KDuma\\SimpleDAL\\DataIntegrity\\Sodium\\Tests\\": "src/plugins/data-integrity-sodium/tests/",
+            "KDuma\\SimpleDAL\\DataIntegrity\\Tests\\": "src/plugins/data-integrity/tests/",
             "KDuma\\SimpleDAL\\Encryption\\Tests\\": "src/plugins/encryption/tests/",
             "KDuma\\SimpleDAL\\Tests\\": "src/library/tests/",
             "KDuma\\SimpleDAL\\Typed\\Tests\\": "src/plugins/typed/tests/"
