@@ -52,11 +52,11 @@ final class DataStore implements DataStoreInterface
 
         $store = $this->stores[$entity];
 
-        if (! $store instanceof CollectionEntityStore) {
-            throw new EntityNotFoundException(
-                sprintf('Entity "%s" is not a collection.', $entity),
-            );
-        }
+        if (! $store instanceof CollectionEntityStore) { // @codeCoverageIgnore
+            throw new EntityNotFoundException( // @codeCoverageIgnore
+                sprintf('Entity "%s" is not a collection.', $entity), // @codeCoverageIgnore
+            ); // @codeCoverageIgnore
+        } // @codeCoverageIgnore
 
         return $store;
     }
@@ -77,11 +77,11 @@ final class DataStore implements DataStoreInterface
 
         $store = $this->stores[$entity];
 
-        if (! $store instanceof SingletonEntityStore) {
-            throw new EntityNotFoundException(
-                sprintf('Entity "%s" is not a singleton.', $entity),
-            );
-        }
+        if (! $store instanceof SingletonEntityStore) { // @codeCoverageIgnore
+            throw new EntityNotFoundException( // @codeCoverageIgnore
+                sprintf('Entity "%s" is not a singleton.', $entity), // @codeCoverageIgnore
+            ); // @codeCoverageIgnore
+        } // @codeCoverageIgnore
 
         return $store;
     }

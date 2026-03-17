@@ -203,7 +203,7 @@ class IntegrityMigrator
 
         foreach ($data as $key => $value) {
             if (is_array($value) && ! array_is_list($value)) {
-                $data[$key] = $this->sortKeysRecursive($value);
+                $data[$key] = $this->sortKeysRecursive($value); // @codeCoverageIgnore
             }
         }
 

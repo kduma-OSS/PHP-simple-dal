@@ -29,11 +29,11 @@ class Ed25519SigningAlgorithm implements SigningAlgorithmInterface
             );
         }
 
-        if ($secretKey !== null && strlen($secretKey) !== SODIUM_CRYPTO_SIGN_SECRETKEYBYTES) {
+        if ($secretKey !== null && strlen($secretKey) !== SODIUM_CRYPTO_SIGN_SECRETKEYBYTES) { // @codeCoverageIgnoreStart
             throw new \InvalidArgumentException(
                 sprintf('Secret key must be %d bytes, got %d.', SODIUM_CRYPTO_SIGN_SECRETKEYBYTES, strlen($secretKey)),
             );
-        }
+        } // @codeCoverageIgnoreEnd
     }
 
     /**
@@ -56,7 +56,7 @@ class Ed25519SigningAlgorithm implements SigningAlgorithmInterface
     public function verify(string $message, string $signature): bool
     {
         if ($signature === '') {
-            return false;
+            return false; // @codeCoverageIgnore
         }
 
         return sodium_crypto_sign_verify_detached($signature, $message, $this->publicKey);

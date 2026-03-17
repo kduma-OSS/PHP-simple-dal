@@ -202,3 +202,105 @@ test('re-signs with different config', function () {
     $result = $adapterB->readAttachment('test_entity', 'rec-1', 'file.txt');
     expect(stream_get_contents($result))->toBe('content');
 });
+
+test('migrates inline attachment to detached mode', function () {
+    $this->adapter->writeRecord('test_entity', 'rec-1', ['x' => 1]);
+
+    // Write attachment via inline integrity adapter
+    $inlineConfig = new IntegrityConfig(hasher: $this->hasher, detachedAttachments: false);
+    $inlineAdapter = new IntegrityStorageAdapter($this->adapter, $inlineConfig);
+    $inlineAdapter->writeAttachment('test_entity', 'rec-1', 'file.txt', 'inline content');
+
+    // Verify it's inline
+    $rawStream = $this->adapter->readAttachment('test_entity', 'rec-1', 'file.txt');
+    expect(IntegrityPayload::hasIntegrity(stream_get_contents($rawStream)))->toBeTrue();
+
+    // Migrate to detached mode
+    $detachedConfig = new IntegrityConfig(hasher: $this->hasher, detachedAttachments: true);
+    (new IntegrityMigrator($this->adapter, $detachedConfig))->migrate(['test_entity']);
+
+    // Raw attachment should now be plain content (no integrity header)
+    $rawStream = $this->adapter->readAttachment('test_entity', 'rec-1', 'file.txt');
+    $raw = stream_get_contents($rawStream);
+    expect(IntegrityPayload::hasIntegrity($raw))->toBeFalse();
+    expect($raw)->toBe('inline content');
+
+    // Sidecar should exist
+    expect($this->adapter->attachmentExists('test_entity', 'rec-1', 'file.txt.sig'))->toBeTrue();
+
+    // Detached adapter can read it
+    $detachedAdapter = new IntegrityStorageAdapter($this->adapter, $detachedConfig);
+    $result = $detachedAdapter->readAttachment('test_entity', 'rec-1', 'file.txt');
+    expect(stream_get_contents($result))->toBe('inline content');
+});
+
+test('migrates detached attachment to inline mode', function () {
+    $this->adapter->writeRecord('test_entity', 'rec-1', ['x' => 1]);
+
+    // Write attachment via detached integrity adapter (default)
+    $detachedConfig = new IntegrityConfig(hasher: $this->hasher, detachedAttachments: true);
+    $detachedAdapter = new IntegrityStorageAdapter($this->adapter, $detachedConfig);
+    $detachedAdapter->writeAttachment('test_entity', 'rec-1', 'file.txt', 'detached content');
+
+    // Verify sidecar exists
+    expect($this->adapter->attachmentExists('test_entity', 'rec-1', 'file.txt.sig'))->toBeTrue();
+
+    // Migrate to inline mode
+    $inlineConfig = new IntegrityConfig(hasher: $this->hasher, detachedAttachments: false);
+    (new IntegrityMigrator($this->adapter, $inlineConfig))->migrate(['test_entity']);
+
+    // Sidecar should be removed
+    expect($this->adapter->attachmentExists('test_entity', 'rec-1', 'file.txt.sig'))->toBeFalse();
+
+    // Raw attachment should now have integrity header
+    $rawStream = $this->adapter->readAttachment('test_entity', 'rec-1', 'file.txt');
+    expect(IntegrityPayload::hasIntegrity(stream_get_contents($rawStream)))->toBeTrue();
+
+    // Inline adapter can read it
+    $inlineAdapter = new IntegrityStorageAdapter($this->adapter, $inlineConfig);
+    $result = $inlineAdapter->readAttachment('test_entity', 'rec-1', 'file.txt');
+    expect(stream_get_contents($result))->toBe('detached content');
+});
+
+test('migrates detached attachment to no-integrity removes sidecar', function () {
+    $this->adapter->writeRecord('test_entity', 'rec-1', ['x' => 1]);
+
+    // Write with detached integrity
+    $config = new IntegrityConfig(hasher: $this->hasher, detachedAttachments: true);
+    $adapter = new IntegrityStorageAdapter($this->adapter, $config);
+    $adapter->writeAttachment('test_entity', 'rec-1', 'file.txt', 'content');
+
+    expect($this->adapter->attachmentExists('test_entity', 'rec-1', 'file.txt.sig'))->toBeTrue();
+
+    // Migrate with no hasher/signer but detached mode
+    $noIntegrityConfig = new IntegrityConfig(detachedAttachments: true);
+    (new IntegrityMigrator($this->adapter, $noIntegrityConfig))->migrate(['test_entity']);
+
+    // Sidecar removed, raw content unchanged
+    expect($this->adapter->attachmentExists('test_entity', 'rec-1', 'file.txt.sig'))->toBeFalse();
+    $rawStream = $this->adapter->readAttachment('test_entity', 'rec-1', 'file.txt');
+    expect(stream_get_contents($rawStream))->toBe('content');
+});
+
+test('migrates inline attachment to no-integrity strips envelope', function () {
+    $this->adapter->writeRecord('test_entity', 'rec-1', ['x' => 1]);
+
+    // Write with inline integrity
+    $config = new IntegrityConfig(hasher: $this->hasher, detachedAttachments: false);
+    $adapter = new IntegrityStorageAdapter($this->adapter, $config);
+    $adapter->writeAttachment('test_entity', 'rec-1', 'file.txt', 'protected');
+
+    // Verify inline
+    $rawStream = $this->adapter->readAttachment('test_entity', 'rec-1', 'file.txt');
+    expect(IntegrityPayload::hasIntegrity(stream_get_contents($rawStream)))->toBeTrue();
+
+    // Migrate with no hasher/signer, inline mode
+    $noIntegrityConfig = new IntegrityConfig(detachedAttachments: false);
+    (new IntegrityMigrator($this->adapter, $noIntegrityConfig))->migrate(['test_entity']);
+
+    // Raw content should be plain
+    $rawStream = $this->adapter->readAttachment('test_entity', 'rec-1', 'file.txt');
+    $raw = stream_get_contents($rawStream);
+    expect(IntegrityPayload::hasIntegrity($raw))->toBeFalse();
+    expect($raw)->toBe('protected');
+});

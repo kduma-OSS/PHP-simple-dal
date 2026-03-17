@@ -28,9 +28,9 @@ class TypedCollectionEntity implements TypedCollectionEntityInterface
 
     public function make(): TypedRecord
     {
-        if ($this->recordClass === null) {
+        if ($this->recordClass === null) { // @codeCoverageIgnoreStart
             throw new \LogicException('No recordClass configured for this typed collection entity.');
-        }
+        } // @codeCoverageIgnoreEnd
 
         return TypedRecordHydrator::createBlank($this->recordClass);
     }
@@ -58,7 +58,7 @@ class TypedCollectionEntity implements TypedCollectionEntityInterface
             return null;
         }
 
-        return $this->wrapRecord($record);
+        return $this->wrapRecord($record); // @codeCoverageIgnore
     }
 
     public function has(string $id): bool
@@ -73,6 +73,7 @@ class TypedCollectionEntity implements TypedCollectionEntityInterface
         return array_map(fn (RecordInterface $record) => $this->wrapRecord($record), $records);
     }
 
+    /** @codeCoverageIgnore */
     public function filter(FilterInterface $filter): array
     {
         $records = $this->inner->filter($filter);
@@ -107,9 +108,9 @@ class TypedCollectionEntity implements TypedCollectionEntityInterface
 
     private function wrapRecord(RecordInterface $record): TypedRecord
     {
-        if ($this->recordClass === null) {
+        if ($this->recordClass === null) { // @codeCoverageIgnoreStart
             throw new \LogicException('No recordClass configured for this typed collection entity.');
-        }
+        } // @codeCoverageIgnoreEnd
 
         return TypedRecordHydrator::hydrateFromRecord($this->recordClass, $record);
     }

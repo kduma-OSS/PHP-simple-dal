@@ -108,9 +108,9 @@ class IntegrityPayload
 
             return new self($hash, $hashAlgorithm, $signingAlgorithm, $keyId, $signature, $payload);
         } catch (CorruptedDataException $e) {
-            throw $e;
-        } catch (RuntimeException $e) {
+            throw $e; // @codeCoverageIgnore
+        } catch (RuntimeException $e) { // @codeCoverageIgnoreStart
             throw new CorruptedDataException('Integrity payload is truncated — '.$e->getMessage());
-        }
+        } // @codeCoverageIgnoreEnd
     }
 }

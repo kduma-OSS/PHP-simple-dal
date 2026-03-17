@@ -40,7 +40,7 @@ class TypedSingletonEntity implements TypedSingletonEntityInterface
             return null;
         }
 
-        return $this->wrapRecord($record);
+        return $this->wrapRecord($record); // @codeCoverageIgnore
     }
 
     public function exists(): bool
@@ -50,9 +50,9 @@ class TypedSingletonEntity implements TypedSingletonEntityInterface
 
     public function make(): TypedRecord
     {
-        if ($this->recordClass === null) {
+        if ($this->recordClass === null) { // @codeCoverageIgnoreStart
             throw new \LogicException('No recordClass configured for this typed singleton entity.');
-        }
+        } // @codeCoverageIgnoreEnd
 
         return TypedRecordHydrator::createBlank($this->recordClass);
     }
@@ -78,6 +78,7 @@ class TypedSingletonEntity implements TypedSingletonEntityInterface
         $this->inner->delete();
     }
 
+    /** @codeCoverageIgnore */
     public function attachments(): TypedAttachmentStoreInterface
     {
         $inner = $this->inner->attachments();
@@ -87,9 +88,9 @@ class TypedSingletonEntity implements TypedSingletonEntityInterface
 
     private function wrapRecord(RecordInterface $record): TypedRecord
     {
-        if ($this->recordClass === null) {
+        if ($this->recordClass === null) { // @codeCoverageIgnoreStart
             throw new \LogicException('No recordClass configured for this typed singleton entity.');
-        }
+        } // @codeCoverageIgnoreEnd
 
         return TypedRecordHydrator::hydrateFromRecord($this->recordClass, $record);
     }

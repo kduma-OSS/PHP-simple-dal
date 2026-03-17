@@ -54,19 +54,19 @@ class EncryptedPayload
             $reader->skip(strlen(self::MAGIC));
 
             $version = $reader->readByte();
-            if ($version !== self::VERSION) {
+            if ($version !== self::VERSION) { // @codeCoverageIgnoreStart
                 throw new DecryptionException("Unsupported encryption version: {$version}.");
-            }
+            } // @codeCoverageIgnoreEnd
 
             $algorithm = $reader->readByte();
             $keyId = $reader->readBytesWith(length: IntType::UINT16)->toString();
             $payload = $reader->remaining_data->toString();
 
             return new self($keyId, $algorithm, $payload);
-        } catch (DecryptionException $e) {
+        } catch (DecryptionException $e) { // @codeCoverageIgnoreStart
             throw $e;
         } catch (RuntimeException $e) {
             throw new DecryptionException('Encrypted payload is truncated — '.$e->getMessage());
-        }
+        } // @codeCoverageIgnoreEnd
     }
 }

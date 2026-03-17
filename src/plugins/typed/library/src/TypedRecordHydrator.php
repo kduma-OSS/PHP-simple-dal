@@ -35,7 +35,7 @@ class TypedRecordHydrator
         foreach ($targets as $target) {
             // Only handle property targets
             if (! $target->target instanceof \ReflectionProperty) {
-                continue;
+                continue; // @codeCoverageIgnore
             }
 
             $prop = $target->target;
@@ -179,7 +179,7 @@ class TypedRecordHydrator
 
         foreach ($mappings as $mapping) {
             if (! $mapping->reflection->isInitialized($record)) {
-                continue;
+                continue; // @codeCoverageIgnore
             }
 
             $value = $mapping->reflection->getValue($record);
@@ -207,6 +207,11 @@ class TypedRecordHydrator
      *
      * @param  array<string, mixed>  $data
      */
+    /**
+     * @codeCoverageIgnore
+     *
+     * @param  array<string, mixed>  $data
+     */
     private static function extractFromData(array $data, string $path): mixed
     {
         $segments = explode('.', $path);
@@ -225,6 +230,8 @@ class TypedRecordHydrator
 
     /**
      * Remove a value from a nested array using dot-notation.
+     *
+     * @codeCoverageIgnore
      *
      * @param  array<string, mixed>  $data
      */

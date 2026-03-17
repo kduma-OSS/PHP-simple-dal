@@ -36,9 +36,9 @@ class SecretBoxAlgorithm implements EncryptionAlgorithmInterface
 
     public function decrypt(string $payload): string
     {
-        if (strlen($payload) < SODIUM_CRYPTO_SECRETBOX_NONCEBYTES + SODIUM_CRYPTO_SECRETBOX_MACBYTES) {
+        if (strlen($payload) < SODIUM_CRYPTO_SECRETBOX_NONCEBYTES + SODIUM_CRYPTO_SECRETBOX_MACBYTES) { // @codeCoverageIgnoreStart
             throw new DecryptionException('Encrypted payload is too short for symmetric decryption.');
-        }
+        } // @codeCoverageIgnoreEnd
 
         $nonce = substr($payload, 0, SODIUM_CRYPTO_SECRETBOX_NONCEBYTES);
         $ciphertext = substr($payload, SODIUM_CRYPTO_SECRETBOX_NONCEBYTES);

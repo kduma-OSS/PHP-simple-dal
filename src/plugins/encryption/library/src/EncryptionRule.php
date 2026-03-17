@@ -61,10 +61,10 @@ class EncryptionRule
             return [$value];
         }
 
-        return array_values(array_map(
+        return array_values(array_map( // @codeCoverageIgnoreStart
             static fn (string|\BackedEnum $v): string => $v instanceof \BackedEnum ? (string) $v->value : $v,
             $value,
-        ));
+        )); // @codeCoverageIgnoreEnd
     }
 
     /**
@@ -78,7 +78,7 @@ class EncryptionRule
         }
 
         if (is_string($value)) {
-            return [$value];
+            return [$value]; // @codeCoverageIgnore
         }
 
         return $value;

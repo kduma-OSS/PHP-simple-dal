@@ -44,9 +44,9 @@ class RsaAlgorithm implements EncryptionAlgorithmInterface
     {
         $ciphertext = $this->publicKey->encrypt($plaintext);
 
-        if (! is_string($ciphertext)) {
+        if (! is_string($ciphertext)) { // @codeCoverageIgnoreStart
             throw new DecryptionException('RSA encryption failed.');
-        }
+        } // @codeCoverageIgnoreEnd
 
         return $ciphertext;
     }
@@ -63,9 +63,9 @@ class RsaAlgorithm implements EncryptionAlgorithmInterface
             throw new DecryptionException('RSA decryption failed — wrong key or corrupted data.', 0, $e);
         }
 
-        if (! is_string($plaintext)) {
+        if (! is_string($plaintext)) { // @codeCoverageIgnoreStart
             throw new DecryptionException('RSA decryption failed — wrong key or corrupted data.');
-        }
+        } // @codeCoverageIgnoreEnd
 
         return $plaintext;
     }

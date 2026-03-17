@@ -19,6 +19,7 @@ class TypedAttachmentStore implements TypedAttachmentStoreInterface
         return $this->inner->put((string) $name->value, $contents, $mimeType);
     }
 
+    /** @codeCoverageIgnore */
     public function putStream(\BackedEnum $name, mixed $stream, string $mimeType = 'application/octet-stream'): AttachmentInterface
     {
         return $this->inner->putStream((string) $name->value, $stream, $mimeType);

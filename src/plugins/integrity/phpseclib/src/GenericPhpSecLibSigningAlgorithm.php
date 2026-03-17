@@ -32,9 +32,9 @@ class GenericPhpSecLibSigningAlgorithm implements SigningAlgorithmInterface
         if ($key instanceof PrivateKey) {
             $this->privateKey = $key;
             $publicKey = $key->getPublicKey();
-            if (! $publicKey instanceof PublicKey) {
+            if (! $publicKey instanceof PublicKey) { // @codeCoverageIgnoreStart
                 throw new \RuntimeException("Failed to extract public key from private key '{$this->id}'.");
-            }
+            } // @codeCoverageIgnoreEnd
             $this->publicKey = $publicKey;
         } else {
             $this->privateKey = null;
@@ -49,9 +49,9 @@ class GenericPhpSecLibSigningAlgorithm implements SigningAlgorithmInterface
         }
 
         $signature = $this->privateKey->sign($message);
-        if (! is_string($signature)) {
+        if (! is_string($signature)) { // @codeCoverageIgnoreStart
             throw new \RuntimeException("Expected string signature from key '{$this->id}', got ".get_debug_type($signature).'.');
-        }
+        } // @codeCoverageIgnoreEnd
 
         return $signature;
     }

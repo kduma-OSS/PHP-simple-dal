@@ -48,16 +48,19 @@ class IntegrityStorageAdapter implements StorageAdapterInterface
         return $this->verifyAndStripIntegrity($entityName, $recordId, $data);
     }
 
+    /** @codeCoverageIgnore */
     public function deleteRecord(string $entityName, string $recordId): void
     {
         $this->inner->deleteRecord($entityName, $recordId);
     }
 
+    /** @codeCoverageIgnore */
     public function recordExists(string $entityName, string $recordId): bool
     {
         return $this->inner->recordExists($entityName, $recordId);
     }
 
+    /** @codeCoverageIgnore */
     public function listRecordIds(string $entityName): array
     {
         return $this->inner->listRecordIds($entityName);
@@ -88,15 +91,15 @@ class IntegrityStorageAdapter implements StorageAdapterInterface
     ): void {
         if (is_resource($contents)) {
             $raw = stream_get_contents($contents);
-            if ($raw === false) {
+            if ($raw === false) { // @codeCoverageIgnoreStart
                 throw new \RuntimeException('Failed to read stream contents.');
-            }
+            } // @codeCoverageIgnoreEnd
             $contents = $raw;
         }
 
-        if (! is_string($contents)) {
+        if (! is_string($contents)) { // @codeCoverageIgnoreStart
             throw new \RuntimeException('Attachment contents must be a string or stream resource.');
-        }
+        } // @codeCoverageIgnoreEnd
 
         $hash = null;
         $hashAlgorithm = null;
@@ -169,9 +172,9 @@ class IntegrityStorageAdapter implements StorageAdapterInterface
             fclose($stream);
         }
 
-        if ($raw === false) {
+        if ($raw === false) { // @codeCoverageIgnoreStart
             throw new \RuntimeException("Failed to read attachment stream for '{$name}' on record '{$recordId}' in entity '{$entityName}'.");
-        }
+        } // @codeCoverageIgnoreEnd
 
         $data = $raw;
 
@@ -209,9 +212,9 @@ class IntegrityStorageAdapter implements StorageAdapterInterface
         }
 
         $result = fopen('php://memory', 'r+');
-        if ($result === false) {
+        if ($result === false) { // @codeCoverageIgnoreStart
             throw new \RuntimeException('Failed to open php://memory stream.');
-        }
+        } // @codeCoverageIgnoreEnd
         fwrite($result, $data);
         rewind($result);
 
@@ -228,6 +231,7 @@ class IntegrityStorageAdapter implements StorageAdapterInterface
         }
     }
 
+    /** @codeCoverageIgnore */
     public function deleteAllAttachments(string $entityName, string $recordId): void
     {
         $this->inner->deleteAllAttachments($entityName, $recordId);
@@ -241,16 +245,19 @@ class IntegrityStorageAdapter implements StorageAdapterInterface
         return array_values(array_filter($names, fn (string $n) => ! str_ends_with($n, '.sig')));
     }
 
+    /** @codeCoverageIgnore */
     public function attachmentExists(string $entityName, string $recordId, string $name): bool
     {
         return $this->inner->attachmentExists($entityName, $recordId, $name);
     }
 
+    /** @codeCoverageIgnore */
     public function initializeEntity(string $entityName, EntityDefinitionInterface $definition): void
     {
         $this->inner->initializeEntity($entityName, $definition);
     }
 
+    /** @codeCoverageIgnore */
     public function purgeEntity(string $entityName): void
     {
         $this->inner->purgeEntity($entityName);

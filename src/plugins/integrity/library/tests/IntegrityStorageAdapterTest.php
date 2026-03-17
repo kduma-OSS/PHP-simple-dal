@@ -404,3 +404,159 @@ test('sign-only mode: tampered record triggers IntegrityException', function () 
 
     $adapter->readRecord('test_entity', 'rec-1');
 })->throws(IntegrityException::class);
+
+test('tampered signature on record passes in Ignore mode', function () {
+    $writeAdapter = new IntegrityStorageAdapter($this->inner, new IntegrityConfig(
+        hasher: $this->hasher,
+        signer: $this->signer,
+    ));
+
+    $writeAdapter->writeRecord('test_entity', 'rec-1', ['x' => 1]);
+
+    // Tamper with data directly (signature becomes invalid)
+    $raw = $this->inner->readRecord('test_entity', 'rec-1');
+    $raw['x'] = 999;
+    $this->inner->writeRecord('test_entity', 'rec-1', $raw);
+
+    // Read with both failures set to Ignore
+    $readAdapter = new IntegrityStorageAdapter($this->inner, new IntegrityConfig(
+        hasher: $this->hasher,
+        signer: $this->signer,
+        onChecksumFailure: FailureMode::Ignore,
+        onSignatureFailure: FailureMode::Ignore,
+    ));
+
+    $data = $readAdapter->readRecord('test_entity', 'rec-1');
+    expect($data)->toBe(['x' => 999]);
+});
+
+test('tampered signature on inline attachment passes in Ignore mode', function () {
+    $writeAdapter = new IntegrityStorageAdapter($this->inner, new IntegrityConfig(
+        hasher: $this->hasher,
+        signer: $this->signer,
+        detachedAttachments: false,
+    ));
+
+    $this->inner->writeRecord('test_entity', 'rec-1', ['x' => 1]);
+    $writeAdapter->writeAttachment('test_entity', 'rec-1', 'file.txt', 'original');
+
+    // Tamper: re-encode with tampered content
+    $stream = $this->inner->readAttachment('test_entity', 'rec-1', 'file.txt');
+    $rawData = stream_get_contents($stream);
+    $payload = IntegrityPayload::decode($rawData);
+
+    $tampered = IntegrityPayload::encode(
+        'tampered',
+        hash: $payload->hash,
+        hashAlgorithm: $payload->hashAlgorithm,
+        signingAlgorithm: $payload->signingAlgorithm,
+        keyId: $payload->keyId,
+        signature: $payload->signature,
+    );
+    $this->inner->writeAttachment('test_entity', 'rec-1', 'file.txt', $tampered);
+
+    // Read with failures set to Ignore
+    $readAdapter = new IntegrityStorageAdapter($this->inner, new IntegrityConfig(
+        hasher: $this->hasher,
+        signer: $this->signer,
+        onChecksumFailure: FailureMode::Ignore,
+        onSignatureFailure: FailureMode::Ignore,
+        detachedAttachments: false,
+    ));
+
+    $result = $readAdapter->readAttachment('test_entity', 'rec-1', 'file.txt');
+    expect(stream_get_contents($result))->toBe('tampered');
+});
+
+test('tampered signature on detached attachment passes in Ignore mode', function () {
+    $writeAdapter = new IntegrityStorageAdapter($this->inner, new IntegrityConfig(
+        hasher: $this->hasher,
+        signer: $this->signer,
+        detachedAttachments: true,
+    ));
+
+    $this->inner->writeRecord('test_entity', 'rec-1', ['x' => 1]);
+    $writeAdapter->writeAttachment('test_entity', 'rec-1', 'file.txt', 'original');
+
+    // Tamper the raw file (sidecar still has old hash+signature)
+    $this->inner->writeAttachment('test_entity', 'rec-1', 'file.txt', 'tampered');
+
+    // Read with failures set to Ignore
+    $readAdapter = new IntegrityStorageAdapter($this->inner, new IntegrityConfig(
+        hasher: $this->hasher,
+        signer: $this->signer,
+        onChecksumFailure: FailureMode::Ignore,
+        onSignatureFailure: FailureMode::Ignore,
+        detachedAttachments: true,
+    ));
+
+    $result = $readAdapter->readAttachment('test_entity', 'rec-1', 'file.txt');
+    expect(stream_get_contents($result))->toBe('tampered');
+});
+
+test('no integrity on attachment write when no hasher and no signer', function () {
+    $adapter = new IntegrityStorageAdapter($this->inner, new IntegrityConfig(
+        onMissingIntegrity: FailureMode::Ignore,
+    ));
+
+    $this->inner->writeRecord('test_entity', 'rec-1', ['x' => 1]);
+    $adapter->writeAttachment('test_entity', 'rec-1', 'file.txt', 'plain data');
+
+    // Raw attachment should be unchanged (no envelope, no sidecar)
+    $rawStream = $this->inner->readAttachment('test_entity', 'rec-1', 'file.txt');
+    expect(stream_get_contents($rawStream))->toBe('plain data');
+    expect($this->inner->attachmentExists('test_entity', 'rec-1', 'file.txt.sig'))->toBeFalse();
+
+    // Can read it back
+    $result = $adapter->readAttachment('test_entity', 'rec-1', 'file.txt');
+    expect(stream_get_contents($result))->toBe('plain data');
+});
+
+test('inline: tampered signature throws IntegrityException', function () {
+    $adapter = new IntegrityStorageAdapter($this->inner, new IntegrityConfig(
+        signer: $this->signer,
+        detachedAttachments: false,
+    ));
+
+    $this->inner->writeRecord('test_entity', 'rec-1', ['x' => 1]);
+    $adapter->writeAttachment('test_entity', 'rec-1', 'file.txt', 'original');
+
+    // Read raw, decode, re-encode with bad signature
+    $stream = $this->inner->readAttachment('test_entity', 'rec-1', 'file.txt');
+    $rawData = stream_get_contents($stream);
+    $payload = IntegrityPayload::decode($rawData);
+
+    $tampered = IntegrityPayload::encode(
+        $payload->payload,
+        signingAlgorithm: $payload->signingAlgorithm,
+        keyId: $payload->keyId,
+        signature: 'bad-signature-data',
+    );
+    $this->inner->writeAttachment('test_entity', 'rec-1', 'file.txt', $tampered);
+
+    $adapter->readAttachment('test_entity', 'rec-1', 'file.txt');
+})->throws(IntegrityException::class, 'Signature verification failed');
+
+test('detached: tampered signature throws IntegrityException', function () {
+    $adapter = new IntegrityStorageAdapter($this->inner, new IntegrityConfig(
+        signer: $this->signer,
+        detachedAttachments: true,
+    ));
+
+    $this->inner->writeRecord('test_entity', 'rec-1', ['x' => 1]);
+    $adapter->writeAttachment('test_entity', 'rec-1', 'file.txt', 'original');
+
+    // Tamper the sidecar signature
+    $sigStream = $this->inner->readAttachment('test_entity', 'rec-1', 'file.txt.sig');
+    $sigData = json_decode(stream_get_contents($sigStream), true);
+    assert(is_array($sigData));
+    $sigData['signature'] = base64_encode('bad-signature');
+    $this->inner->writeAttachment(
+        'test_entity',
+        'rec-1',
+        'file.txt.sig',
+        json_encode($sigData, JSON_THROW_ON_ERROR),
+    );
+
+    $adapter->readAttachment('test_entity', 'rec-1', 'file.txt');
+})->throws(IntegrityException::class, 'Signature verification failed');

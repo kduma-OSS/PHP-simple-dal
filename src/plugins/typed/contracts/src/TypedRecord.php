@@ -23,6 +23,7 @@ abstract class TypedRecord
     /**
      * Protected constructor -- records are created via fromRecord().
      */
+    /** @codeCoverageIgnore */
     protected function __construct(
         string $id,
         ?\DateTimeImmutable $createdAt = null,

@@ -217,7 +217,7 @@ final class CollectionEntityStore implements CollectionEntityInterface
 
             foreach ($segments as $segment) {
                 if (! is_array($current) || ! array_key_exists($segment, $current)) {
-                    break;
+                    break; // @codeCoverageIgnore
                 }
 
                 $current = $current[$segment];

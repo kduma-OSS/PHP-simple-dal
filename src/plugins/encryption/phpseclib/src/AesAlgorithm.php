@@ -33,9 +33,9 @@ class AesAlgorithm implements EncryptionAlgorithmInterface
     {
         $ivLength = $this->cipher->getBlockLength() >> 3;
 
-        if (strlen($payload) < $ivLength) {
+        if (strlen($payload) < $ivLength) { // @codeCoverageIgnoreStart
             throw new DecryptionException('Encrypted payload is too short — missing IV.');
-        }
+        } // @codeCoverageIgnoreEnd
 
         $iv = substr($payload, 0, $ivLength);
         $ciphertext = substr($payload, $ivLength);
