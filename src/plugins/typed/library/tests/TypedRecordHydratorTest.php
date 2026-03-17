@@ -39,6 +39,7 @@ class HydratorTestRecord extends TypedRecord
 
 class HydratorNestedRecord extends TypedRecord
 {
+    /** @var array<string> */
     #[Field(path: 'meta.tags')]
     public array $tags;
 
@@ -141,6 +142,7 @@ test('hydrateFromRecord populates typed properties', function () {
     );
 
     $typed = TypedRecordHydrator::hydrateFromRecord(HydratorTestRecord::class, $record);
+    assert($typed instanceof HydratorTestRecord);
 
     expect($typed)->toBeInstanceOf(HydratorTestRecord::class);
     expect($typed->id)->toBe('rec-1');
@@ -169,6 +171,7 @@ test('hydrateFromRecord handles null for nullable fields', function () {
     );
 
     $typed = TypedRecordHydrator::hydrateFromRecord(HydratorTestRecord::class, $record);
+    assert($typed instanceof HydratorTestRecord);
 
     expect($typed->description)->toBeNull();
 });
@@ -211,6 +214,7 @@ test('hydrateFromRecord handles nested dot-notation paths', function () {
     );
 
     $typed = TypedRecordHydrator::hydrateFromRecord(HydratorNestedRecord::class, $record);
+    assert($typed instanceof HydratorNestedRecord);
 
     expect($typed->tags)->toBe(['php', 'dal']);
     expect($typed->priority)->toBe(5);
@@ -236,10 +240,12 @@ test('dehydrateToArray produces correct array', function () {
     );
 
     $typed = TypedRecordHydrator::hydrateFromRecord(HydratorTestRecord::class, $record);
+    assert($typed instanceof HydratorTestRecord);
 
     // Modify a field
     $typed->title = 'Updated Title';
 
+    /** @var array<string, mixed> $data */
     $data = TypedRecordHydrator::dehydrateToArray($typed);
 
     expect($data['title'])->toBe('Updated Title');
@@ -265,13 +271,17 @@ test('dehydrateToArray handles nested paths', function () {
     );
 
     $typed = TypedRecordHydrator::hydrateFromRecord(HydratorNestedRecord::class, $record);
+    assert($typed instanceof HydratorNestedRecord);
     $typed->tags = ['a', 'b', 'c'];
 
+    /** @var array<string, mixed> $data */
     $data = TypedRecordHydrator::dehydrateToArray($typed);
 
-    expect($data['meta']['tags'])->toBe(['a', 'b', 'c']);
-    expect($data['meta']['priority'])->toBe(1);
-    expect($data['meta']['other'])->toBe('preserved');
+    $meta = $data['meta'];
+    assert(is_array($meta));
+    expect($meta['tags'])->toBe(['a', 'b', 'c']);
+    expect($meta['priority'])->toBe(1);
+    expect($meta['other'])->toBe('preserved');
 });
 
 test('dehydrateToArray converts enum back to storage value', function () {
@@ -289,8 +299,10 @@ test('dehydrateToArray converts enum back to storage value', function () {
     );
 
     $typed = TypedRecordHydrator::hydrateFromRecord(HydratorTestRecord::class, $record);
+    assert($typed instanceof HydratorTestRecord);
     $typed->status = HydratorTestStatus::Published;
 
+    /** @var array<string, mixed> $data */
     $data = TypedRecordHydrator::dehydrateToArray($typed);
 
     expect($data['status'])->toBe('published');
@@ -316,6 +328,7 @@ test('getRawField accesses extra data', function () {
     );
 
     $typed = TypedRecordHydrator::hydrateFromRecord(HydratorTestRecord::class, $record);
+    assert($typed instanceof HydratorTestRecord);
 
     // getRawField is protected, so we test via reflection
     $ref = new ReflectionMethod($typed, 'getRawField');

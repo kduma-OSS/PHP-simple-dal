@@ -50,7 +50,10 @@ final class FlysystemAdapter implements StorageAdapterInterface
 
         $contents = $this->filesystem->read($path);
 
-        return json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
+        /** @var array<string, mixed> $decoded */
+        $decoded = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
+
+        return $decoded;
     }
 
     public function deleteRecord(string $entityName, string $recordId): void
@@ -144,8 +147,10 @@ final class FlysystemAdapter implements StorageAdapterInterface
 
         if (is_resource($contents)) {
             $this->filesystem->writeStream($path, $contents);
-        } else {
+        } elseif (is_string($contents)) {
             $this->filesystem->write($path, $contents);
+        } else {
+            throw new \InvalidArgumentException('Attachment contents must be a string or resource.');
         }
     }
 
@@ -253,7 +258,10 @@ final class FlysystemAdapter implements StorageAdapterInterface
 
         $contents = $this->filesystem->read($path);
 
-        return json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
+        /** @var array<string, array<string, string[]>> $decoded */
+        $decoded = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
+
+        return $decoded;
     }
 
     /**
@@ -325,6 +333,10 @@ final class FlysystemAdapter implements StorageAdapterInterface
                 continue;
             }
 
+            if (! is_scalar($fieldValue)) {
+                continue;
+            }
+
             $stringValue = (string) $fieldValue;
 
             if (! isset($index[$field])) {
@@ -393,15 +405,17 @@ final class FlysystemAdapter implements StorageAdapterInterface
         $candidateSets = [];
 
         foreach ($filters as $filter) {
-            if (($filter['type'] ?? '') !== 'and') {
+            $filterType = isset($filter['type']) && is_string($filter['type']) ? $filter['type'] : '';
+            if ($filterType !== 'and') {
                 continue;
             }
 
-            if (($filter['operator'] ?? '') !== '=') {
+            $filterOp = isset($filter['operator']) && is_string($filter['operator']) ? $filter['operator'] : '';
+            if ($filterOp !== '=') {
                 continue;
             }
 
-            $field = $filter['field'] ?? '';
+            $field = isset($filter['field']) && is_string($filter['field']) ? $filter['field'] : '';
 
             if (! in_array($field, $indexedFields, true)) {
                 continue;
@@ -411,7 +425,8 @@ final class FlysystemAdapter implements StorageAdapterInterface
                 $index = $this->readIndex($entityName);
             }
 
-            $value = (string) ($filter['value'] ?? '');
+            $rawValue = $filter['value'] ?? '';
+            $value = is_scalar($rawValue) ? (string) $rawValue : '';
 
             $candidateSets[] = $index[$field][$value] ?? [];
         }
@@ -439,8 +454,8 @@ final class FlysystemAdapter implements StorageAdapterInterface
     private function matchesAllFilters(array $data, array $filters): bool
     {
         foreach ($filters as $filter) {
-            $field = $filter['field'] ?? '';
-            $operator = $filter['operator'] ?? '=';
+            $field = isset($filter['field']) && is_string($filter['field']) ? $filter['field'] : '';
+            $operator = isset($filter['operator']) && is_string($filter['operator']) ? $filter['operator'] : '=';
             $value = $filter['value'] ?? null;
 
             $fieldValue = $this->resolveFieldValue($data, $field);
@@ -470,6 +485,8 @@ final class FlysystemAdapter implements StorageAdapterInterface
 
     /**
      * Resolve a field value from data using dot notation.
+     *
+     * @param  array<string, mixed>  $data
      */
     private function resolveFieldValue(array $data, string $field): mixed
     {
@@ -498,15 +515,16 @@ final class FlysystemAdapter implements StorageAdapterInterface
      */
     private function applySort(array $results, array $sort): array
     {
-        $keys = array_keys($results);
-        $values = array_values($results);
-
-        $pairs = array_map(null, $keys, $values);
+        /** @var array<int, array{string, array<string, mixed>}> $pairs */
+        $pairs = [];
+        foreach ($results as $key => $value) {
+            $pairs[] = [$key, $value];
+        }
 
         usort($pairs, function (array $a, array $b) use ($sort): int {
             foreach ($sort as $sortDescriptor) {
-                $field = $sortDescriptor['field'] ?? '';
-                $direction = $sortDescriptor['direction'] ?? 'asc';
+                $field = isset($sortDescriptor['field']) && is_string($sortDescriptor['field']) ? $sortDescriptor['field'] : '';
+                $direction = isset($sortDescriptor['direction']) && is_string($sortDescriptor['direction']) ? $sortDescriptor['direction'] : 'asc';
 
                 $aVal = $this->resolveFieldValue($a[1], $field);
                 $bVal = $this->resolveFieldValue($b[1], $field);
@@ -534,13 +552,19 @@ final class FlysystemAdapter implements StorageAdapterInterface
     //  Utilities
     // ---------------------------------------------------------------
 
+    /**
+     * @param  array<string, mixed>  $array
+     */
     private function sortKeysRecursively(array &$array): void
     {
         ksort($array);
 
-        foreach ($array as &$value) {
+        foreach ($array as $key => &$value) {
             if (is_array($value) && ! array_is_list($value)) {
-                $this->sortKeysRecursively($value);
+                /** @var array<string, mixed> $child */
+                $child = $value;
+                $this->sortKeysRecursively($child);
+                $array[$key] = $child;
             }
         }
     }

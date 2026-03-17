@@ -71,6 +71,7 @@ beforeEach(function () {
 
     $definition = new class('test_entity', false, true, false, []) implements EntityDefinitionInterface
     {
+        /** @param array<string> $indexedFields */
         public function __construct(
             public readonly string $name,
             public readonly bool $isSingleton,
@@ -157,14 +158,18 @@ test('re-signs with different config', function () {
     $adapter->writeAttachment('test_entity', 'rec-1', 'file.txt', 'content');
 
     $rawBefore = $this->adapter->readRecord('test_entity', 'rec-1');
-    expect($rawBefore['_integrity']['key_id'])->toBe('test-signer');
+    $integrity = $rawBefore['_integrity'];
+    assert(is_array($integrity));
+    expect($integrity['key_id'])->toBe('test-signer');
 
     // Migrate to signer B
     $configB = new IntegrityConfig(hasher: $this->hasher, signer: $this->signerB);
     (new IntegrityMigrator($this->adapter, $configB))->migrate(['test_entity']);
 
     $rawAfter = $this->adapter->readRecord('test_entity', 'rec-1');
-    expect($rawAfter['_integrity']['key_id'])->toBe('signer-b');
+    $integrityAfter = $rawAfter['_integrity'];
+    assert(is_array($integrityAfter));
+    expect($integrityAfter['key_id'])->toBe('signer-b');
 
     // Verify attachment was also re-signed
     $stream = $this->adapter->readAttachment('test_entity', 'rec-1', 'file.txt');

@@ -23,7 +23,7 @@ class AesAlgorithm implements EncryptionAlgorithmInterface
 
     public function encrypt(string $plaintext): string
     {
-        $iv = random_bytes($this->cipher->getBlockLength() >> 3);
+        $iv = random_bytes(max(1, $this->cipher->getBlockLength() >> 3));
         $this->cipher->setIV($iv);
 
         return $iv.$this->cipher->encrypt($plaintext);

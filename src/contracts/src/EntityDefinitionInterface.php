@@ -18,7 +18,7 @@ interface EntityDefinitionInterface
      * Fields that should be indexed for faster filtering.
      * Dot-notation supported (e.g. "subject.commonName").
      *
-     * @return string[]
+     * @var array<string>
      */
     public array $indexedFields { get; }
 }

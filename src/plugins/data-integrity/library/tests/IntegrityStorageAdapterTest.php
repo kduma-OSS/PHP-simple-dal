@@ -51,6 +51,7 @@ beforeEach(function () {
 
     $definition = new class('test_entity', false, true, false, []) implements EntityDefinitionInterface
     {
+        /** @param array<string> $indexedFields */
         public function __construct(
             public readonly string $name,
             public readonly bool $isSingleton,
@@ -268,6 +269,7 @@ test('stream input to writeAttachment works', function () {
     $this->inner->writeRecord('test_entity', 'rec-1', ['x' => 1]);
 
     $stream = fopen('php://memory', 'r+');
+    assert(is_resource($stream));
     fwrite($stream, 'stream content');
     rewind($stream);
 

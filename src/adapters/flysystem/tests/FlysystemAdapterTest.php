@@ -18,6 +18,7 @@ beforeEach(function () {
 
     $definition = new class('test_entity', false, true, false, ['status', 'meta.role']) implements EntityDefinitionInterface
     {
+        /** @param array<string> $indexedFields */
         public function __construct(
             public readonly string $name,
             public readonly bool $isSingleton,
@@ -38,6 +39,7 @@ afterEach(function () {
         );
 
         foreach ($iterator as $file) {
+            assert($file instanceof \SplFileInfo);
             if ($file->isDir()) {
                 rmdir($file->getPathname());
             } else {
@@ -67,10 +69,13 @@ test('data.json is pretty-printed with sorted keys', function () {
     ]);
 
     $raw = file_get_contents($this->tempDir.'/test_entity/rec-1/data.json');
+    assert(is_string($raw));
     $decoded = json_decode($raw, true);
+    assert(is_array($decoded));
 
     // Keys should be sorted alphabetically at both levels
     expect(array_keys($decoded))->toBe(['alpha', 'meta', 'zebra']);
+    assert(is_array($decoded['meta']));
     expect(array_keys($decoded['meta']))->toBe(['a_key', 'z_key']);
 
     // Should be pretty-printed (contains newlines)
@@ -96,7 +101,10 @@ test('index file is created and maintained', function () {
     $indexPath = $this->tempDir.'/test_entity/_index.json';
     expect(file_exists($indexPath))->toBeTrue();
 
-    $index = json_decode(file_get_contents($indexPath), true);
+    $raw = file_get_contents($indexPath);
+    assert(is_string($raw));
+    /** @var array<string, array<string, list<string>>> $index */
+    $index = json_decode($raw, true);
 
     expect($index)->toHaveKey('status');
     expect($index['status'])->toHaveKey('active');
@@ -118,7 +126,10 @@ test('index is updated when a record is overwritten', function () {
         'meta' => ['role' => 'user'],
     ]);
 
-    $index = json_decode(file_get_contents($this->tempDir.'/test_entity/_index.json'), true);
+    $raw = file_get_contents($this->tempDir.'/test_entity/_index.json');
+    assert(is_string($raw));
+    /** @var array<string, array<string, list<string>>> $index */
+    $index = json_decode($raw, true);
 
     // Old value should be gone
     expect($index['status'])->not->toHaveKey('active');
@@ -140,7 +151,10 @@ test('index is updated when a record is deleted', function () {
 
     $this->adapter->deleteRecord('test_entity', 'rec-1');
 
-    $index = json_decode(file_get_contents($this->tempDir.'/test_entity/_index.json'), true);
+    $raw = file_get_contents($this->tempDir.'/test_entity/_index.json');
+    assert(is_string($raw));
+    /** @var array<string, array<string, list<string>>> $index */
+    $index = json_decode($raw, true);
 
     // rec-1 should be removed from the active index
     expect($index['status']['active'])->not->toContain('rec-1');

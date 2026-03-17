@@ -19,6 +19,7 @@ test('sign and verify round-trip with RSA', function () {
 test('verify-only mode throws on sign', function () {
     $privateKey = RSA::createKey(2048);
     $publicKey = $privateKey->getPublicKey();
+    assert($publicKey instanceof \phpseclib3\Crypt\RSA\PublicKey);
 
     $algo = new RsaSigningAlgorithm('rsa-key', $publicKey);
 
@@ -47,6 +48,7 @@ test('algorithm constant is 2', function () {
 
 test('works with PSS padding', function () {
     $privateKey = RSA::createKey(2048)->withPadding(RSA::SIGNATURE_PSS);
+    assert($privateKey instanceof \phpseclib3\Crypt\RSA\PrivateKey);
 
     $algo = new RsaSigningAlgorithm('rsa-pss', $privateKey);
 

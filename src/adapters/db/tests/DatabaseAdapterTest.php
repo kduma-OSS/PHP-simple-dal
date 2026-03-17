@@ -13,6 +13,7 @@ beforeEach(function () {
     // Initialize the entity tables so every test starts with a clean schema.
     $definition = new class('test_entity', false, true, true, ['status', 'meta.role']) implements EntityDefinitionInterface
     {
+        /** @param array<string> $indexedFields */
         public function __construct(
             public readonly string $name,
             public readonly bool $isSingleton,
@@ -43,6 +44,7 @@ test('purge entity allows re-initialization', function () {
 
     $definition = new class('test_entity', false, true, true, []) implements EntityDefinitionInterface
     {
+        /** @param array<string> $indexedFields */
         public function __construct(
             public readonly string $name,
             public readonly bool $isSingleton,

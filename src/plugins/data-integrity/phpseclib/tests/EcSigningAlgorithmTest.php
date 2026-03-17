@@ -30,6 +30,7 @@ test('sign and verify round-trip with P-256 (ECDSA)', function () {
 test('verify-only mode throws on sign', function () {
     $privateKey = EC::createKey('Ed25519');
     $publicKey = $privateKey->getPublicKey();
+    assert($publicKey instanceof \phpseclib3\Crypt\EC\PublicKey);
 
     $algo = new EcSigningAlgorithm('ec-key', $publicKey);
 

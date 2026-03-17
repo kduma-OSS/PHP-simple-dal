@@ -453,6 +453,7 @@ trait AdapterConformanceTests
         $this->adapter()->writeRecord($this->entity(), 'rec-1', ['x' => 1]);
 
         $input = fopen('php://memory', 'r+');
+        assert(is_resource($input));
         fwrite($input, 'stream data');
         rewind($input);
 
@@ -623,6 +624,7 @@ trait AdapterConformanceTests
      *
      * @param  string[]  $indexedFields
      */
+    /** @param array<string> $indexedFields */
     private function createEntityDefinition(
         string $name,
         bool $isSingleton,
@@ -632,6 +634,7 @@ trait AdapterConformanceTests
     ): EntityDefinitionInterface {
         return new class($name, $isSingleton, $hasAttachments, $hasTimestamps, $indexedFields) implements EntityDefinitionInterface
         {
+            /** @param array<string> $indexedFields */
             public function __construct(
                 public readonly string $name,
                 public readonly bool $isSingleton,

@@ -20,12 +20,10 @@ class TypedCollectionEntity implements TypedCollectionEntityInterface
 
     /**
      * @param  class-string<TypedRecord>|null  $recordClass
-     * @param  class-string<\BackedEnum>|null  $attachmentEnum
      */
     public function __construct(
         private readonly CollectionEntityInterface $inner,
         private readonly ?string $recordClass,
-        private readonly ?string $attachmentEnum,
     ) {}
 
     public function make(): TypedRecord

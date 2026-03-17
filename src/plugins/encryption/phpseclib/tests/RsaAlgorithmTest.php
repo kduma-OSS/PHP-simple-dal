@@ -20,6 +20,7 @@ test('encrypt and decrypt round-trip with RSA OAEP', function () {
 test('encrypt-only mode throws on decrypt', function () {
     $privateKey = RSA::createKey(2048);
     $publicKey = $privateKey->getPublicKey();
+    assert($publicKey instanceof \phpseclib3\Crypt\RSA\PublicKey);
 
     $key = new RsaAlgorithm('rsa-key', $publicKey);
 
@@ -40,6 +41,7 @@ test('wrong key fails decryption', function () {
 
 test('encrypt and decrypt with PKCS1 padding', function () {
     $privateKey = RSA::createKey(2048)->withPadding(RSA::ENCRYPTION_PKCS1);
+    assert($privateKey instanceof \phpseclib3\Crypt\RSA\PrivateKey);
 
     $key = new RsaAlgorithm('rsa-pkcs1', $privateKey);
 

@@ -19,8 +19,11 @@ class TypedDataStore
     /** @var array<string, EntityDefinitionInterface> */
     private array $entityDefs;
 
-    /** @var array<string, TypedCollectionEntity|TypedSingletonEntity> */
-    private array $stores = [];
+    /** @var array<string, TypedCollectionEntity> */
+    private array $collections = [];
+
+    /** @var array<string, TypedSingletonEntity> */
+    private array $singletons = [];
 
     /**
      * @param  EntityDefinitionInterface[]  $entities
@@ -40,28 +43,26 @@ class TypedDataStore
 
     public function collection(string $entity): TypedCollectionEntity
     {
-        if (! isset($this->stores[$entity])) {
+        if (! isset($this->collections[$entity])) {
             $inner = $this->inner->collection($entity);
             $def = $this->entityDefs[$entity] ?? null;
             $recordClass = ($def instanceof TypedCollectionDefinition) ? $def->recordClass : null;
-            $attachmentEnum = ($def instanceof TypedCollectionDefinition) ? $def->attachmentEnum : null;
-            $this->stores[$entity] = new TypedCollectionEntity($inner, $recordClass, $attachmentEnum);
+            $this->collections[$entity] = new TypedCollectionEntity($inner, $recordClass);
         }
 
-        return $this->stores[$entity];
+        return $this->collections[$entity];
     }
 
     public function singleton(string $entity): TypedSingletonEntity
     {
-        if (! isset($this->stores[$entity])) {
+        if (! isset($this->singletons[$entity])) {
             $inner = $this->inner->singleton($entity);
             $def = $this->entityDefs[$entity] ?? null;
             $recordClass = ($def instanceof TypedSingletonDefinition) ? $def->recordClass : null;
-            $attachmentEnum = ($def instanceof TypedSingletonDefinition) ? $def->attachmentEnum : null;
-            $this->stores[$entity] = new TypedSingletonEntity($inner, $recordClass, $attachmentEnum);
+            $this->singletons[$entity] = new TypedSingletonEntity($inner, $recordClass);
         }
 
-        return $this->stores[$entity];
+        return $this->singletons[$entity];
     }
 
     /**

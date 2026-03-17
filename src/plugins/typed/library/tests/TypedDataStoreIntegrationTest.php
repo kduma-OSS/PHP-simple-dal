@@ -42,6 +42,7 @@ class ArticleRecord extends TypedRecord
     #[Field(converter: DateTimeConverter::class)]
     public DateTimeImmutable $publishedAt;
 
+    /** @var array<string> */
     #[Field(path: 'meta.tags')]
     public array $tags;
 }
@@ -93,9 +94,13 @@ beforeEach(function () {
 //  Helpers
 // -----------------------------------------------------------------
 
+/**
+ * @param array<string> $tags
+ */
 function makeArticle(TypedDataStore $store, string $title = 'Test', IntegrationStatus $status = IntegrationStatus::Draft, ?string $body = null, ?DateTimeImmutable $publishedAt = null, array $tags = []): ArticleRecord
 {
     $record = $store->collection('articles')->make();
+    assert($record instanceof ArticleRecord);
     $record->title = $title;
     $record->status = $status;
     $record->body = $body;
@@ -108,6 +113,7 @@ function makeArticle(TypedDataStore $store, string $title = 'Test', IntegrationS
 function makeSettings(TypedDataStore $store, string $siteName = 'My Site', string $locale = 'en', bool $maintenance = false): SettingsRecord
 {
     $record = $store->singleton('settings')->make();
+    assert($record instanceof SettingsRecord);
     $record->siteName = $siteName;
     $record->locale = $locale;
     $record->maintenance = $maintenance;
@@ -140,6 +146,7 @@ test('create and find a typed collection record', function () {
 
     $record = makeArticle($this->store, 'First Article', IntegrationStatus::Draft, 'Hello world.', new DateTimeImmutable('2024-06-15T10:00:00+00:00'), ['php', 'dal']);
     $created = $collection->create($record, 'art-1');
+    assert($created instanceof ArticleRecord);
 
     expect($created)->toBeInstanceOf(ArticleRecord::class);
     expect($created->id)->toBe('art-1');
@@ -150,6 +157,7 @@ test('create and find a typed collection record', function () {
 
     // Find it back
     $found = $collection->find('art-1');
+    assert($found instanceof ArticleRecord);
 
     expect($found)->toBeInstanceOf(ArticleRecord::class);
     expect($found->title)->toBe('First Article');
@@ -180,6 +188,8 @@ test('all returns all typed records', function () {
     $all = $collection->all();
 
     expect($all)->toHaveCount(2);
+    assert($all[0] instanceof ArticleRecord);
+    assert($all[1] instanceof ArticleRecord);
     expect($all[0])->toBeInstanceOf(ArticleRecord::class);
     expect($all[1])->toBeInstanceOf(ArticleRecord::class);
 });
@@ -188,17 +198,20 @@ test('save persists modified typed record', function () {
     $collection = $this->store->collection('articles');
 
     $created = $collection->create(makeArticle($this->store, 'Original Title'), 'art-save');
+    assert($created instanceof ArticleRecord);
 
     $created->title = 'Updated Title';
     $created->status = IntegrationStatus::Published;
 
     $saved = $collection->save($created);
+    assert($saved instanceof ArticleRecord);
 
     expect($saved->title)->toBe('Updated Title');
     expect($saved->status)->toBe(IntegrationStatus::Published);
 
     // Re-fetch to confirm persistence
     $refetched = $collection->find('art-save');
+    assert($refetched instanceof ArticleRecord);
 
     expect($refetched->title)->toBe('Updated Title');
     expect($refetched->status)->toBe(IntegrationStatus::Published);
@@ -210,9 +223,11 @@ test('save replaces data for existing record', function () {
     $collection->create(makeArticle($this->store, 'Update Me', IntegrationStatus::Draft, 'Old body', new DateTimeImmutable('2024-01-01T00:00:00+00:00'), ['old']), 'art-update');
 
     $record = $collection->find('art-update');
+    assert($record instanceof ArticleRecord);
     $record->body = 'New body';
 
     $saved = $collection->save($record);
+    assert($saved instanceof ArticleRecord);
 
     expect($saved)->toBeInstanceOf(ArticleRecord::class);
     expect($saved->title)->toBe('Update Me');
@@ -325,6 +340,7 @@ test('singleton set and get', function () {
     expect($singleton->exists())->toBeFalse();
 
     $created = $singleton->set(makeSettings($this->store));
+    assert($created instanceof SettingsRecord);
 
     expect($created)->toBeInstanceOf(SettingsRecord::class);
     expect($created->siteName)->toBe('My Site');
@@ -333,6 +349,7 @@ test('singleton set and get', function () {
     expect($singleton->exists())->toBeTrue();
 
     $fetched = $singleton->get();
+    assert($fetched instanceof SettingsRecord);
 
     expect($fetched)->toBeInstanceOf(SettingsRecord::class);
     expect($fetched->siteName)->toBe('My Site');
@@ -350,16 +367,19 @@ test('singleton save persists modifications', function () {
     $singleton->set(makeSettings($this->store, 'Original'));
 
     $record = $singleton->get();
+    assert($record instanceof SettingsRecord);
     $record->siteName = 'Updated Site';
     $record->maintenance = true;
 
     $saved = $singleton->save($record);
+    assert($saved instanceof SettingsRecord);
 
     expect($saved->siteName)->toBe('Updated Site');
     expect($saved->maintenance)->toBeTrue();
 
     // Re-fetch to confirm persistence
     $refetched = $singleton->get();
+    assert($refetched instanceof SettingsRecord);
 
     expect($refetched->siteName)->toBe('Updated Site');
     expect($refetched->maintenance)->toBeTrue();
@@ -371,9 +391,11 @@ test('singleton save updates partial data', function () {
     $singleton->set(makeSettings($this->store));
 
     $record = $singleton->get();
+    assert($record instanceof SettingsRecord);
     $record->locale = 'fr';
 
     $saved = $singleton->save($record);
+    assert($saved instanceof SettingsRecord);
 
     expect($saved)->toBeInstanceOf(SettingsRecord::class);
     expect($saved->siteName)->toBe('My Site');

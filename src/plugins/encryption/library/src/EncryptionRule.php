@@ -13,8 +13,8 @@ class EncryptionRule
     private readonly ?array $normalizedRecordIds;
 
     /**
-     * @param  string|string[]|\BackedEnum|\BackedEnum[]|null  $attachmentNames  null = all
-     * @param  string|string[]|null  $recordIds  null = all records
+     * @param  string|array<string|\BackedEnum>|\BackedEnum|null  $attachmentNames  null = all
+     * @param  string|array<string>|null  $recordIds  null = all records
      */
     public function __construct(
         public readonly string $keyId,
@@ -44,6 +44,7 @@ class EncryptionRule
     }
 
     /**
+     * @param  string|array<string|\BackedEnum>|\BackedEnum|null  $value
      * @return string[]|null
      */
     private static function normalizeNames(string|array|\BackedEnum|null $value): ?array
@@ -60,13 +61,14 @@ class EncryptionRule
             return [$value];
         }
 
-        return array_map(
-            fn (string|\BackedEnum $v) => $v instanceof \BackedEnum ? (string) $v->value : $v,
+        return array_values(array_map(
+            static fn (string|\BackedEnum $v): string => $v instanceof \BackedEnum ? (string) $v->value : $v,
             $value,
-        );
+        ));
     }
 
     /**
+     * @param  string|array<string>|null  $value
      * @return string[]|null
      */
     private static function normalizeStringArray(string|array|null $value): ?array

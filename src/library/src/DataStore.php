@@ -50,7 +50,15 @@ final class DataStore implements DataStoreInterface
             $this->stores[$entity] = new CollectionEntityStore($this->adapter, $definition);
         }
 
-        return $this->stores[$entity];
+        $store = $this->stores[$entity];
+
+        if (! $store instanceof CollectionEntityStore) {
+            throw new EntityNotFoundException(
+                sprintf('Entity "%s" is not a collection.', $entity),
+            );
+        }
+
+        return $store;
     }
 
     public function singleton(string $entity): SingletonEntityInterface
@@ -67,7 +75,15 @@ final class DataStore implements DataStoreInterface
             $this->stores[$entity] = new SingletonEntityStore($this->adapter, $definition);
         }
 
-        return $this->stores[$entity];
+        $store = $this->stores[$entity];
+
+        if (! $store instanceof SingletonEntityStore) {
+            throw new EntityNotFoundException(
+                sprintf('Entity "%s" is not a singleton.', $entity),
+            );
+        }
+
+        return $store;
     }
 
     public function entities(): array

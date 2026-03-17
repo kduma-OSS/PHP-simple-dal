@@ -71,10 +71,10 @@ final class Filter implements FilterInterface
 
     public function toFilterDescriptors(): array
     {
-        return array_map(
+        return array_values(array_map(
             fn (FilterCondition $condition) => $condition->toArray(),
             $this->conditions,
-        );
+        ));
     }
 
     public function toSortDescriptors(): array

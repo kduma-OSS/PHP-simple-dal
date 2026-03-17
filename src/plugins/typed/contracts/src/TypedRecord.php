@@ -12,10 +12,10 @@ abstract class TypedRecord
 
     public readonly ?\DateTimeImmutable $updatedAt;
 
-    /** Non-mapped extra data fields */
+    /** @var array<string, mixed> Non-mapped extra data fields */
     private array $_extraData = [];
 
-    /** Field mappings -- set by the hydrator, not by the constructor */
+    /** @var list<\KDuma\SimpleDAL\Typed\FieldMapping> Field mappings -- set by the hydrator, not by the constructor */
     private array $_fieldMappings = [];
 
     /**
@@ -71,25 +71,37 @@ abstract class TypedRecord
 
     // --- Internal methods (used by TypedRecordHydrator, package-internal) ---
 
-    /** @internal */
+    /**
+     * @internal
+     * @param  array<string, mixed>  $data
+     */
     public function _setExtraData(array $data): void
     {
         $this->_extraData = $data;
     }
 
-    /** @internal */
+    /**
+     * @internal
+     * @return array<string, mixed>
+     */
     public function _getExtraData(): array
     {
         return $this->_extraData;
     }
 
-    /** @internal */
+    /**
+     * @internal
+     * @param  list<\KDuma\SimpleDAL\Typed\FieldMapping>  $mappings
+     */
     public function _setFieldMappings(array $mappings): void
     {
         $this->_fieldMappings = $mappings;
     }
 
-    /** @internal */
+    /**
+     * @internal
+     * @return list<\KDuma\SimpleDAL\Typed\FieldMapping>
+     */
     public function _getFieldMappings(): array
     {
         return $this->_fieldMappings;

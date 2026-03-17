@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace KDuma\SimpleDAL\Encryption\Contracts;
 
+use KDuma\SimpleDAL\Encryption\Contracts\Exception\DecryptionException;
+
 interface EncryptionAlgorithmInterface
 {
     public string $id { get; }

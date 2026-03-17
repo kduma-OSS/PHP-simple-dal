@@ -35,6 +35,7 @@ final class FlysystemAdapterConformanceTest extends TestCase
 
         $definition = new class('test_entity', false, true, false, ['status', 'meta.role']) implements EntityDefinitionInterface
         {
+            /** @param array<string> $indexedFields */
             public function __construct(
                 public readonly string $name,
                 public readonly bool $isSingleton,
@@ -56,6 +57,7 @@ final class FlysystemAdapterConformanceTest extends TestCase
             );
 
             foreach ($iterator as $file) {
+                assert($file instanceof \SplFileInfo);
                 if ($file->isDir()) {
                     rmdir($file->getPathname());
                 } else {

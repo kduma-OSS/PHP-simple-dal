@@ -19,7 +19,10 @@ final class SchemaManager
     {
         $this->createRecordTable($tableName);
         $this->createAttachmentTable($tableName);
-        $this->createFieldIndexes($tableName, $definition->indexedFields);
+
+        /** @var string[] $fields */
+        $fields = $definition->indexedFields;
+        $this->createFieldIndexes($tableName, $fields);
     }
 
     /**

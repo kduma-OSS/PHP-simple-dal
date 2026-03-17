@@ -16,27 +16,27 @@ class TypedAttachmentStore implements TypedAttachmentStoreInterface
 
     public function put(\BackedEnum $name, string $contents, string $mimeType = 'application/octet-stream'): AttachmentInterface
     {
-        return $this->inner->put($name->value, $contents, $mimeType);
+        return $this->inner->put((string) $name->value, $contents, $mimeType);
     }
 
     public function putStream(\BackedEnum $name, mixed $stream, string $mimeType = 'application/octet-stream'): AttachmentInterface
     {
-        return $this->inner->putStream($name->value, $stream, $mimeType);
+        return $this->inner->putStream((string) $name->value, $stream, $mimeType);
     }
 
     public function get(\BackedEnum $name): AttachmentInterface
     {
-        return $this->inner->get($name->value);
+        return $this->inner->get((string) $name->value);
     }
 
     public function getOrNull(\BackedEnum $name): ?AttachmentInterface
     {
-        return $this->inner->getOrNull($name->value);
+        return $this->inner->getOrNull((string) $name->value);
     }
 
     public function has(\BackedEnum $name): bool
     {
-        return $this->inner->has($name->value);
+        return $this->inner->has((string) $name->value);
     }
 
     public function list(): array
@@ -46,7 +46,7 @@ class TypedAttachmentStore implements TypedAttachmentStoreInterface
 
     public function delete(\BackedEnum $name): void
     {
-        $this->inner->delete($name->value);
+        $this->inner->delete((string) $name->value);
     }
 
     public function deleteAll(): void

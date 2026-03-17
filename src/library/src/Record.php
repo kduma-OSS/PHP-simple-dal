@@ -26,7 +26,7 @@ final class Record implements RecordInterface
     }
 
     /**
-     * @param  array<string, mixed>  $data
+     * @param  array<string, mixed>  $_data
      */
     public function __construct(
         private string $_id,
@@ -105,7 +105,9 @@ final class Record implements RecordInterface
 
     public function merge(array $data): static
     {
-        $this->_data = self::deepMerge($this->_data, $data);
+        /** @var array<string, mixed> $currentData */
+        $currentData = $this->_data;
+        $this->_data = self::deepMerge($currentData, $data);
 
         return $this;
     }
@@ -150,7 +152,11 @@ final class Record implements RecordInterface
     {
         foreach ($overlay as $key => $value) {
             if (is_array($value) && isset($base[$key]) && is_array($base[$key])) {
-                $base[$key] = self::deepMerge($base[$key], $value);
+                /** @var array<string, mixed> $baseChild */
+                $baseChild = $base[$key];
+                /** @var array<string, mixed> $overlayChild */
+                $overlayChild = $value;
+                $base[$key] = self::deepMerge($baseChild, $overlayChild);
             } else {
                 $base[$key] = $value;
             }

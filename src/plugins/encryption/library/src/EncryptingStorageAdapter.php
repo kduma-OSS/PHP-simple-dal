@@ -59,8 +59,14 @@ class EncryptingStorageAdapter implements StorageAdapterInterface
 
         if ($rule !== null) {
             if (is_resource($contents)) {
-                $contents = stream_get_contents($contents);
+                $raw = stream_get_contents($contents);
+                if ($raw === false) {
+                    throw new \RuntimeException('Failed to read stream contents for encryption.');
+                }
+                $contents = $raw;
             }
+
+            assert(is_string($contents));
 
             $key = $this->config->getKey($rule->keyId);
             $encrypted = $key->encrypt($contents);
@@ -73,10 +79,13 @@ class EncryptingStorageAdapter implements StorageAdapterInterface
     public function readAttachment(string $entityName, string $recordId, string $name): mixed
     {
         $stream = $this->inner->readAttachment($entityName, $recordId, $name);
-        $data = stream_get_contents($stream);
 
-        if (is_resource($stream)) {
-            fclose($stream);
+        assert(is_resource($stream));
+        $data = stream_get_contents($stream);
+        fclose($stream);
+
+        if ($data === false) {
+            throw new \RuntimeException('Failed to read attachment stream contents.');
         }
 
         if (EncryptedPayload::isEncrypted($data)) {
@@ -86,6 +95,7 @@ class EncryptingStorageAdapter implements StorageAdapterInterface
         }
 
         $result = fopen('php://memory', 'r+');
+        assert($result !== false);
         fwrite($result, $data);
         rewind($result);
 

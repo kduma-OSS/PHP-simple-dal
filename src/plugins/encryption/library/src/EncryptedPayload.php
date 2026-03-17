@@ -54,7 +54,11 @@ class EncryptedPayload
 
         $algorithm = ord($data[$offset++]);
 
-        $keyIdLen = unpack('n', substr($data, $offset, 2))[1];
+        $unpacked = unpack('nkeyIdLen', substr($data, $offset, 2));
+        if ($unpacked === false || ! is_int($unpacked['keyIdLen'])) {
+            throw new DecryptionException('Failed to unpack key ID length from encrypted payload.');
+        }
+        $keyIdLen = $unpacked['keyIdLen'];
         $offset += 2;
 
         if (strlen($data) < $offset + $keyIdLen) {

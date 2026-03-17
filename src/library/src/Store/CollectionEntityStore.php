@@ -200,6 +200,9 @@ final class CollectionEntityStore implements CollectionEntityInterface
         );
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     */
     private function resolveId(array $data, ?string $id): string
     {
         if ($id !== null) {
@@ -237,6 +240,9 @@ final class CollectionEntityStore implements CollectionEntityInterface
         }
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     */
     private function hydrateRecord(string $id, array $data): Record
     {
         $createdAt = null;

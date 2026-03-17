@@ -31,7 +31,9 @@ class RsaAlgorithm implements EncryptionAlgorithmInterface
     ) {
         if ($key instanceof PrivateKey) {
             $this->privateKey = $key;
-            $this->publicKey = $key->getPublicKey();
+            $publicKey = $key->getPublicKey();
+            assert($publicKey instanceof PublicKey);
+            $this->publicKey = $publicKey;
         } else {
             $this->publicKey = $key;
             $this->privateKey = null;
@@ -42,7 +44,7 @@ class RsaAlgorithm implements EncryptionAlgorithmInterface
     {
         $ciphertext = $this->publicKey->encrypt($plaintext);
 
-        if ($ciphertext === false) {
+        if (! is_string($ciphertext)) {
             throw new DecryptionException('RSA encryption failed.');
         }
 
@@ -61,7 +63,7 @@ class RsaAlgorithm implements EncryptionAlgorithmInterface
             throw new DecryptionException('RSA decryption failed — wrong key or corrupted data.', 0, $e);
         }
 
-        if ($plaintext === false) {
+        if (! is_string($plaintext)) {
             throw new DecryptionException('RSA decryption failed — wrong key or corrupted data.');
         }
 

@@ -66,6 +66,7 @@ test('typed record hydrates all field types correctly', function () {
     );
 
     $typed = TypedRecordHydrator::hydrateFromRecord(UserTypedRecord::class, $record);
+    assert($typed instanceof UserTypedRecord);
 
     expect($typed)->toBeInstanceOf(UserTypedRecord::class);
     expect($typed->id)->toBe('user-1');
@@ -77,7 +78,9 @@ test('typed record hydrates all field types correctly', function () {
     expect($typed->registeredAt->format('Y-m-d'))->toBe('2024-03-15');
     expect($typed->bio)->toBe('Software engineer');
     expect($typed->theme)->toBe('dark');
+    assert($typed->createdAt !== null);
     expect($typed->createdAt->format('Y-m-d'))->toBe('2024-03-15');
+    assert($typed->updatedAt !== null);
     expect($typed->updatedAt->format('Y-m-d'))->toBe('2024-06-01');
 });
 
@@ -98,6 +101,7 @@ test('typed record handles nullable bio as null', function () {
     );
 
     $typed = TypedRecordHydrator::hydrateFromRecord(UserTypedRecord::class, $record);
+    assert($typed instanceof UserTypedRecord);
 
     expect($typed->bio)->toBeNull();
 });
@@ -119,19 +123,23 @@ test('typed record dehydration produces correct array', function () {
     );
 
     $typed = TypedRecordHydrator::hydrateFromRecord(UserTypedRecord::class, $record);
+    assert($typed instanceof UserTypedRecord);
 
     // Modify fields
     $typed->name = 'Charles';
     $typed->role = RecordTestRole::Admin;
 
+    /** @var array<string, mixed> $data */
     $data = TypedRecordHydrator::dehydrateToArray($typed);
 
     expect($data['name'])->toBe('Charles');
     expect($data['role'])->toBe('admin');
     expect($data['email'])->toBe('charlie@example.com');
     expect($data['age'])->toBe(22);
-    expect($data['settings']['theme'])->toBe('auto');
-    expect($data['settings']['language'])->toBe('en');
+    $settings = $data['settings'];
+    assert(is_array($settings));
+    expect($settings['theme'])->toBe('auto');
+    expect($settings['language'])->toBe('en');
 });
 
 test('typed record getRawField works for extra data', function () {
@@ -152,6 +160,7 @@ test('typed record getRawField works for extra data', function () {
     );
 
     $typed = TypedRecordHydrator::hydrateFromRecord(UserTypedRecord::class, $record);
+    assert($typed instanceof UserTypedRecord);
 
     // Access getRawField via reflection (it's protected)
     $ref = new ReflectionMethod($typed, 'getRawField');
@@ -178,6 +187,7 @@ test('typed record setRawField works for extra data', function () {
     );
 
     $typed = TypedRecordHydrator::hydrateFromRecord(UserTypedRecord::class, $record);
+    assert($typed instanceof UserTypedRecord);
 
     // Access setRawField and getRawField via reflection (protected)
     $setRef = new ReflectionMethod($typed, 'setRawField');
@@ -207,6 +217,7 @@ test('typed record preserves timestamps from null', function () {
     );
 
     $typed = TypedRecordHydrator::hydrateFromRecord(UserTypedRecord::class, $record);
+    assert($typed instanceof UserTypedRecord);
 
     expect($typed->createdAt)->toBeNull();
     expect($typed->updatedAt)->toBeNull();

@@ -1,0 +1,43 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Method KDuma\\SimpleDAL\\Contracts\\EntityDefinitionInterface@anonymous/adapters/contracts/tests/Concerns/AdapterConformanceTests\.php\:635\:\:__construct\(\) has parameter \$indexedFields with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/adapters/db/tests/DatabaseAdapterConformanceTest.php
+
+		-
+			message: '#^Method KDuma\\SimpleDAL\\Contracts\\EntityDefinitionInterface@anonymous/adapters/contracts/tests/Concerns/AdapterConformanceTests\.php\:635\:\:__construct\(\) has parameter \$indexedFields with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/adapters/flysystem/tests/FlysystemAdapterConformanceTest.php
+
+		-
+			message: '#^Method KDuma\\SimpleDAL\\Contracts\\EntityDefinitionInterface@anonymous/adapters/contracts/tests/Concerns/AdapterConformanceTests\.php\:635\:\:__construct\(\) has parameter \$indexedFields with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/adapters/flysystem/tests/ZipConformanceTest.php
+
+		-
+			message: '#^Parameter \$hasher of class KDuma\\SimpleDAL\\DataIntegrity\\IntegrityConfig constructor expects KDuma\\SimpleDAL\\DataIntegrity\\Contracts\\HashingAlgorithmInterface\|null, object given\.$#'
+			identifier: argument.type
+			count: 5
+			path: src/plugins/data-integrity/library/tests/IntegrityMigratorTest.php
+
+		-
+			message: '#^Parameter \$signer of class KDuma\\SimpleDAL\\DataIntegrity\\IntegrityConfig constructor expects KDuma\\SimpleDAL\\DataIntegrity\\Contracts\\SigningAlgorithmInterface\|null, object given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/plugins/data-integrity/library/tests/IntegrityMigratorTest.php
+
+		-
+			message: '#^Parameter \$hasher of class KDuma\\SimpleDAL\\DataIntegrity\\IntegrityConfig constructor expects KDuma\\SimpleDAL\\DataIntegrity\\Contracts\\HashingAlgorithmInterface\|null, object given\.$#'
+			identifier: argument.type
+			count: 15
+			path: src/plugins/data-integrity/library/tests/IntegrityStorageAdapterTest.php
+
+		-
+			message: '#^Parameter \$signer of class KDuma\\SimpleDAL\\DataIntegrity\\IntegrityConfig constructor expects KDuma\\SimpleDAL\\DataIntegrity\\Contracts\\SigningAlgorithmInterface\|null, object given\.$#'
+			identifier: argument.type
+			count: 4
+			path: src/plugins/data-integrity/library/tests/IntegrityStorageAdapterTest.php

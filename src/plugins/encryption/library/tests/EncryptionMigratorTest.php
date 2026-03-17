@@ -18,6 +18,7 @@ beforeEach(function () {
 
     $definition = new class('test_entity', false, true, false, []) implements EntityDefinitionInterface
     {
+        /** @param array<string> $indexedFields */
         public function __construct(
             public readonly string $name,
             public readonly bool $isSingleton,

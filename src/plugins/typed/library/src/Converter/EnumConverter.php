@@ -15,13 +15,17 @@ class EnumConverter implements FieldConverterInterface
         private readonly string $enumClass,
     ) {}
 
-    public function fromStorage(mixed $value): mixed
+    public function fromStorage(mixed $value): \BackedEnum
     {
+        assert(is_int($value) || is_string($value));
+
         return $this->enumClass::from($value);
     }
 
-    public function toStorage(mixed $value): mixed
+    public function toStorage(mixed $value): int|string
     {
+        assert($value instanceof \BackedEnum);
+
         return $value->value;
     }
 }

@@ -19,12 +19,10 @@ class TypedSingletonEntity implements TypedSingletonEntityInterface
 
     /**
      * @param  class-string<TypedRecord>|null  $recordClass
-     * @param  class-string<\BackedEnum>|null  $attachmentEnum
      */
     public function __construct(
         private readonly SingletonEntityInterface $inner,
         private readonly ?string $recordClass,
-        private readonly ?string $attachmentEnum,
     ) {}
 
     public function get(): TypedRecord

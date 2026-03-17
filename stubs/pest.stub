@@ -1,0 +1,11 @@
+<?php
+
+namespace Pest\Support;
+
+/**
+ * @method self throws(string|int $exception, ?string $exceptionMessage = null, ?int $exceptionCode = null)
+ * @method self throwsIf(callable|bool $condition, string|int $exception, ?string $exceptionMessage = null, ?int $exceptionCode = null)
+ * @method self throwsUnless(callable|bool $condition, string|int $exception, ?string $exceptionMessage = null, ?int $exceptionCode = null)
+ * @method self throwsNoExceptions()
+ */
+final class HigherOrderTapProxy {}

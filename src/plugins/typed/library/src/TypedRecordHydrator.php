@@ -6,13 +6,14 @@ namespace KDuma\SimpleDAL\Typed;
 
 use KDuma\SimpleDAL\Contracts\RecordInterface;
 use KDuma\SimpleDAL\Typed\Contracts\Attribute\Field;
+use KDuma\SimpleDAL\Typed\Contracts\Converter\FieldConverterInterface;
 use KDuma\SimpleDAL\Typed\Contracts\TypedRecord;
 use KDuma\SimpleDAL\Typed\Converter\EnumConverter;
 use Spatie\Attributes\Attributes;
 
 class TypedRecordHydrator
 {
-    /** @var array<class-string, FieldMapping[]> */
+    /** @var array<class-string, list<FieldMapping>> */
     private static array $cache = [];
 
     /**
@@ -20,7 +21,7 @@ class TypedRecordHydrator
      * Results are cached per class.
      *
      * @param  class-string<TypedRecord>  $class
-     * @return FieldMapping[]
+     * @return list<FieldMapping>
      */
     public static function discoverFields(string $class): array
     {
@@ -39,6 +40,7 @@ class TypedRecordHydrator
 
             $prop = $target->target;
             $field = $target->attribute;
+            assert($field instanceof Field);
 
             // Determine data path
             $path = $field->path ?? self::camelToSnake($prop->getName());
@@ -47,7 +49,9 @@ class TypedRecordHydrator
             $converter = null;
 
             if ($field->converter !== null) {
-                $converter = new ($field->converter)();
+                /** @var class-string<FieldConverterInterface> $converterClass */
+                $converterClass = $field->converter;
+                $converter = new $converterClass();
             } else {
                 // Auto-detect backed enum
                 $type = $prop->getType();
@@ -59,6 +63,7 @@ class TypedRecordHydrator
                         $ref = new \ReflectionEnum($typeName);
 
                         if ($ref->isBacked()) {
+                            /** @var class-string<\BackedEnum> $typeName */
                             $converter = new EnumConverter($typeName);
                         }
                     }
@@ -164,6 +169,8 @@ class TypedRecordHydrator
 
     /**
      * Dehydrate a TypedRecord back to a storage array.
+     *
+     * @return array<string, mixed>
      */
     public static function dehydrateToArray(TypedRecord $record): array
     {
@@ -192,11 +199,13 @@ class TypedRecordHydrator
      */
     public static function camelToSnake(string $name): string
     {
-        return strtolower(preg_replace('/[A-Z]/', '_$0', lcfirst($name)));
+        return strtolower((string) preg_replace('/[A-Z]/', '_$0', lcfirst($name)));
     }
 
     /**
      * Extract a value from a nested array using dot-notation.
+     *
+     * @param  array<string, mixed>  $data
      */
     private static function extractFromData(array $data, string $path): mixed
     {
@@ -216,6 +225,8 @@ class TypedRecordHydrator
 
     /**
      * Remove a value from a nested array using dot-notation.
+     *
+     * @param  array<string, mixed>  $data
      */
     private static function removeFromData(array &$data, string $path): void
     {
@@ -235,6 +246,8 @@ class TypedRecordHydrator
 
     /**
      * Set a value in a nested array using dot-notation.
+     *
+     * @param  array<string, mixed>  $data
      */
     private static function setInData(array &$data, string $path, mixed $value): void
     {
