@@ -17,7 +17,7 @@
     "require": {
         "php": "^8.4",
         "ext-sodium": "*",
-        "kduma/simple-dal-data-integrity-contracts": "^0.0.5"
+        "kduma/simple-dal-data-integrity-contracts": "^0.1"
     },
     "require-dev": {
         "pestphp/pest": "^3.0"
