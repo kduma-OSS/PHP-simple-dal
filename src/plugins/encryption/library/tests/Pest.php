@@ -5,15 +5,22 @@ declare(strict_types=1);
 use KDuma\SimpleDAL\Adapter\Database\DatabaseAdapter;
 use KDuma\SimpleDAL\Encryption\Sodium\SealedBoxAlgorithm;
 use KDuma\SimpleDAL\Encryption\Sodium\SecretBoxAlgorithm;
+use PHPUnit\Framework\TestCase;
 
-abstract class EncryptionTestCase extends \PHPUnit\Framework\TestCase
+abstract class EncryptionTestCase extends TestCase
 {
-    public \PDO $pdo;
+    public PDO $pdo;
+
     public DatabaseAdapter $inner;
+
     public DatabaseAdapter $adapter;
+
     public SecretBoxAlgorithm $symmetricKey;
+
     public SealedBoxAlgorithm $asymmetricKey;
+
     public SecretBoxAlgorithm $keyA;
+
     public SecretBoxAlgorithm $keyB;
 }
 
