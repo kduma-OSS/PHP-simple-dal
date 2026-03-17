@@ -9,7 +9,6 @@ use KDuma\SimpleDAL\Contracts\EntityDefinitionInterface;
 use KDuma\SimpleDAL\Contracts\Exception\AttachmentNotFoundException;
 use KDuma\SimpleDAL\Contracts\Exception\RecordNotFoundException;
 use League\Flysystem\FilesystemOperator;
-use League\Flysystem\UnableToReadFile;
 
 final class DirectoryAdapter implements StorageAdapterInterface
 {
@@ -45,11 +44,11 @@ final class DirectoryAdapter implements StorageAdapterInterface
     {
         $path = "{$entityName}/{$recordId}/data.json";
 
-        try {
-            $contents = $this->filesystem->read($path);
-        } catch (UnableToReadFile) {
+        if (! $this->filesystem->fileExists($path)) {
             throw new RecordNotFoundException("Record '{$recordId}' not found in entity '{$entityName}'.");
         }
+
+        $contents = $this->filesystem->read($path);
 
         return json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
     }
