@@ -15,8 +15,8 @@
     ],
     "require": {
         "php": "^8.4",
-        "kduma/simple-dal-contracts": "^0.1",
-        "kduma/simple-dal-adapter-contracts": "^0.1"
+        "kduma/simple-dal-contracts": "^0.1.0",
+        "kduma/simple-dal-adapter-contracts": "^0.1.0"
     },
     "require-dev": {
         "pestphp/pest": "^3.0"
