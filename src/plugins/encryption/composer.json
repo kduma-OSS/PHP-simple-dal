@@ -16,8 +16,8 @@
     ],
     "require": {
         "php": "^8.4",
-        "kduma/simple-dal-adapter-contracts": "^1.0",
-        "kduma/simple-dal-encryption-contracts": "^1.0"
+        "kduma/simple-dal-adapter-contracts": "^0.1",
+        "kduma/simple-dal-encryption-contracts": "^0.1"
     },
     "require-dev": {
         "pestphp/pest": "^3.0"
@@ -34,7 +34,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "1.0.x-dev"
+            "dev-master": "0.1-dev"
         }
     },
     "config": {
