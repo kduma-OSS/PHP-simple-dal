@@ -16,12 +16,12 @@
     ],
     "require": {
         "php": "^8.4",
-        "kduma/simple-dal-adapter-contracts": "^0.1",
+        "kduma/simple-dal-adapter-contracts": "^0.0.5",
         "league/flysystem": "^3.0"
     },
     "require-dev": {
         "pestphp/pest": "^3.0",
-        "kduma/simple-dal": "^0.1"
+        "kduma/simple-dal": "^0.0.5"
     },
     "suggest": {
         "league/flysystem-ziparchive": "For ZIP archive storage"
