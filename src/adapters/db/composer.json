@@ -16,12 +16,12 @@
     ],
     "require": {
         "php": "^8.4",
-        "kduma/simple-dal-adapter-contracts": "^0.2.0",
+        "kduma/simple-dal-adapter-contracts": "^0.3",
         "ext-pdo": "*"
     },
     "require-dev": {
         "pestphp/pest": "^3.0",
-        "kduma/simple-dal": "^0.2.0"
+        "kduma/simple-dal": "^0.3"
     },
     "autoload": {
         "psr-4": {
@@ -35,7 +35,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "0.2-dev"
+            "dev-master": "0.3-dev"
         }
     },
     "config": {
